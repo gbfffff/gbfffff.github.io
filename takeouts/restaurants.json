@@ -571,11 +571,13 @@
           "item": "Steamed or Pan Fried Dumpling (6pcs) 蒸餃或鍋貼",
           "price": 7.5,
           "popular": true,
+          "orOptions": ["Steamed", "Pan Fried"],
           "category": "Appetizers"
         },
         {
           "item": "Steamed or Fried Veggie Dumplings (6pcs) 素水餃或素鍋貼",
           "price": 7.95,
+          "orOptions": ["Steamed", "Fried"],
           "category": "Appetizers"
         },
         {
@@ -1094,6 +1096,7 @@
           "item": "Shanghai Wong Pan Fried Noodles — Pork or Chicken 上海王家炒二面黃（肉絲/雞絲）",
           "price": 16.95,
           "popular": true,
+          "orOptions": ["Pork", "Chicken"],
           "category": "Chef's Suggestions"
         },
         {
@@ -1144,6 +1147,7 @@
         {
           "item": "Shredded Pork or Chicken with Bamboo Shoot and Chili Pepper 小椒筍尖肉絲/雞絲",
           "price": 17.95,
+          "orOptions": ["Pork", "Chicken"],
           "category": "Chef's Suggestions"
         },
         {
@@ -1745,7 +1749,8 @@
         {
           "item": "Tostadas",
           "price": 5.0,
-          "desc": "Flat deep fried corn tortilla with tinga shredded beef or pata"
+          "desc": "Flat deep fried corn tortilla with tinga shredded beef or pata",
+          "orOptions": ["Beef", "Pata"]
         },
         {
           "item": "Quesadilla",
@@ -1991,6 +1996,7 @@
           "item": "Larb",
           "price": 10,
           "protein": true,
+          "orOptions": ["Chicken", "Pork"],
           "desc": "Spicy ground chicken or pork with rice powder, scallions, red onion, cilantro, chili pepper, fish sauce, and lime juice"
         },
         {
