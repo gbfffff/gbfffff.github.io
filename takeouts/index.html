@@ -25,16 +25,18 @@
       --green:       #007a30;
       --card-bg:     #ffffff;
     }
-    [data-theme="yellow"]   { --accent: #fcf811; --bg: #fcf811; }
-    [data-theme="green"]    { --accent: #39ff14; --bg: #39ff14; }
-    [data-theme="pink"]     { --accent: #fc16ac; --bg: #fc16ac; }
-    [data-theme="cyan"]     { --accent: #04f2d6; --bg: #04f2d6; }
-    [data-theme="white"]    { --accent: #ffffff; --bg: #ffffff; }
-    [data-theme="offwhite"] { --accent: #fafcc4; --bg: #fafcc4; }
-    [data-theme="grey"]     { --accent: #b8c4c6; --bg: #b8c4c6; }
+    [data-theme="yellow"]    { --accent: #fcf811; --bg: #fcf811; }
+    [data-theme="green"]     { --accent: #39ff14; --bg: #39ff14; }
+    [data-theme="pink"]      { --accent: #fc16ac; --bg: #fc16ac; }
+    [data-theme="lightpink"] { --accent: #ffd1e8; --bg: #ffd1e8; }
+    [data-theme="cyan"]      { --accent: #04f2d6; --bg: #04f2d6; }
+    [data-theme="white"]     { --accent: #ffffff; --bg: #ffffff; }
+    [data-theme="offwhite"]  { --accent: #fafcc4; --bg: #fafcc4; }
+    [data-theme="grey"]      { --accent: #b8c4c6; --bg: #b8c4c6; }
     body.dark[data-theme="yellow"],
     body.dark[data-theme="green"],
     body.dark[data-theme="pink"],
+    body.dark[data-theme="lightpink"],
     body.dark[data-theme="cyan"],
     body.dark[data-theme="white"],
     body.dark[data-theme="offwhite"],
@@ -1217,6 +1219,7 @@
     <div class="theme-swatch" data-theme="yellow" style="background:#fcf811" title="Acid Yellow"></div>
     <div class="theme-swatch" data-theme="green"  style="background:#39ff14" title="Acid Green"></div>
     <div class="theme-swatch" data-theme="pink"   style="background:#fc16ac" title="Acid Pink"></div>
+    <div class="theme-swatch" data-theme="lightpink" style="background:#ffd1e8" title="Light Pink"></div>
     <div class="theme-swatch" data-theme="cyan"   style="background:#04f2d6" title="Cyan"></div>
     <div class="theme-swatch" data-theme="white"    style="background:#ffffff" title="White"></div>
     <div class="theme-swatch" data-theme="offwhite" style="background:#fafcc4" title="Off White"></div>
@@ -2567,7 +2570,7 @@ function startCountdown() {
 // ── Theme & dark mode ──────────────────────────────────────────────────
 (function() {
   const SWATCH_COLORS = {
-    yellow: "#fcf811", green: "#39ff14", pink: "#fc16ac", cyan: "#04f2d6", white: "#ffffff", offwhite: "#fafcc4", grey: "#b8c4c6"
+    yellow: "#fcf811", green: "#39ff14", pink: "#fc16ac", lightpink: "#ffd1e8", cyan: "#04f2d6", white: "#ffffff", offwhite: "#fafcc4", grey: "#b8c4c6"
   };
   const switcher   = document.getElementById("theme-switcher");
   const darkBtn    = document.getElementById("dark-toggle");
@@ -2587,7 +2590,9 @@ function startCountdown() {
     localStorage.setItem("darkMode", on ? "1" : "0");
   }
 
-  applyTheme(localStorage.getItem("theme") || "yellow");
+  const themeNames = Object.keys(SWATCH_COLORS);
+  const randomTheme = themeNames[Math.floor(Math.random() * themeNames.length)];
+  applyTheme(localStorage.getItem("theme") || randomTheme);
   applyDark(localStorage.getItem("darkMode") === "1");
 
   currentEl.addEventListener("click", e => {
