@@ -1,0 +1,2667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>::::/ Friday Takeout /::: GBF :::://///</title>
+  <style>
+    :root {
+      --accent:      #fcf811;
+      --bg:          #fcf811;
+      --ink:         #000000;
+      --surface:     #ffffff;
+      --surface-2:   #f0faf4;
+      --border:      #000000;
+      --border-2:    #000000;
+      --yellow:      #000000;
+      --yellow-dim:  rgba(0,0,0,0.06);
+      --yellow-glow: rgba(0,0,0,0.12);
+      --gold:        #000000;
+      --text:        #000000;
+      --text-muted:  #1a1a1a;
+      --text-dim:    #444444;
+      --red:         #cc0000;
+      --red-dim:     rgba(204,0,0,0.08);
+      --green:       #007a30;
+      --card-bg:     #ffffff;
+    }
+    [data-theme="yellow"]   { --accent: #fcf811; --bg: #fcf811; }
+    [data-theme="green"]    { --accent: #39ff14; --bg: #39ff14; }
+    [data-theme="pink"]     { --accent: #fc16ac; --bg: #fc16ac; }
+    [data-theme="cyan"]     { --accent: #04f2d6; --bg: #04f2d6; }
+    [data-theme="white"]    { --accent: #ffffff; --bg: #ffffff; }
+    [data-theme="offwhite"] { --accent: #fafcc4; --bg: #fafcc4; }
+    [data-theme="grey"]     { --accent: #b8c4c6; --bg: #b8c4c6; }
+    body.dark[data-theme="yellow"],
+    body.dark[data-theme="green"],
+    body.dark[data-theme="pink"],
+    body.dark[data-theme="cyan"],
+    body.dark[data-theme="white"],
+    body.dark[data-theme="offwhite"],
+    body.dark[data-theme="grey"]    { --bg: #000; }
+    body.dark {
+      --bg:          #000000;
+      --ink:         var(--accent);
+      --surface:     #111111;
+      --surface-2:   #1a1a1a;
+      --border:      var(--accent);
+      --border-2:    var(--accent);
+      --yellow:      var(--accent);
+      --yellow-dim:  rgba(255,255,255,0.06);
+      --yellow-glow: rgba(255,255,255,0.12);
+      --gold:        var(--accent);
+      --text:        var(--accent);
+      --text-muted:  var(--accent);
+      --text-dim:    var(--accent);
+      --red:         #ff4444;
+      --red-dim:     rgba(255,68,68,0.12);
+      --green:       #00cc55;
+      --card-bg:     #111111;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0 !important; }
+    * { box-shadow: none !important; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+      font-size: 1.25rem;
+    }
+
+    .container { max-width: 860px; margin: 0 auto; }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #000;
+    }
+
+    /* ── Lightbulb marquee ── */
+    .marquee-sign {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      padding: 1rem 0 0.5rem;
+      border-top: 3px solid #000;
+      border-bottom: 3px solid #000;
+    }
+    .marquee-friday-text {
+      font-size: clamp(2.5rem, 12vw, 5rem);
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #000;
+      line-height: 1;
+    }
+
+    .site-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .header-body {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      border: 2px solid #000;
+    }
+
+    .header-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.25rem 1.5rem;
+      border-right: 2px solid #000;
+      gap: 0.4rem;
+    }
+
+    .header-left .site-label { margin-bottom: 0; }
+
+    .big-date {
+      font-size: clamp(1.6rem, 5vw, 2.8rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      color: #000;
+      line-height: 1.15;
+    }
+    .big-date-year {
+      display: block;
+      font-size: clamp(2.4rem, 8vw, 4.5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      color: #000;
+    }
+
+    .order-countdown {
+      display: flex;
+      align-items: stretch;
+      background: #000;
+      color: var(--accent);
+      border-bottom: 2px solid #000;
+      font-family: "Courier New", Courier, monospace;
+    }
+    .order-countdown.closed {
+      justify-content: center;
+      padding: 0.75rem 1rem;
+      font-weight: 900;
+      font-size: 0.85rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+    .countdown-label {
+      padding: 0.6rem 1rem;
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border-right: 2px solid var(--accent);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      opacity: 0.85;
+      line-height: 1.3;
+    }
+    .countdown-label-time {
+      font-size: 1.3rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      border-bottom: 1px dashed color-mix(in srgb, var(--accent) 50%, transparent);
+    }
+    .countdown-time-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: "Courier New", Courier, monospace;
+      font-size: 1rem;
+      font-weight: 900;
+      width: 5ch;
+      text-align: center;
+      outline: none;
+    }
+    .countdown-units {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: 0.5rem 0.75rem;
+    }
+    .countdown-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .countdown-sep {
+      font-size: clamp(2rem, 7vw, 3rem);
+      font-weight: 900;
+      font-family: "Courier New", Courier, monospace;
+      line-height: 1;
+      padding: 0 0.15rem;
+      padding-bottom: 1rem;
+      opacity: 0.6;
+    }
+    .countdown-num {
+      font-size: clamp(2rem, 7vw, 3rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.04em;
+      font-family: "Courier New", Courier, monospace;
+    }
+    .countdown-unit-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0.6;
+      margin-top: 0.3rem;
+    }
+
+    .friday-calendar {
+      display: none;
+      min-width: 200px;
+      flex-shrink: 0;
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .fcal-row {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      border-bottom: 1px solid #000;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .fcal-row:last-child { border-bottom: none; }
+    .fcal-date {
+      width: 5rem;
+      flex-shrink: 0;
+      padding: 0.5rem 0.7rem;
+      border-right: 1px solid #000;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .fcal-name {
+      padding: 0.5rem 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .fcal-current {
+      background: #000;
+      color: var(--accent);
+    }
+    .fcal-current .fcal-date { border-right-color: #333; }
+    .fcal-current .fcal-name { color: var(--accent); }
+
+    .restaurant-badge {
+      background: #000;
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 0.88rem;
+      letter-spacing: 0.02em;
+      padding: 0.3rem 0.85rem;
+      border-radius: 0;
+    }
+
+    .date-badge {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--bg);
+      border: 2px solid #000;
+      border-radius: 0;
+      margin-bottom: 1rem;
+    }
+
+    .card-header {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-header h2 {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .card-body { padding: 1.25rem; }
+
+    /* ── Orders-so-far summary ── */
+    .orders-summary {
+      background: transparent;
+      border: 2px solid #000;
+      border-left: 4px solid #000;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 1rem;
+    }
+
+    .orders-summary-title {
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #000;
+      margin-bottom: 0.5rem;
+    }
+
+    .orders-summary-row { color: #000; line-height: 1.8; font-size: 1rem; }
+    .orders-summary-name { color: #000; font-weight: 700; font-size: 1.15rem; }
+
+    /* ── Form elements ── */
+    .field-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 2px solid #000;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.92rem;
+      font-family: inherit;
+      color: #000;
+      outline: none;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      background: color-mix(in srgb, var(--accent) 60%, #fff);
+    }
+
+    textarea { resize: vertical; min-height: 72px; }
+
+    .field-group { margin-bottom: 1rem; }
+
+    /* ── Menu search + dropdown ── */
+    .menu-search-wrap { position: relative; }
+
+    .menu-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: var(--bg);
+      border: 2px solid #000;
+      max-height: 60vh;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .menu-dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.65rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid #000;
+      transition: background 0.1s;
+    }
+
+    .menu-dropdown-item:last-child { border-bottom: none; }
+
+    .menu-dropdown-item:hover,
+    .menu-dropdown-item.focused {
+      background: #000; color: var(--accent);
+    }
+    .menu-dropdown-item:hover .dd-name,
+    .menu-dropdown-item:hover .dd-price,
+    .menu-dropdown-item:hover .dd-protein,
+    .menu-dropdown-item.focused .dd-name,
+    .menu-dropdown-item.focused .dd-price,
+    .menu-dropdown-item.focused .dd-protein { color: var(--accent) !important; opacity: 1; }
+
+    .menu-dropdown-item.is-selected { opacity: 0.4; cursor: default; }
+
+    .dd-name { font-size: 1rem; color: var(--text); flex: 1; }
+
+    .dd-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-shrink: 0;
+    }
+
+    .dd-price { font-size: 1rem; color: var(--text-muted); }
+    .dd-protein { font-size: 0.72rem; color: var(--gold); opacity: 0.8; margin-left: 0.3rem; font-style: italic; }
+
+    .dd-taken {
+      font-size: 0.72rem;
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    .menu-dropdown-empty {
+      padding: 0.8rem 1rem;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    /* Selected item pills */
+    .selected-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+    }
+
+    .selected-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.5rem 0.3rem 0.75rem;
+      background: #000;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      border: 2px solid #000;
+    }
+
+    .selected-pill.is-taken {
+      background: #cc0000;
+      border-color: #cc0000;
+      color: #fff;
+    }
+
+    .pill-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0;
+      opacity: 0.6;
+      transition: opacity 0.1s;
+      font-family: inherit;
+    }
+
+    .pill-remove:hover { opacity: 1; }
+
+    /* ── Duplicate warning ── */
+    .dup-warning {
+      display: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #cc0000;
+      margin-top: 0.5rem;
+    }
+    .dup-warning.show { display: block; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.12s, background 0.12s;
+      margin-top: 1.25rem;
+    }
+
+    .btn-primary {
+      background: #000;
+      color: var(--accent);
+    }
+
+    .btn-primary:hover { background: #000; color: var(--accent); opacity: 1; }
+
+    #order-btn:hover {
+      color: #000;
+      background-color: var(--accent);
+      background-image: repeating-linear-gradient(
+        45deg,
+        #000 0px, #000 6px,
+        var(--accent) 6px, var(--accent) 14px
+      );
+    }
+    .btn-primary:disabled { background: #ccc; color: #888; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid #000;
+      color: #000;
+    }
+
+    .btn-secondary:hover { background: #000; color: var(--accent); }
+
+    /* ── Success ── */
+    .success-msg {
+      display: none;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--green);
+    }
+
+    /* ── Badge ── */
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-yellow { background: #000; color: var(--accent); }
+    .badge-dim    { background: transparent; color: #000; border: 2px solid #000; }
+
+    /* ── Orders table ── */
+    .orders-table-wrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    table colgroup .col-name    { width: 18%; }
+    table colgroup .col-items   { width: auto; }
+    table colgroup .col-total   { width: 10%; }
+    table colgroup .col-actions { width: 5.5rem; }
+
+    thead th {
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #000;
+      padding: 0.65rem 1.25rem;
+      border-bottom: 2px solid #000;
+      background: var(--bg);
+    }
+
+    tbody tr { border-bottom: 1px solid #000; background: var(--bg); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #000; color: var(--accent); }
+    tbody tr:hover td, tbody tr:hover .td-name, tbody tr:hover .td-items,
+    tbody tr:hover .td-notes, tbody tr:hover .td-total { color: var(--accent) !important; }
+
+    tbody td { padding: 0.8rem 1.25rem; font-size: 1.1rem; vertical-align: top; }
+    .td-name  { font-weight: 700; color: var(--text); word-break: break-word; }
+    .td-items { color: var(--text-muted); }
+    .td-actions {
+      text-align: center;
+      vertical-align: top;
+      padding: 0.4rem 0.5rem;
+      white-space: nowrap;
+    }
+    .td-actions-inner {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0;
+    }
+    @media (max-width: 520px) {
+      .td-actions-inner { flex-direction: column; }
+    }
+    .td-total-cell { white-space: nowrap; vertical-align: top; padding-top: 0.8rem; }
+    .td-total { font-weight: 700; font-size: 1rem; display: block; padding-top: 0.15rem; }
+    .td-item-row { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; line-height: 1.7; }
+    .td-item-price { font-size: 1rem; color: var(--text-dim); font-weight: 600; white-space: nowrap; }
+    .order-row-edit-btn, .order-row-delete-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 1.25rem; padding: 0.3rem;
+      opacity: 0.4; line-height: 1;
+      color: inherit; transition: color 0.15s, opacity 0.15s;
+      width: 2.2rem; height: 2.2rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .order-row-edit-btn svg { width: 1.25rem; height: 1.25rem; }
+    .order-row-edit-btn:hover { opacity: 1; }
+    .order-row-delete-btn:hover { opacity: 1; color: #e05555; }
+    .td-notes { color: var(--text-dim); font-size: 0.78rem; }
+
+    .dup-item { color: var(--red); font-weight: 600; }
+
+    .dup-banner {
+      padding: 0.65rem 1.25rem;
+      background: var(--red-dim);
+      border-bottom: 1px solid rgba(240,80,80,0.2);
+      font-size: 0.76rem;
+      color: var(--red);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Trending ── */
+    .trend-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.3rem 0;
+      font-size: 0.84rem;
+    }
+    .trend-name { flex: 1; color: var(--text); }
+    .trend-bar-wrap { width: 100px; height: 4px; background: #000; flex-shrink: 0; }
+    .trend-bar { height: 100%; background: #000; }
+    .trend-count { font-size: 0.75rem; color: var(--text-muted); width: 2rem; text-align: right; flex-shrink: 0; }
+    .trending-note { font-size: 0.74rem; color: var(--text-dim); margin-top: 0.75rem; }
+
+
+    /* ── Order info strip ── */
+    #order-info-strip {
+      padding: 0.6rem 1.25rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+      align-items: center;
+    }
+    .oi-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #000;
+      text-decoration: none;
+      padding: 0.28rem 0.6rem;
+      border: 2px solid #000;
+      white-space: nowrap;
+      transition: background 0.1s;
+    }
+    .oi-link:hover { background: #000; color: var(--accent); }
+    .oi-phone { color: #000; }
+    .oi-name {
+      font-weight: 900;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-right: 0.25rem;
+    }
+
+    /* ── Traffic card ── */
+    .traffic-map-wrap {
+      overflow: hidden;
+      height: 160px;
+      background-color: var(--accent);
+      background-image: repeating-linear-gradient(
+        45deg,
+        #000 0px, #000 10px,
+        var(--accent) 10px, var(--accent) 24px
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .traffic-coming-soon {
+      background: #000;
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 0.35rem 1rem;
+    }
+
+    .traffic-note {
+      padding: 0.55rem 1.25rem;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Menu URL link ── */
+    .menu-url-link {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--yellow);
+      text-decoration: none;
+      opacity: 0.7;
+      transition: opacity 0.1s;
+    }
+    .menu-url-link:hover { opacity: 1; }
+
+    /* ── Menu image banner ── */
+    /* ── Menu image gallery ── */
+    .menu-img-strip {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      grid-column: 1 / -1;
+      margin-bottom: 0.5rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-2) transparent;
+    }
+    .menu-img-strip::-webkit-scrollbar { height: 3px; }
+    .menu-img-strip::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+    .menu-img-thumb {
+      flex: 0 0 auto;
+      height: 180px;
+      width: auto;
+      max-width: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      cursor: zoom-in;
+      filter: grayscale(100%) contrast(1.15);
+      transition: filter 0.2s, border-color 0.2s;
+    }
+    .menu-img-thumb:hover {
+      filter: grayscale(0%) contrast(1);
+      border-color: var(--border-2);
+    }
+    .menu-img-strip.single .menu-img-thumb { width: 100%; height: 200px; }
+
+    /* ── Lightbox ── */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.93);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 88vw;
+      max-height: 88vh;
+      object-fit: contain;
+      border-radius: 4px;
+      border: 1px solid var(--border-2);
+      box-shadow: 0 0 60px rgba(0,0,0,0.8);
+      cursor: default;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 2rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+      z-index: 1;
+    }
+    .lightbox-close:hover { color: var(--text); }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 1.6rem;
+      line-height: 1;
+      width: 2.6rem;
+      height: 2.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 1;
+    }
+    .lightbox-nav:hover { background: rgba(196,152,36,0.2); border-color: var(--border-2); }
+    .lightbox-nav.prev { left: 1rem; }
+    .lightbox-nav.next { right: 1rem; }
+    .lightbox-nav[hidden] { display: none; }
+    .lightbox-counter {
+      position: absolute;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Menu panel ── */
+    .menu-panel {
+      display: block;
+      max-height: 520px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-2) transparent;
+    }
+
+    @media (max-width: 600px) { .mpi-grid { grid-template-columns: 1fr; } }
+
+    .menu-panel::-webkit-scrollbar { width: 4px; }
+    .menu-panel::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+
+    .mpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .mpi {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.55rem 1.25rem;
+      cursor: pointer;
+      transition: background 0.1s;
+      background: var(--bg);
+      border-bottom: 1px solid #000;
+      border-right: 1px solid #000;
+    }
+
+    .mpi-grid .mpi:nth-child(even) { border-right: none; }
+    .mpi-grid .mpi:last-child { border-bottom: none; }
+    .mpi-grid .mpi:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+    .mpi:hover { background: #000; color: var(--accent); }
+    .mpi:hover .mpi-name, .mpi:hover .mpi-price, .mpi:hover .mpi-desc,
+    .mpi:hover .mpi-protein-hint { color: var(--accent) !important; opacity: 1; }
+
+    .mpi-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      min-width: 0;
+    }
+
+    .mpi-name { font-size: 1rem; color: #000; line-height: 1.3; }
+    .mpi-desc { font-size: 0.8rem; color: #333; opacity: 0.75; line-height: 1.3; font-style: italic; }
+    .mpi-price { font-size: 1rem; font-weight: 700; color: #000; white-space: nowrap; flex-shrink: 0; padding-top: 0.1rem; }
+
+    .protein-btn {
+      padding: 0.38rem 0.75rem;
+      border: 2px solid #000;
+      background: var(--bg);
+      color: #000;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .protein-btn-add { background: #000; color: var(--accent); border-color: #000; }
+    .protein-btn:hover { background: #000; color: var(--accent); }
+    .extras-option-btn { border-color: #000; }
+    .extras-option-btn:hover { background: #000; color: var(--accent); opacity: 1; }
+    .mpi-trend-mark { font-size: 0.8em; margin-right: 0.2rem; }
+    .mpi-section-label {
+      grid-column: 1 / -1;
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #000;
+      padding: 0.6rem 1rem 0.3rem;
+      background: var(--bg);
+    }
+    .mpi-popular-block, .mpi-cat-block {
+      grid-column: 1 / -1;
+      border-bottom: 2px solid #000;
+    }
+    .mpi-popular-block .mpi { background: var(--accent); }
+    .mpi-popular-block .mpi:hover { background: var(--ink); color: var(--accent); }
+    .mpi-cat-block:last-child { border-bottom: none; }
+    .mpi-popular-block .mpi-section-label,
+    .mpi-cat-block     .mpi-section-label {
+      border-bottom: 1px solid #000;
+    }
+    @media (max-width: 600px) {
+      .mpi-popular-block, .mpi-cat-block { grid-template-columns: 1fr; }
+    }
+
+    /* ── Mobile layout ── */
+    @media (max-width: 600px) {
+      body { padding: 1rem 0.5rem 3rem; }
+
+      /* Single column menu items */
+      .mpi-grid { grid-template-columns: 1fr !important; }
+      .mpi-grid .mpi { border-right: none !important; }
+      .mpi-grid .mpi:nth-last-child(2):nth-child(odd) { border-bottom: 1px solid #000; }
+
+      /* Header: stack calendar below date */
+      .header-body { flex-direction: column; }
+      .header-left {
+        border-right: none;
+        border-bottom: 2px solid #000;
+        padding: 1.5rem 1rem;
+        align-items: center;
+        text-align: center;
+      }
+      .big-date {
+        font-size: clamp(3rem, 14vw, 5rem);
+        line-height: 1.05;
+      }
+      .big-date-year {
+        font-size: clamp(5rem, 22vw, 8rem);
+      }
+      .restaurant-badge {
+        font-size: 1.1rem;
+        padding: 0.4rem 1.25rem;
+        width: 100%;
+        text-align: center;
+        display: block;
+      }
+      .friday-calendar { min-width: unset; width: 100%; }
+      .fcal-current { margin: 0; }
+
+      /* Tables: fixed layout with wider name/items columns */
+      .orders-table-wrap { margin: 0; }
+      table { table-layout: fixed; width: 100%; }
+      .col-name    { width: 22%; }
+      .td-name { font-size: 0.85rem; }
+      .col-items   { width: auto; }
+      .col-total   { width: 4.5rem; }
+      .col-actions { width: 2.8rem; }
+      tbody td { padding: 0.6rem 0.5rem; }
+      .td-total-cell { padding-left: 0.25rem; }
+      .td-actions { padding: 0.4rem 0.15rem; }
+
+      /* Countdown: stack units vertically, full width digital style */
+      .order-countdown {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .countdown-label {
+        border-right: none;
+        border-bottom: 2px solid var(--accent);
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+      }
+      .countdown-label-time { font-size: 1rem; }
+      .countdown-units {
+        flex-direction: column;
+        padding: 0.5rem 1rem;
+        gap: 0;
+        align-items: stretch;
+      }
+      .countdown-unit {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      }
+      .countdown-unit:last-child { border-bottom: none; }
+      .countdown-sep { display: none; }
+      .countdown-num {
+        font-size: clamp(3rem, 18vw, 5rem);
+        letter-spacing: 0.08em;
+        text-shadow: 0 0 12px currentColor;
+      }
+      .countdown-unit-label {
+        font-size: 1rem;
+        letter-spacing: 0.3em;
+        opacity: 0.5;
+        margin-top: 0;
+        text-align: right;
+      }
+    }
+    .dd-popular { margin-right: 0.2rem; font-size: 0.8em; }
+    .mpi-protein-hint { font-size: 0.68rem; color: #000; opacity: 0.6; margin-left: 0.35rem; font-style: italic; }
+    .mpi-taken-badge {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #cc0000;
+      margin-top: 0.15rem;
+      letter-spacing: 0.02em;
+    }
+    .mpi-is-taken { border-left: 3px solid #cc0000; }
+
+    /* ── Dark mode overrides ── */
+    body.dark { color-scheme: dark; }
+    body.dark header,
+    body.dark .marquee-sign { border-color: var(--ink); }
+    body.dark .marquee-sign { border-color: var(--ink); }
+    body.dark .marquee-friday-text { color: var(--ink); }
+    body.dark .big-date,
+    body.dark .big-date-year { color: var(--ink); }
+    body.dark .header-body { border-color: var(--ink); }
+    body.dark .header-left { border-color: var(--ink); }
+    body.dark .fcal-row { border-color: var(--ink); }
+    body.dark .fcal-date { border-color: var(--ink); }
+    body.dark .fcal-current { background: var(--ink); color: var(--bg); }
+    body.dark .fcal-current .fcal-date { border-right-color: #999; }
+    body.dark .fcal-current .fcal-name { color: var(--bg); }
+    body.dark .restaurant-badge { background: var(--ink); color: var(--bg); }
+    body.dark .order-countdown { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    body.dark .countdown-label { border-right-color: var(--bg); }
+    body.dark .countdown-label-time { border-bottom-color: rgba(0,0,0,0.5); }
+    body.dark .countdown-time-input { border-color: var(--bg); color: var(--bg); }
+    body.dark .countdown-unit { border-right-color: rgba(0,0,0,0.25); }
+    body.dark .card { border-color: var(--ink); }
+    body.dark .orders-summary { border-color: var(--ink); }
+    body.dark .orders-summary-title,
+    body.dark .orders-summary-row,
+    body.dark .orders-summary-name { color: var(--ink); }
+    body.dark input[type="text"],
+    body.dark textarea { border-color: var(--ink); color: var(--ink); }
+    body.dark input[type="text"]:focus,
+    body.dark textarea:focus { background: #1a1a00; }
+    body.dark .menu-dropdown { border-color: var(--ink); }
+    body.dark .menu-dropdown-item { border-bottom-color: var(--ink); }
+    body.dark .menu-dropdown-item:hover,
+    body.dark .menu-dropdown-item.focused { background: var(--ink); color: var(--bg); }
+    body.dark .menu-dropdown-item:hover .dd-name,
+    body.dark .menu-dropdown-item:hover .dd-price,
+    body.dark .menu-dropdown-item:hover .dd-protein,
+    body.dark .menu-dropdown-item.focused .dd-name,
+    body.dark .menu-dropdown-item.focused .dd-price,
+    body.dark .menu-dropdown-item.focused .dd-protein { color: var(--bg) !important; }
+    body.dark .selected-pill { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    body.dark .badge-yellow { background: var(--ink); color: var(--bg); }
+    body.dark .badge-dim { border-color: var(--ink); color: var(--ink); }
+    body.dark .btn-primary { background: var(--ink); color: var(--bg); }
+    body.dark #order-btn:hover {
+      color: var(--ink);
+      background-color: var(--bg);
+      background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 6px, var(--bg) 6px, var(--bg) 14px);
+    }
+    body.dark .btn-secondary { border-color: var(--ink); color: var(--ink); }
+    body.dark .btn-secondary:hover { background: var(--ink); color: var(--bg); }
+    body.dark thead th { color: var(--ink); border-color: var(--ink); }
+    body.dark tbody tr { border-color: var(--ink); }
+    body.dark tbody tr:hover { background: var(--ink); color: var(--bg); }
+    body.dark tbody tr:hover td,
+    body.dark tbody tr:hover .td-name,
+    body.dark tbody tr:hover .td-items,
+    body.dark tbody tr:hover .td-notes,
+    body.dark tbody tr:hover .td-total { color: var(--bg) !important; }
+    body.dark .trend-bar-wrap,
+    body.dark .trend-bar { background: var(--ink); }
+    body.dark .oi-link { color: var(--ink); border-color: var(--ink); }
+    body.dark .oi-link:hover { background: var(--ink); color: var(--bg); }
+    body.dark .oi-phone { color: var(--ink); }
+    body.dark .traffic-map-wrap {
+      background-color: var(--bg);
+      background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 10px, var(--bg) 10px, var(--bg) 24px);
+    }
+    body.dark .traffic-coming-soon { background: var(--ink); color: var(--bg); }
+    body.dark .mpi { border-color: var(--ink); }
+    body.dark .mpi:hover { background: var(--ink); color: var(--bg); }
+    body.dark .mpi:hover .mpi-name,
+    body.dark .mpi:hover .mpi-price,
+    body.dark .mpi:hover .mpi-desc,
+    body.dark .mpi:hover .mpi-protein-hint { color: var(--bg) !important; }
+    body.dark .mpi-name { color: var(--ink); }
+    body.dark .mpi-desc { color: #aaa800; }
+    body.dark .mpi-price { color: var(--ink); }
+    body.dark .mpi-section-label { color: var(--ink); }
+    body.dark .mpi-popular-block,
+    body.dark .mpi-cat-block { border-color: var(--ink); }
+    body.dark .mpi-popular-block .mpi { background: #111100; }
+    body.dark .mpi-popular-block .mpi-section-label,
+    body.dark .mpi-cat-block .mpi-section-label { border-bottom-color: var(--ink); }
+    body.dark .mpi-protein-hint { color: var(--ink); }
+    body.dark .protein-btn { border-color: var(--ink); color: var(--ink); }
+    body.dark .protein-btn-add { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    body.dark .protein-btn:hover { background: var(--ink); color: var(--bg); }
+    body.dark .extras-option-btn { border-color: var(--ink); }
+    body.dark .extras-option-btn:hover { background: var(--ink); color: var(--bg); }
+    /* ── Theme switcher ── */
+    .theme-switcher {
+      position: fixed;
+      bottom: 1.25rem;
+      right: 1.25rem;
+      z-index: 500;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .theme-options {
+      display: flex;
+      flex-direction: row;
+      gap: 0.4rem;
+      overflow: hidden;
+      max-width: 0;
+      opacity: 0;
+      transition: max-width 0.25s ease, opacity 0.2s ease;
+    }
+    .theme-switcher.open .theme-options {
+      max-width: 20rem;
+      opacity: 1;
+    }
+    .theme-swatch {
+      width: 2rem;
+      height: 2rem;
+      border: 2px solid #000;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.1s;
+    }
+    .theme-swatch:hover { transform: scale(1.15); }
+    .theme-swatch-current {
+      width: 2rem;
+      height: 2rem;
+      border: 3px solid #000;
+      cursor: pointer;
+      flex-shrink: 0;
+      outline: 2px solid #fff;
+      outline-offset: 1px;
+      transition: transform 0.1s;
+    }
+    .theme-swatch-current:hover { transform: scale(1.08); }
+    .theme-dark-btn {
+      width: 2rem;
+      height: 2rem;
+      background: #000;
+      color: var(--accent);
+      border: 2px solid #000;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    body.dark .theme-dark-btn { background: var(--accent); color: #000; border-color: var(--accent); }
+    body.dark .theme-swatch,
+    body.dark .theme-swatch-current { border-color: var(--accent); outline-color: rgba(0,0,0,0.4); }
+
+    /* ── Placeholder ── */
+    .placeholder {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--text-dim);
+      font-size: 0.84rem;
+    }
+
+    .error-text { color: var(--red); }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0.25rem 0 1.25rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    footer button {
+      background: none; border: none;
+      color: var(--yellow); cursor: pointer;
+      font-size: 0.72rem; margin-left: 0.5rem;
+      opacity: 0.7;
+      transition: opacity 0.1s;
+    }
+
+    footer button:hover { opacity: 1; }
+  </style>
+</head>
+<body>
+<div class="theme-switcher" id="theme-switcher">
+  <button class="theme-dark-btn" id="dark-toggle" title="Toggle dark mode">☾</button>
+  <div class="theme-swatch-current" id="theme-current" title="Change color"></div>
+  <div class="theme-options" id="theme-options">
+    <div class="theme-swatch" data-theme="yellow" style="background:#fcf811" title="Acid Yellow"></div>
+    <div class="theme-swatch" data-theme="green"  style="background:#39ff14" title="Acid Green"></div>
+    <div class="theme-swatch" data-theme="pink"   style="background:#fc16ac" title="Acid Pink"></div>
+    <div class="theme-swatch" data-theme="cyan"   style="background:#04f2d6" title="Cyan"></div>
+    <div class="theme-swatch" data-theme="white"    style="background:#ffffff" title="White"></div>
+    <div class="theme-swatch" data-theme="offwhite" style="background:#fafcc4" title="Off White"></div>
+    <div class="theme-swatch" data-theme="grey"     style="background:#b8c4c6" title="Grey"></div>
+  </div>
+</div>
+<div class="container">
+
+  <header>
+    <div class="marquee-sign"><span class="marquee-friday-text">TAKEOUT ORDER</span></div>
+    <div class="header-body">
+      <div class="header-left">
+        <p class="site-label">Weekly Group Order</p>
+        <div class="big-date" id="friday-date"></div>
+        <span class="restaurant-badge" id="restaurant-name">Loading</span>
+      </div>
+      <div id="friday-calendar" class="friday-calendar" style="display:none"></div>
+    </div>
+  </header>
+
+  <!-- MENU PANEL -->
+  <div class="card" id="menu-panel-card" style="display:none">
+    <div class="card-header">
+      <h2 id="menu-panel-title">Menu</h2>
+    </div>
+    <div class="menu-panel" id="menu-panel"></div>
+  </div>
+
+  <!-- ORDER FORM -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Place Order</h2>
+      <span class="badge badge-yellow" id="order-count">0</span>
+    </div>
+    <div id="order-countdown" class="order-countdown"></div>
+    <div class="card-body">
+      <form id="order-form">
+
+        <div class="orders-summary" id="orders-summary" style="display:none">
+          <div class="orders-summary-title">Orders so far</div>
+          <div id="orders-summary-body"></div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="order-name">Name</label>
+          <input type="text" id="order-name" placeholder="Your name" required />
+        </div>
+
+        <div class="field-group" id="menu-section">
+          <!-- built from restaurants.json -->
+        </div>
+
+        <div class="dup-warning" id="dup-warning">
+          <span id="dup-warning-text"></span>
+        </div>
+
+        <div class="field-group" style="margin-top:1rem">
+          <label class="field-label" for="order-notes">Special Requests</label>
+          <textarea id="order-notes" placeholder="No onions, extra sauce…"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="order-btn">Submit Order</button>
+      </form>
+      <div class="success-msg" id="order-success">
+        Order submitted. See you Friday.
+        <div id="order-success-items" style="margin-top:0.5rem;font-size:0.82rem;color:var(--text-muted);line-height:1.5"></div>
+        <br><button type="button" class="btn btn-secondary" id="edit-order-btn" style="margin-top:0.5rem;font-size:0.8rem">Edit My Order</button>
+      </div>
+      <div id="form-trending" style="display:none;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border)">
+        <div class="field-label" id="form-trending-title" style="margin-bottom:0.6rem"></div>
+        <div id="form-trending-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDERS LIST -->
+  <div class="card">
+    <div class="card-header">
+      <h2>This Week's Orders</h2>
+      <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.04em">
+        <input type="checkbox" id="tax-toggle" style="accent-color:#000;width:13px;height:13px">
+        +6% TAX
+      </label>
+    </div>
+    <div id="order-info-strip" style="display:none"></div>
+    <div id="orders-container">
+      <div class="placeholder">No orders yet.</div>
+    </div>
+  </div>
+
+  <!-- TRENDING -->
+  <div class="card" id="trending-card" style="display:none">
+    <div class="card-header">
+      <h2>Trending Dishes</h2>
+      <span class="badge badge-dim" id="trending-restaurant-label"></span>
+    </div>
+    <div id="trending-container" class="card-body" style="padding-bottom:1rem">
+      <div class="placeholder">Loading…</div>
+    </div>
+  </div>
+
+
+  <!-- TRAFFIC -->
+  <div class="card">
+    <div class="card-header"><h2>Traffic</h2></div>
+    <div class="traffic-map-wrap">
+      <span class="traffic-coming-soon">Coming Soon</span>
+    </div>
+  </div>
+
+  <footer>
+    <span id="last-updated" style="display:none"></span>
+  </footer>
+
+</div>
+<script src="config.js"></script>
+<script>
+
+const _cfg            = window.TAKEOUT_CONFIG || {};
+const APPS_SCRIPT_URL = _cfg.APPS_SCRIPT_URL  || "";
+const FORM_URL        = _cfg.FORM_URL         || "";
+const FORM_NAME_ENTRY = _cfg.FORM_NAME_ENTRY  || "";
+const FORM_ORDER_ENTRY= _cfg.FORM_ORDER_ENTRY || "";
+const SHEET_ID        = _cfg.SHEET_ID         || "";
+const ORDERS_GID      = _cfg.ORDERS_GID       || "0";
+
+let currentFriday = null;
+let takenItems    = {};
+let allMenuItems  = [];
+let selectedItems = [];
+let trendingItems = new Set(); // base names of top-trending dishes
+
+// ── Date helpers ────────────────────────────────────────────────────
+
+function getThisFriday() {
+  const d    = new Date();
+  const diff = d.getDay() <= 5 ? 5 - d.getDay() : 6;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function toYMD(d) { return d.toISOString().slice(0, 10); }
+
+function formatFriday(d) {
+  return d.toLocaleDateString("en-US", {
+    weekday: "long", month: "long", day: "numeric", year: "numeric"
+  });
+}
+
+// ── Rotation ─────────────────────────────────────────────────────────
+
+function getRotationIndex(startDate, total) {
+  const start = new Date(startDate + "T00:00:00");
+  const weeks = Math.round((getThisFriday() - start) / (7 * 24 * 60 * 60 * 1000));
+  return ((weeks % total) + total) % total;
+}
+
+// ── Load restaurant ─────────────────────────────────────────────────
+
+function buildFridayCalendar(config) {
+  const el       = document.getElementById("friday-calendar");
+  const thisFri  = new Date(currentFriday + "T00:00:00");
+  const year     = thisFri.getFullYear();
+  const month    = thisFri.getMonth();
+  const total    = config.restaurants.length;
+  const startMs  = new Date(config.startDate + "T00:00:00").getTime();
+
+  // Collect all Fridays in the current month
+  const d = new Date(year, month, 1);
+  while (d.getDay() !== 5) d.setDate(d.getDate() + 1);
+  const rows = [];
+  while (d.getMonth() === month) {
+    const ymd   = toYMD(d);
+    const weeks = Math.round((d.getTime() - startMs) / (7 * 24 * 60 * 60 * 1000));
+    const idx   = ((weeks % total) + total) % total;
+    const name  = config.restaurants[idx].name;
+    rows.push({ ymd, day: d.getDate(), mon: d.toLocaleDateString("en-US", { month: "short" }), name });
+    d.setDate(d.getDate() + 7);
+  }
+
+  el.innerHTML = rows.map(r => {
+    const cur = r.ymd === currentFriday;
+    return `<div class="fcal-row${cur ? " fcal-current" : ""}">
+      <span class="fcal-date">${r.mon} ${r.day}</span>
+      <span class="fcal-name">${esc(r.name)}</span>
+    </div>`;
+  }).join("");
+  el.style.display = "flex";
+}
+
+async function loadRestaurant() {
+  const friday  = getThisFriday();
+  currentFriday = toYMD(friday);
+  const weekday = friday.toLocaleDateString("en-US", { weekday: "long" }).toUpperCase();
+  const monthDay = friday.toLocaleDateString("en-US", { month: "long", day: "numeric" }).toUpperCase();
+  const year     = friday.getFullYear();
+  document.getElementById("friday-date").innerHTML =
+    `${weekday}<br>${monthDay}<br><span class="big-date-year">${year}</span>`;
+
+  let restaurant = null;
+  try {
+    const res    = await fetch("restaurants.json?v=" + Date.now());
+    const config = await res.json();
+    const weekParam = new URLSearchParams(location.search).get("week");
+    const idx  = weekParam !== null
+      ? ((parseInt(weekParam, 10) % config.restaurants.length) + config.restaurants.length) % config.restaurants.length
+      : getRotationIndex(config.startDate, config.restaurants.length);
+    const raw  = config.restaurants[idx];
+    restaurant = raw.ref
+      ? config.restaurants.find(r => r.name === raw.ref) || raw
+      : raw;
+    buildFridayCalendar(config);
+  } catch (e) {
+    console.warn("Could not load restaurants.json", e);
+  }
+
+  const nameEl = document.getElementById("restaurant-name");
+  if (restaurant?.name) {
+    nameEl.textContent = restaurant.name;
+    const imgs = restaurant.menuImages || (restaurant.menuImage ? [restaurant.menuImage] : []);
+    buildMenuPanel(restaurant.menu || [], restaurant.name, restaurant.menuUrl || "", imgs);
+    buildMenu(restaurant.menu || []);
+    buildTrafficMap(restaurant.name);
+    buildOrderInfoStrip(restaurant);
+  } else {
+    nameEl.textContent = "TBD";
+    buildMenuPanel([], "", "", []);
+    buildMenu([]);
+    buildTrafficMap("");
+    buildOrderInfoStrip(null);
+  }
+}
+
+function buildMenuPanel(items, restaurantName, menuUrl, menuImages) {
+  const card  = document.getElementById("menu-panel-card");
+  const panel = document.getElementById("menu-panel");
+  const title = document.getElementById("menu-panel-title");
+
+  if (!items.length) { card.style.display = "none"; return; }
+
+  title.innerHTML = menuUrl
+    ? `${esc(restaurantName)} — Menu &nbsp;<a href="${escAttr(menuUrl)}" target="_blank" rel="noopener" class="menu-url-link">View Full Menu</a>`
+    : esc(restaurantName) + " — Menu";
+
+  card.style.display = "block";
+
+  const imgs = Array.isArray(menuImages) ? menuImages.filter(Boolean) : [];
+  const stripClass = imgs.length === 1 ? "menu-img-strip single" : "menu-img-strip";
+  const imgHtml = imgs.length
+    ? `<div class="${stripClass}">${imgs.map((src, i) =>
+        `<img class="menu-img-thumb" src="${escAttr(src)}" alt="${escAttr(restaurantName)} menu ${i+1}" loading="lazy" onerror="this.parentElement.removeChild(this)" onclick="openLightbox(${i})">`
+      ).join("")}</div>`
+    : "";
+
+  function mpiHtml(item) {
+    const price       = item.price ? `<span class="mpi-price">$${Number(item.price).toFixed(2)}</span>` : "";
+    const proteinHint = item.protein ? `<span class="mpi-protein-hint">+ protein</span>` : "";
+    const desc        = item.desc ? `<span class="mpi-desc">${esc(item.desc)}</span>` : "";
+    return `<div class="mpi" data-name="${escAttr(item.item)}">
+      <span class="mpi-left"><span class="mpi-name">${esc(item.item)}${proteinHint}</span>${desc}</span>
+      ${price}
+    </div>`;
+  }
+
+  const popular = items.filter(i => i.popular);
+  const popularSection = popular.length
+    ? `<div class="mpi-popular-block">
+        <div class="mpi-section-label">Popular Items</div>
+        <div class="mpi-grid">${popular.map(mpiHtml).join("")}</div>
+       </div>`
+    : "";
+
+  // Group by category if any items have one, else flat list
+  const hasCats = items.some(i => i.category);
+  let bodyHtml = "";
+  if (hasCats) {
+    const catOrder = [];
+    const catMap   = new Map();
+    items.forEach(it => {
+      const cat = it.category || "Other";
+      if (!catMap.has(cat)) { catMap.set(cat, []); catOrder.push(cat); }
+      catMap.get(cat).push(it);
+    });
+    bodyHtml = catOrder.map(cat =>
+      `<div class="mpi-cat-block">
+        <div class="mpi-section-label">${esc(cat)}</div>
+        <div class="mpi-grid">${catMap.get(cat).map(mpiHtml).join("")}</div>
+       </div>`
+    ).join("");
+  } else {
+    bodyHtml = `<div class="mpi-grid">${items.map(mpiHtml).join("")}</div>`;
+  }
+
+  panel.innerHTML = imgHtml + popularSection + bodyHtml;
+
+  applyMenuTrendMarks();
+  applyMenuTakenMarks();
+
+  // Clicking a menu panel item adds it to the order
+  panel.addEventListener("click", e => {
+    const row = e.target.closest(".mpi");
+    if (!row) return;
+    addItem(row.dataset.name);
+    // don't steal focus if protein prompt is about to appear
+    const meta = allMenuItems.find(m => m.item === row.dataset.name);
+    if (!meta?.protein) document.getElementById("order-name")?.focus();
+  });
+}
+
+// ── Menu search + dropdown ────────────────────────────────────────────
+
+function buildMenu(items) {
+  allMenuItems  = items;
+  selectedItems = [];
+  const section = document.getElementById("menu-section");
+
+  if (!items.length) {
+    section.innerHTML = `
+      <label class="field-label">Order</label>
+      <textarea id="order-freetext" placeholder="What would you like?"></textarea>`;
+    return;
+  }
+
+  section.innerHTML = `
+    <label class="field-label">Menu</label>
+    <div class="menu-search-wrap">
+      <input type="text" id="menu-search" placeholder="Search dishes…" autocomplete="off" />
+      <div class="menu-dropdown" id="menu-dropdown"></div>
+    </div>
+    <div class="selected-pills" id="selected-pills"></div>
+    <div id="protein-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--card-bg);border:1px solid var(--gold);border-radius:6px;font-size:0.85rem">
+      <span style="color:var(--text-muted)">Protein for <strong id="protein-prompt-item"></strong>:</span>
+      <div style="display:flex;gap:0.5rem;margin-top:0.4rem;align-items:center">
+        <input type="text" id="protein-input" placeholder="e.g. Chicken, Beef, Tofu, Shrimp…" style="flex:1;min-width:0;padding:0.4rem 0.6rem;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.85rem;font-family:inherit" />
+        <button type="button" id="protein-add-btn" class="protein-btn protein-btn-add">Add</button>
+        <button type="button" id="protein-skip-btn" class="protein-btn">Skip</button>
+      </div>
+    </div>
+    <div id="combo-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--card-bg);border:1px solid var(--gold);border-radius:6px;font-size:0.85rem">
+      <div style="color:var(--text-muted);margin-bottom:0.5rem">Adding: <strong id="combo-prompt-item"></strong></div>
+      <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+        <input type="checkbox" id="combo-checkbox" style="accent-color:var(--gold);width:15px;height:15px" />
+        Make it a combo &nbsp;<span id="combo-price-label" style="color:var(--gold);font-weight:700"></span>
+      </label>
+      <div id="combo-side-wrap" style="display:none;margin-top:0.5rem;flex-direction:column;gap:0.4rem">
+        <div style="font-size:0.75rem;color:var(--text-muted)">Side choice</div>
+        <select id="combo-side-select" style="width:100%;padding:0.4rem 0.6rem;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.85rem;font-family:inherit"></select>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem">Drink (included) — type your choice</div>
+        <input type="text" id="combo-drink-input" placeholder="e.g. Coke, Sprite, water…" style="width:100%;padding:0.4rem 0.6rem;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.85rem;font-family:inherit;box-sizing:border-box" />
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.6rem">
+        <button type="button" id="combo-add-btn" class="protein-btn protein-btn-add">Add to Order</button>
+        <button type="button" id="combo-skip-btn" class="protein-btn">Cancel</button>
+      </div>
+    </div>
+    <div id="extras-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--card-bg);border:1px solid var(--gold);border-radius:6px;font-size:0.85rem">
+      <div style="color:var(--text-muted);margin-bottom:0.5rem">Add protein to <strong id="extras-prompt-item"></strong>? <span style="font-size:0.72rem;opacity:0.7">(optional)</span></div>
+      <div id="extras-options" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.6rem"></div>
+      <div style="display:flex;gap:0.5rem">
+        <button type="button" id="extras-skip-btn" class="protein-btn">No thanks, just the salad</button>
+      </div>
+    </div>`;
+
+  const input    = document.getElementById("menu-search");
+  const dropdown = document.getElementById("menu-dropdown");
+  let focusedIdx = -1;
+
+  function renderDropdown(q) {
+    const matches = q
+      ? allMenuItems.filter(m => m.item.toLowerCase().includes(q.toLowerCase()))
+      : allMenuItems;
+
+    if (!matches.length) { dropdown.style.display = "none"; return; }
+
+    focusedIdx = -1;
+    dropdown.innerHTML = matches.map(m => {
+      const takers  = takenItems[m.item.toLowerCase()] || [];
+      const taken   = selectedItems.includes(m.item);
+      const price   = m.price ? `<span class="dd-price">$${Number(m.price).toFixed(2)}</span>` : "";
+      const takenLbl = takers.length ? `<span class="dd-taken">${takers.join(", ")}</span>` : "";
+      const proteinLbl  = m.protein ? `<span class="dd-protein">+ protein</span>` : "";
+      const popularStar = m.popular ? `<span class="dd-popular">★</span>` : "";
+      return `<div class="menu-dropdown-item${taken ? " is-selected" : ""}" data-name="${escAttr(m.item)}">
+        <span class="dd-name">${popularStar}${esc(m.item)}${proteinLbl}</span>
+        <span class="dd-right">${takenLbl}${price}</span>
+      </div>`;
+    }).join("");
+
+    dropdown.style.display = "block";
+
+    dropdown.querySelectorAll(".menu-dropdown-item:not(.is-selected)").forEach(el => {
+      el.addEventListener("mousedown", e => {
+        e.preventDefault();
+        addItem(el.dataset.name);
+        input.value = "";
+        dropdown.style.display = "none";
+      });
+    });
+  }
+
+  function moveFocus(dir) {
+    const items = [...dropdown.querySelectorAll(".menu-dropdown-item:not(.is-selected)")];
+    if (!items.length) return;
+    items[focusedIdx]?.classList.remove("focused");
+    focusedIdx = Math.max(0, Math.min(items.length - 1, focusedIdx + dir));
+    items[focusedIdx].classList.add("focused");
+    items[focusedIdx].scrollIntoView({ block: "nearest" });
+  }
+
+  input.addEventListener("focus",   () => renderDropdown(input.value.trim()));
+  input.addEventListener("click",   () => renderDropdown(input.value.trim()));
+  input.addEventListener("input",   () => renderDropdown(input.value.trim()));
+  input.addEventListener("keydown", e => {
+    if (e.key === "ArrowDown")  { e.preventDefault(); moveFocus(1); }
+    if (e.key === "ArrowUp")    { e.preventDefault(); moveFocus(-1); }
+    if (e.key === "Escape")     { dropdown.style.display = "none"; }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const focused = dropdown.querySelector(".menu-dropdown-item.focused");
+      if (focused) {
+        addItem(focused.dataset.name);
+      } else if (input.value.trim()) {
+        addItem(input.value.trim());
+      }
+      input.value = "";
+      dropdown.style.display = "none";
+    }
+  });
+  input.addEventListener("blur", () => setTimeout(() => { dropdown.style.display = "none"; }, 150));
+}
+
+function addItem(name) {
+  const meta = allMenuItems.find(m => m.item === name);
+  if (meta && meta.combo) {
+    showComboPrompt(name, meta);
+    return;
+  }
+  if (meta && meta.extras && meta.extras.length) {
+    showExtrasPrompt(name, meta);
+    return;
+  }
+  if (meta && meta.protein) {
+    showProteinPrompt(name);
+    return;
+  }
+  if (!selectedItems.includes(name)) {
+    selectedItems.push(name);
+    renderPills();
+    checkDuplicates();
+  }
+}
+
+function showExtrasPrompt(baseName, meta) {
+  const prompt    = document.getElementById("extras-prompt");
+  const label     = document.getElementById("extras-prompt-item");
+  const optionsEl = document.getElementById("extras-options");
+  const skipBtn   = document.getElementById("extras-skip-btn");
+  if (!prompt) return;
+
+  label.textContent = baseName;
+
+  optionsEl.innerHTML = meta.extras.map(e =>
+    `<button type="button" class="protein-btn extras-option-btn" data-extra="${escAttr(e.name)}" data-price="${e.price}">
+      ${esc(e.name)} <span style="color:var(--gold);margin-left:0.25rem">+$${Number(e.price).toFixed(2)}</span>
+    </button>`
+  ).join("");
+
+  prompt.style.display = "block";
+
+  function commit(finalName) {
+    prompt.style.display = "none";
+    if (!selectedItems.includes(finalName)) {
+      selectedItems.push(finalName);
+      renderPills();
+      checkDuplicates();
+    }
+    cleanup();
+  }
+  function onOption(e) {
+    const btn = e.target.closest(".extras-option-btn");
+    if (!btn) return;
+    commit(`${baseName} + ${btn.dataset.extra}`);
+  }
+  function onSkip() { commit(baseName); }
+  function cleanup() {
+    optionsEl.removeEventListener("click", onOption);
+    skipBtn.removeEventListener("click", onSkip);
+  }
+  optionsEl.addEventListener("click", onOption);
+  skipBtn.addEventListener("click", onSkip);
+}
+
+function showComboPrompt(baseName, meta) {
+  const prompt      = document.getElementById("combo-prompt");
+  const label       = document.getElementById("combo-prompt-item");
+  const checkbox    = document.getElementById("combo-checkbox");
+  const priceEl     = document.getElementById("combo-price-label");
+  const sideWrap    = document.getElementById("combo-side-wrap");
+  const sideSelect  = document.getElementById("combo-side-select");
+  const drinkInput  = document.getElementById("combo-drink-input");
+  const addBtn      = document.getElementById("combo-add-btn");
+  const skipBtn     = document.getElementById("combo-skip-btn");
+  if (!prompt) return;
+
+  label.textContent       = baseName;
+  priceEl.textContent     = `(+$${Number(meta.comboPrice).toFixed(2)})`;
+  checkbox.checked        = false;
+  sideWrap.style.display  = "none";
+  drinkInput.value        = "";
+  sideSelect.innerHTML    = (meta.comboSides || []).map(s => `<option>${s}</option>`).join("");
+  prompt.style.display    = "block";
+
+  function onCheck() {
+    sideWrap.style.display = checkbox.checked ? "flex" : "none";
+  }
+  function commit() {
+    prompt.style.display = "none";
+    let finalName = baseName;
+    if (checkbox.checked) {
+      const drink = drinkInput.value.trim();
+      finalName = drink
+        ? `${baseName} + Combo (${sideSelect.value}, ${drink})`
+        : `${baseName} + Combo (${sideSelect.value})`;
+    }
+    if (!selectedItems.includes(finalName)) {
+      selectedItems.push(finalName);
+      renderPills();
+      checkDuplicates();
+    }
+    cleanup();
+  }
+  function cancel() { prompt.style.display = "none"; cleanup(); }
+  function cleanup() {
+    checkbox.removeEventListener("change", onCheck);
+    addBtn.removeEventListener("click", commit);
+    skipBtn.removeEventListener("click", cancel);
+  }
+  checkbox.addEventListener("change", onCheck);
+  addBtn.addEventListener("click", commit);
+  skipBtn.addEventListener("click", cancel);
+}
+
+function showProteinPrompt(baseName) {
+  const prompt   = document.getElementById("protein-prompt");
+  const label    = document.getElementById("protein-prompt-item");
+  const input    = document.getElementById("protein-input");
+  const addBtn   = document.getElementById("protein-add-btn");
+  const skipBtn  = document.getElementById("protein-skip-btn");
+  if (!prompt) return;
+
+  label.textContent = baseName;
+  input.value = "";
+  prompt.style.display = "block";
+  input.focus();
+
+  function commit() {
+    const protein = input.value.trim();
+    const finalName = protein ? `${baseName} (${protein})` : baseName;
+    prompt.style.display = "none";
+    if (!selectedItems.includes(finalName)) {
+      selectedItems.push(finalName);
+      renderPills();
+      checkDuplicates();
+    }
+    // clean up listeners
+    addBtn.removeEventListener("click", onAdd);
+    skipBtn.removeEventListener("click", onSkip);
+    input.removeEventListener("keydown", onKey);
+  }
+
+  function onAdd()  { commit(); }
+  function onSkip() { input.value = ""; commit(); }
+  function onKey(e) { if (e.key === "Enter") { e.preventDefault(); commit(); } }
+
+  addBtn.addEventListener("click",  onAdd);
+  skipBtn.addEventListener("click", onSkip);
+  input.addEventListener("keydown", onKey);
+}
+
+function renderPills() {
+  const container = document.getElementById("selected-pills");
+  if (!container) return;
+
+  container.innerHTML = selectedItems.map((item, i) => {
+    const taken = (takenItems[item.toLowerCase()] || []).length > 0;
+    return `<span class="selected-pill${taken ? " is-taken" : ""}">
+      ${esc(item)}
+      <button type="button" class="pill-remove" data-idx="${i}">&times;</button>
+    </span>`;
+  }).join("");
+
+  container.querySelectorAll(".pill-remove").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedItems.splice(Number(btn.dataset.idx), 1);
+      renderPills();
+      checkDuplicates();
+    });
+  });
+}
+
+function updateMenuIndicators() {
+  renderPills();
+  applyMenuTakenMarks();
+  // Refresh dropdown results if open so taken labels update live
+  const input = document.getElementById("menu-search");
+  if (input?.value.trim()) input.dispatchEvent(new Event("input"));
+}
+
+function applyMenuTakenMarks() {
+  document.querySelectorAll(".mpi").forEach(el => {
+    const key    = (el.dataset.name || "").toLowerCase();
+    // Exact match, or a takenItems key that is a prefix of this menu item name
+    // (handles menu items whose names contain commas, e.g. "Basil Chicken, Thai Style")
+    let takers = takenItems[key];
+    if (!takers) {
+      const matchKey = Object.keys(takenItems).find(k => key.startsWith(k) || k.startsWith(key));
+      takers = matchKey ? takenItems[matchKey] : [];
+    }
+    let badge = el.querySelector(".mpi-taken-badge");
+    if (takers.length) {
+      if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "mpi-taken-badge";
+        el.querySelector(".mpi-left")?.appendChild(badge);
+      }
+      badge.textContent = "Ordered by " + takers.join(", ");
+      el.classList.add("mpi-is-taken");
+    } else {
+      badge?.remove();
+      el.classList.remove("mpi-is-taken");
+    }
+  });
+}
+
+function checkDuplicates() {
+  const dups = selectedItems
+    .map(item => ({ item, takers: takenItems[item.toLowerCase()] || [] }))
+    .filter(d => d.takers.length > 0);
+
+  const warningEl = document.getElementById("dup-warning");
+  const textEl    = document.getElementById("dup-warning-text");
+
+  if (!dups.length) { warningEl.classList.remove("show"); return; }
+
+  textEl.textContent = dups
+    .map(d => `${d.item} already ordered by ${d.takers.join(" & ")}`)
+    .join(". ") + ". You can still submit.";
+  warningEl.classList.add("show");
+}
+
+function buildTrafficMap() {}
+
+function buildOrderInfoStrip(r) {
+  const strip = document.getElementById("order-info-strip");
+  if (!strip) return;
+  if (!r) { strip.style.display = "none"; strip.innerHTML = ""; return; }
+
+  const links = [];
+
+  if (r.name) {
+    links.push(`<span class="oi-name">${esc(r.name)}</span>`);
+  }
+
+  if (r.phone) {
+    links.push(`<a class="oi-link oi-phone" href="tel:${r.phone.replace(/\D/g,'')}">&#9743; ${r.phone}</a>`);
+  }
+
+  if (r.orderUrl) {
+    links.push(`<a class="oi-link" href="${escAttr(r.orderUrl)}" target="_blank" rel="noopener">Order Online</a>`);
+  }
+
+  const mapsHref = r.mapUrl
+    || (r.address
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.address)}`
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + " restaurant")}`);
+  links.push(`<a class="oi-link" href="${escAttr(mapsHref)}" target="_blank" rel="noopener">Google Maps</a>`);
+
+  if (!links.length) { strip.style.display = "none"; return; }
+  strip.innerHTML = links.join("");
+  strip.style.display = "flex";
+}
+
+// ── Submit order ──────────────────────────────────────────────────────
+
+document.getElementById("order-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn  = document.getElementById("order-btn");
+  const name = document.getElementById("order-name").value.trim();
+  const notes = document.getElementById("order-notes").value.trim();
+
+  let items = "";
+  const freetext = document.getElementById("order-freetext");
+  if (freetext) {
+    items = freetext.value.trim();
+    const dupTakers = takenItems[items.toLowerCase()] || [];
+    if (dupTakers.length) {
+      const ok = confirm(`"${items}" was already ordered by ${dupTakers.join(" & ")}.\n\nSubmit anyway?`);
+      if (!ok) return;
+    }
+  } else {
+    // flush any text left in the search box that wasn't explicitly added
+    const searchInput = document.getElementById("menu-search");
+    if (searchInput?.value.trim()) addItem(searchInput.value.trim());
+    items = selectedItems.join(", ");
+  }
+
+  if (!name || !items) { alert("Please enter your name and at least one item."); return; }
+
+  console.log("[order] name:", name, "| items:", items, "| date:", currentFriday);
+  console.log("[order] APPS_SCRIPT_URL:", APPS_SCRIPT_URL || "(empty!)");
+
+  btn.disabled    = true;
+  btn.textContent = "Submitting…";
+
+  try {
+    await post({ type: "order", date: currentFriday, name, items, notes });
+    console.log("[order] success");
+    localStorage.setItem("lastOrderName",  name);
+    localStorage.setItem("lastOrderItems", items);
+    localStorage.setItem("lastOrderDate",  currentFriday);
+    showOrderSuccess(name, items);
+    setTimeout(loadData, 4000);
+  } catch (err) {
+    console.error("[order] failed:", err);
+    btn.disabled    = false;
+    btn.textContent = "Submit Order";
+    alert("Submission failed — check your Apps Script URL in config.js.");
+  }
+});
+
+document.getElementById("edit-order-btn").addEventListener("click", () => {
+  const savedName  = localStorage.getItem("lastOrderName")  || "";
+  const savedItems = (localStorage.getItem("lastOrderItems") || "").split(",").map(s => s.trim()).filter(Boolean);
+  document.getElementById("order-form").style.display    = "block";
+  document.getElementById("order-success").style.display = "none";
+  document.getElementById("order-name").value = savedName;
+  selectedItems = savedItems;
+  renderPills();
+  checkDuplicates();
+  document.getElementById("order-btn").textContent = "Update Order";
+  document.getElementById("order-btn").disabled    = false;
+});
+
+function confirmModal(message) {
+  return new Promise(resolve => {
+    const modal  = document.getElementById("confirm-modal");
+    const msg    = document.getElementById("confirm-modal-msg");
+    const okBtn  = document.getElementById("confirm-modal-ok");
+    const cancel = document.getElementById("confirm-modal-cancel");
+    msg.textContent = message;
+    modal.style.display = "flex";
+    function close(result) {
+      modal.style.display = "none";
+      okBtn.removeEventListener("click", onOk);
+      cancel.removeEventListener("click", onCancel);
+      resolve(result);
+    }
+    function onOk()     { close(true);  }
+    function onCancel() { close(false); }
+    okBtn.addEventListener("click",  onOk);
+    cancel.addEventListener("click", onCancel);
+  });
+}
+
+function showOrderSuccess(name, itemsStr) {
+  document.getElementById("order-form").style.display    = "none";
+  document.getElementById("order-success").style.display = "block";
+  const itemsEl = document.getElementById("order-success-items");
+  if (itemsEl && itemsStr) {
+    const list = itemsStr.split(",").map(s => s.trim()).filter(Boolean);
+    itemsEl.innerHTML = `<strong>${esc(name)}</strong>: ${list.map(esc).join(", ")}`;
+  }
+}
+
+
+async function post(payload) {
+  if (!FORM_URL) throw new Error("FORM_URL not configured in config.js");
+  const orderText = payload.notes
+    ? `${payload.items} | Notes: ${payload.notes}`
+    : payload.items;
+  const body = new URLSearchParams({
+    [FORM_NAME_ENTRY]:  payload.name,
+    [FORM_ORDER_ENTRY]: orderText,
+  });
+  console.log("[post/form] submitting:", body.toString());
+  await fetch(FORM_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+  console.log("[post/form] sent");
+}
+
+// ── Load data ─────────────────────────────────────────────────────────
+
+async function loadData() {
+  await Promise.all([loadOrders(), loadTrending()]);
+  document.getElementById("last-updated").textContent =
+    `Updated ${new Date().toLocaleTimeString()}`;
+}
+
+function findMenuItem(name) {
+  // Exact match first
+  let m = allMenuItems.find(i => i.item === name);
+  if (m) return m;
+  // Case-insensitive
+  const lower = name.toLowerCase();
+  m = allMenuItems.find(i => i.item.toLowerCase() === lower);
+  if (m) return m;
+  // Menu item name starts with the order name (handles trailing Chinese chars added later)
+  m = allMenuItems.find(i => i.item.toLowerCase().startsWith(lower));
+  if (m) return m;
+  // Order name starts with the menu item name
+  m = allMenuItems.find(i => lower.startsWith(i.item.toLowerCase()));
+  return m || null;
+}
+
+function smartSplit(orderText) {
+  const clean = orderText.replace(/ \| Notes:.*$/, "");
+  const parts = [];
+  let depth = 0, cur = "";
+  for (const ch of clean) {
+    if (ch === "(") { depth++; cur += ch; }
+    else if (ch === ")") { depth--; cur += ch; }
+    else if (ch === "," && depth === 0) { parts.push(cur.trim()); cur = ""; }
+    else { cur += ch; }
+  }
+  if (cur.trim()) parts.push(cur.trim());
+  return parts.filter(Boolean);
+}
+
+function calcOrderTotal(orderText) {
+  const parts = smartSplit(orderText);
+
+  let total = 0;
+  parts.filter(Boolean).forEach(part => {
+    const plusIdx = part.indexOf(" + ");
+    const baseName = plusIdx >= 0 ? part.slice(0, plusIdx).trim() : part.trim();
+    const suffix   = plusIdx >= 0 ? part.slice(plusIdx + 3).trim() : "";
+    const meta = findMenuItem(baseName);
+    if (!meta) return;
+    total += Number(meta.price) || 0;
+    if (suffix.startsWith("Combo") && meta.comboPrice) {
+      total += Number(meta.comboPrice);
+    } else if (suffix && meta.extras?.length) {
+      const ex = meta.extras.find(e => e.name === suffix);
+      if (ex) total += Number(ex.price) || 0;
+    }
+  });
+  return total;
+}
+
+let _lastOrderRows = [];
+
+async function loadOrders() {
+  const container = document.getElementById("orders-container");
+  const countEl   = document.getElementById("order-count");
+
+  try {
+    const csv  = await fetchCSV(ORDERS_GID);
+    // Form response columns: [0] Timestamp, [1] Name, [2] Order
+    // Orders can be submitted any day of the week, so we match by week window:
+    // Saturday before this Friday through this Friday (inclusive)
+    const friday    = new Date(currentFriday + "T23:59:59");
+    const saturday  = new Date(friday);
+    saturday.setDate(saturday.getDate() - 6);
+    saturday.setHours(0, 0, 0, 0);
+    const allRows = parseCSV(csv).slice(1).filter(r => {
+      if (!r[1]) return false;
+      const ts = r[0] ? new Date(r[0]) : null;
+      return ts && ts >= saturday && ts <= friday;
+    });
+    // Keep only the latest submission per person (for edits)
+    const latest = new Map();
+    allRows.forEach(r => latest.set(r[1].trim().toLowerCase(), r));
+    const rows = [...latest.values()].filter(r => (r[2] ?? "").trim() !== "__deleted__");
+
+    takenItems = {};
+    rows.forEach(r => {
+      const name  = (r[1] ?? "").trim();
+      // Split on commas that are NOT inside parentheses (handles "Gyro + Combo (Fries, Sprite)")
+      const orderText = (r[2] ?? "").replace(/ \| Notes:.*$/, ""); // strip notes suffix
+      const parts = [];
+      let depth = 0, cur = "";
+      for (const ch of orderText) {
+        if (ch === "(") { depth++; cur += ch; }
+        else if (ch === ")") { depth--; cur += ch; }
+        else if (ch === "," && depth === 0) { parts.push(cur.trim()); cur = ""; }
+        else { cur += ch; }
+      }
+      if (cur.trim()) parts.push(cur.trim());
+      parts.filter(Boolean).forEach(item => {
+        // Strip "+ extras/combo suffix" to get base menu item name
+        const base = item.replace(/\s*\+.*$/, "").trim();
+        const key  = base.toLowerCase();
+        if (!takenItems[key]) takenItems[key] = [];
+        if (!takenItems[key].includes(name)) takenItems[key].push(name);
+      });
+    });
+
+    updateMenuIndicators();
+    checkDuplicates();
+
+    countEl.textContent = rows.length;
+
+    const summaryEl = document.getElementById("orders-summary");
+    const bodyEl    = document.getElementById("orders-summary-body");
+    if (rows.length) {
+      summaryEl.style.display = "block";
+      bodyEl.innerHTML = rows.map(r =>
+        `<div class="orders-summary-row">
+          <span class="orders-summary-name">${esc(r[1] ?? "")}</span>
+          &nbsp;—&nbsp;${esc(r[2] ?? "")}
+        </div>`
+      ).join("");
+    } else {
+      summaryEl.style.display = "none";
+    }
+
+    if (!rows.length) {
+      container.innerHTML = `<div class="placeholder">No orders yet.</div>`;
+      return;
+    }
+
+    const itemCounts = {};
+    rows.forEach(r => {
+      (r[2] ?? "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean)
+        .forEach(item => { itemCounts[item] = (itemCounts[item] || 0) + 1; });
+    });
+
+    const dupCount = Object.values(itemCounts).filter(n => n > 1).length;
+
+    _lastOrderRows = rows;
+    renderOrdersTable(dupCount);
+  } catch {
+    container.innerHTML = `<div class="placeholder error-text">Could not load orders. Make sure the sheet is published publicly.</div>`;
+  }
+}
+
+function renderOrdersTable(dupCount) {
+  const container = document.getElementById("orders-container");
+  const rows      = _lastOrderRows;
+  const withTax   = document.getElementById("tax-toggle")?.checked;
+  const TAX       = 1.06;
+
+  if (!rows.length) return;
+
+  const itemCounts = {};
+  rows.forEach(r => {
+    (r[2] ?? "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean)
+      .forEach(item => { itemCounts[item] = (itemCounts[item] || 0) + 1; });
+  });
+
+    const trs = rows.map(r => {
+      const rowName  = (r[1] ?? "").trim();
+      const items    = smartSplit(r[2] ?? "");
+      const itemHtml = items.map(item => {
+        const isDup    = (itemCounts[item.toLowerCase()] || 0) > 1;
+        const baseName = item.replace(/\s*\+.*$/, "").trim();
+        const meta     = findMenuItem(baseName);
+        const price    = meta?.price ? `<span class="td-item-price">$${Number(meta.price).toFixed(2)}</span>` : "";
+        const label    = isDup
+          ? `<span class="dup-item" title="Ordered by multiple people">${esc(item)}</span>`
+          : esc(item);
+        return `<div class="td-item-row">${label}${price}</div>`;
+      }).join("");
+      const rawTotal = calcOrderTotal(r[2] ?? "");
+      const total    = withTax ? rawTotal * TAX : rawTotal;
+      const totalHtml = rawTotal > 0
+        ? `<span class="td-total">$${total.toFixed(2)}</span>`
+        : "";
+      const editBtn   = `<button type="button" class="order-row-edit-btn" title="Edit order" data-name="${escAttr(rowName)}" data-items="${escAttr(r[2] ?? "")}"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M7.5 1.5 L9.5 3.5 L3.5 9.5 L1 10 L1.5 7.5 Z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6.5 2.5 L8.5 4.5" stroke="currentColor" stroke-width="1.2"/></svg></button>`;
+      const deleteBtn = `<button type="button" class="order-row-delete-btn" title="Delete order" data-name="${escAttr(rowName)}">&times;</button>`;
+
+      return `<tr>
+        <td class="td-name">${esc(rowName)}</td>
+        <td class="td-items">${itemHtml}</td>
+        <td class="td-total-cell">${totalHtml}</td>
+        <td class="td-actions"><div class="td-actions-inner">${editBtn}${deleteBtn}</div></td>
+      </tr>`;
+    }).join("");
+
+    const dupBanner = dupCount !== undefined && dupCount
+      ? `<div class="dup-banner">${dupCount} dish${dupCount > 1 ? "es" : ""} ordered by more than one person.</div>`
+      : "";
+
+    const prevTable = container.querySelector("table");
+    const prevBanner = container.querySelector(".dup-banner");
+    const taxLabel = `<span style='font-size:0.65rem;opacity:0.6;visibility:${withTax ? "visible" : "hidden"}'>+tax</span>`;
+
+    container.innerHTML = `${dupBanner}<div class="orders-table-wrap"><table>
+      <colgroup>
+        <col class="col-name"><col class="col-items"><col class="col-total"><col class="col-actions">
+      </colgroup>
+      <thead><tr><th>Name</th><th>Items</th><th style="white-space:nowrap">Total ${taxLabel}</th><th></th></tr></thead>
+      <tbody>${trs}</tbody>
+    </table></div>`;
+
+    container.querySelectorAll(".order-row-edit-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const savedItems = btn.dataset.items.split(",").map(s => s.trim()).filter(Boolean);
+        document.getElementById("order-form").style.display    = "block";
+        document.getElementById("order-success").style.display = "none";
+        document.getElementById("order-name").value = btn.dataset.name;
+        selectedItems = savedItems;
+        renderPills();
+        checkDuplicates();
+        document.getElementById("order-btn").textContent = "Update Order";
+        document.getElementById("order-btn").disabled    = false;
+        document.getElementById("order-name").scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+
+    container.querySelectorAll(".order-row-delete-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const name = btn.dataset.name;
+        const confirmed = await confirmModal(`Delete ${name}'s order? This cannot be undone.`);
+        if (!confirmed) return;
+        btn.disabled = true;
+        btn.textContent = "…";
+        try {
+          const body = new URLSearchParams({
+            [FORM_NAME_ENTRY]:  name,
+            [FORM_ORDER_ENTRY]: "__deleted__",
+          });
+          await fetch(FORM_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() });
+          // if this was our own order, clear localStorage
+          if ((localStorage.getItem("lastOrderName") || "").toLowerCase() === name.toLowerCase()) {
+            localStorage.removeItem("lastOrderName");
+            localStorage.removeItem("lastOrderItems");
+            localStorage.removeItem("lastOrderDate");
+            document.getElementById("order-form").style.display    = "block";
+            document.getElementById("order-success").style.display = "none";
+          }
+          setTimeout(loadData, 1200);
+        } catch {
+          btn.disabled = false;
+          btn.innerHTML = "&times;";
+          alert("Delete failed.");
+        }
+      });
+    });
+}
+
+
+function applyMenuTrendMarks() {
+  document.querySelectorAll(".mpi").forEach(el => {
+    const name = (el.dataset.name || "").toLowerCase();
+    const existing = el.querySelector(".mpi-trend-mark");
+    if (trendingItems.has(name)) {
+      if (!existing) {
+        const mark = document.createElement("span");
+        mark.className = "mpi-trend-mark";
+        mark.textContent = "▲";
+        el.querySelector(".mpi-name")?.prepend(mark);
+      }
+    } else {
+      existing?.remove();
+    }
+  });
+}
+
+async function loadTrending() {
+  const card      = document.getElementById("trending-card");
+  const container = document.getElementById("trending-container");
+  const label     = document.getElementById("trending-restaurant-label");
+
+  if (!restaurant || !restaurant.menu || !restaurant.menu.length) {
+    card.style.display = "none";
+    return;
+  }
+
+  try {
+    const csv = await fetchCSV(ORDERS_GID);
+    const allRows = parseCSV(csv).slice(1).filter(r => r[1] && r[2]);
+    console.log("[trending] total order rows:", allRows.length, "| restaurant:", restaurant?.name);
+
+    // Find all past Fridays where this restaurant was active
+    const total      = config.restaurants.length;
+    const startMs    = new Date(config.startDate + "T12:00:00").getTime();
+    const weekMs     = 7 * 24 * 60 * 60 * 1000;
+    const todayMs    = Date.now();
+    const activeFridays = new Set();
+
+    for (let w = 0; w <= 104; w++) {
+      const fridayMs = startMs + w * weekMs;
+      if (fridayMs > todayMs + weekMs) break;
+      const rotIdx = ((w % total) + total) % total;
+      const raw = config.restaurants[rotIdx];
+      const resolved = raw.ref ? config.restaurants.find(r => r.name === raw.ref) || raw : raw;
+      if (resolved.name === restaurant.name) {
+        const d = new Date(fridayMs);
+        activeFridays.add(toYMD(d));
+      }
+    }
+    console.log("[trending] activeFridays for", restaurant.name, ":", [...activeFridays]);
+
+    // Group rows by their week-Friday, then deduplicate per person (latest entry wins)
+    const byWeek = {};
+    allRows.forEach(r => {
+      const ts = r[0] ? new Date(r[0]) : null;
+      if (!ts) return;
+      const d    = new Date(ts);
+      const diff = ((5 - d.getDay()) + 7) % 7;
+      const fri  = new Date(d);
+      fri.setDate(d.getDate() + diff);
+      const friStr = toYMD(fri);
+      console.log("[trending] row ts:", r[0], "→ friday:", friStr, "| match:", activeFridays.has(friStr));
+      if (!activeFridays.has(friStr)) return;
+      if (!byWeek[friStr]) byWeek[friStr] = new Map();
+      byWeek[friStr].set(r[1].trim().toLowerCase(), r);
+    });
+
+    // Count dishes across deduplicated rows only
+    const counts = {};
+    let totalOrders = 0;
+    Object.values(byWeek).forEach(weekMap => {
+      weekMap.forEach(r => {
+        (r[2] ?? "").split(",").map(s => s.trim()).filter(Boolean).forEach(item => {
+          const base = item.replace(/\s*\(.*?\)\s*$/, "").trim();
+          counts[base] = (counts[base] || 0) + 1;
+          totalOrders++;
+        });
+      });
+    });
+    console.log("[trending] totalOrders:", totalOrders, "| counts:", counts);
+
+    if (!totalOrders) {
+      card.style.display = "none";
+      return;
+    }
+
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 15);
+    const max    = sorted[0][1];
+    const weeks  = activeFridays.size;
+
+    // Mark top-trending items (top 5) for menu panel indicators
+    trendingItems = new Set(sorted.slice(0, 5).map(([name]) => name.toLowerCase()));
+    applyMenuTrendMarks();
+
+    const trendHtml = sorted.map(([name, count]) =>
+      `<div class="trend-row">
+        <span class="trend-name">${trendingItems.has(name.toLowerCase()) ? "▲ " : ""}${esc(name)}</span>
+        <div class="trend-bar-wrap"><div class="trend-bar" style="width:${Math.round(count/max*100)}%"></div></div>
+        <span class="trend-count">${count}×</span>
+      </div>`
+    ).join("");
+    const noteHtml = `<p class="trending-note">Based on ${totalOrders} items across ${weeks} visit${weeks !== 1 ? "s" : ""}.</p>`;
+
+    // Bottom card
+    label.textContent = restaurant.name;
+    card.style.display = "block";
+    container.innerHTML = trendHtml + noteHtml;
+
+    // In-form section
+    const formTrending = document.getElementById("form-trending");
+    const formTitle    = document.getElementById("form-trending-title");
+    const formList     = document.getElementById("form-trending-list");
+    if (formTrending) {
+      formTitle.textContent = `Trending at ${restaurant.name}`;
+      formList.innerHTML = trendHtml;
+      formTrending.style.display = "block";
+    }
+
+  } catch {
+    card.style.display = "none";
+  }
+}
+
+async function fetchCSV(gid) {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}&t=${Date.now()}`;
+  console.log("[fetchCSV] →", url);
+  const res = await fetch(url, { cache: "no-store" });
+  console.log("[fetchCSV] status:", res.status, res.ok ? "OK" : "FAILED");
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  console.log("[fetchCSV] rows:", text.trim().split("\n").length);
+  return text;
+}
+
+function parseCSV(text) {
+  return text.trim().split("\n").map(line => {
+    line = line.replace(/\r$/, "");
+    const cells = [];
+    let cur = "", inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+      else if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cells.push(cur); cur = ""; }
+      else { cur += ch; }
+    }
+    cells.push(cur);
+    return cells;
+  });
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function escAttr(s) {
+  return esc(s).replace(/"/g, "&quot;");
+}
+
+async function init() {
+  await loadRestaurant();
+  await loadData();
+  // restore submitted state only if the name field still matches last submitter
+  if (localStorage.getItem("lastOrderDate") === currentFriday) {
+    const savedName  = localStorage.getItem("lastOrderName")  || "";
+    const savedItems = localStorage.getItem("lastOrderItems") || "";
+    const nameField  = document.getElementById("order-name");
+    // Pre-fill the name but don't lock the form — let anyone use it
+    if (savedName && nameField && !nameField.value) nameField.value = savedName;
+  }
+  setInterval(loadData, 30_000);
+}
+
+// ── Order countdown ──────────────────────────────────────────────────
+// 5×7 pixel font via SVG rects for 0-9
+const PIXEL_DIGITS = {
+  "0": [[1,1,1],[1,0,1],[1,0,1],[1,0,1],[1,0,1],[1,0,1],[1,1,1]],
+  "1": [[0,1,0],[1,1,0],[0,1,0],[0,1,0],[0,1,0],[0,1,0],[1,1,1]],
+  "2": [[1,1,1],[0,0,1],[0,0,1],[1,1,1],[1,0,0],[1,0,0],[1,1,1]],
+  "3": [[1,1,1],[0,0,1],[0,0,1],[1,1,1],[0,0,1],[0,0,1],[1,1,1]],
+  "4": [[1,0,1],[1,0,1],[1,0,1],[1,1,1],[0,0,1],[0,0,1],[0,0,1]],
+  "5": [[1,1,1],[1,0,0],[1,0,0],[1,1,1],[0,0,1],[0,0,1],[1,1,1]],
+  "6": [[1,1,1],[1,0,0],[1,0,0],[1,1,1],[1,0,1],[1,0,1],[1,1,1]],
+  "7": [[1,1,1],[0,0,1],[0,0,1],[0,0,1],[0,0,1],[0,0,1],[0,0,1]],
+  "8": [[1,1,1],[1,0,1],[1,0,1],[1,1,1],[1,0,1],[1,0,1],[1,1,1]],
+  "9": [[1,1,1],[1,0,1],[1,0,1],[1,1,1],[0,0,1],[0,0,1],[1,1,1]],
+};
+function pixelDigit(ch) {
+  const P = 5; // pixel size
+  const grid = PIXEL_DIGITS[ch] || PIXEL_DIGITS["8"];
+  const rects = [];
+  grid.forEach((row, r) => row.forEach((on, c) => {
+    if (on) rects.push(`<rect x="${c*(P+1)}" y="${r*(P+1)}" width="${P}" height="${P}" fill="currentColor"/>`);
+  }));
+  const W = 3*(P+1)-1, H = 7*(P+1)-1;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">${rects.join("")}</svg>`;
+}
+function pixelNum(str) {
+  return `<span class="pixel-num">${str.split("").map(pixelDigit).join("")}</span>`;
+}
+
+function startCountdown() {
+  const el = document.getElementById("order-countdown");
+  if (!el) return;
+
+  const DEFAULT_HH = 17, DEFAULT_MM = 30;
+  let deadlineHH = DEFAULT_HH, deadlineMM = DEFAULT_MM;
+
+  const saved = localStorage.getItem("orderDeadline");
+  if (saved && /^\d{1,2}:\d{2}$/.test(saved)) {
+    [deadlineHH, deadlineMM] = saved.split(":").map(Number);
+  }
+
+  function getDeadline() {
+    const fri = currentFriday || toYMD((() => { const d = new Date(); while (d.getDay() !== 5) d.setDate(d.getDate() + 1); return d; })());
+    const [y, mo, d] = fri.split("-").map(Number);
+    const jan = new Date(y, 0, 1);
+    const dstStart = new Date(y, 2, 8  + (7 - jan.getDay()) % 7);
+    const dstEnd   = new Date(y, 10, 1 + (7 - new Date(y, 10, 1).getDay()) % 7);
+    const friday   = new Date(y, mo - 1, d);
+    const utcOffset = (friday >= dstStart && friday < dstEnd) ? 4 : 5;
+    return new Date(Date.UTC(y, mo - 1, d, deadlineHH + utcOffset, deadlineMM, 0));
+  }
+
+  function fmtTime() {
+    const h12 = deadlineHH % 12 || 12;
+    const ampm = deadlineHH >= 12 ? "PM" : "AM";
+    return `${h12}:${String(deadlineMM).padStart(2,"0")} ${ampm} ET`;
+  }
+
+  function pad(n) { return String(n).padStart(2, "0"); }
+
+  let editing = false;
+
+  function showEditor() {
+    if (editing) return;
+    editing = true;
+    clearInterval(timer);
+    el.innerHTML = `<span class="countdown-label" style="flex:1;align-items:flex-start;gap:0.4rem">
+      <span style="font-size:0.6rem;opacity:0.7">ORDER BY (HH:MM 24h)</span>
+      <input class="countdown-time-input" id="deadline-input" type="text"
+        value="${pad(deadlineHH)}:${pad(deadlineMM)}" maxlength="5" placeholder="17:30">
+      <span style="font-size:0.6rem;opacity:0.5">press Enter to save</span>
+    </span>`;
+    const inp = document.getElementById("deadline-input");
+    inp.focus();
+    inp.select();
+    inp.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const val = inp.value.trim();
+        if (/^\d{1,2}:\d{2}$/.test(val)) {
+          const [hh, mm] = val.split(":").map(Number);
+          if (hh >= 0 && hh <= 23 && mm >= 0 && mm <= 59) {
+            deadlineHH = hh; deadlineMM = mm;
+            localStorage.setItem("orderDeadline", `${hh}:${String(mm).padStart(2,"0")}`);
+          }
+        }
+        editing = false;
+        tick();
+        timer = setInterval(tick, 1000);
+      }
+      if (e.key === "Escape") {
+        editing = false;
+        tick();
+        timer = setInterval(tick, 1000);
+      }
+    });
+  }
+
+  function tick() {
+    if (editing) return;
+    const diff = getDeadline() - Date.now();
+    if (diff <= 0) {
+      el.innerHTML = `<span class="countdown-label" style="flex:1;cursor:pointer" id="deadline-label">ORDER BY<br><span class="countdown-label-time">${fmtTime()}</span></span>
+        <span style="padding:0.75rem 1rem;font-weight:900;letter-spacing:0.18em;font-size:0.85rem;flex:1;text-align:center">ORDERS CLOSED</span>`;
+      document.getElementById("deadline-label")?.addEventListener("click", showEditor);
+      return;
+    }
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.innerHTML = `<span class="countdown-label" style="cursor:pointer" id="deadline-label">ORDER BY<br><span class="countdown-label-time">${fmtTime()}</span></span>
+      <div class="countdown-units">
+        <div class="countdown-unit"><span class="countdown-num">${pad(h)}</span><span class="countdown-unit-label">hrs</span></div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-unit"><span class="countdown-num">${pad(m)}</span><span class="countdown-unit-label">min</span></div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-unit"><span class="countdown-num">${pad(s)}</span><span class="countdown-unit-label">sec</span></div>
+      </div>`;
+    document.getElementById("deadline-label")?.addEventListener("click", showEditor);
+  }
+
+  tick();
+  let timer = setInterval(tick, 1000);
+}
+
+// ── Theme & dark mode ──────────────────────────────────────────────────
+(function() {
+  const SWATCH_COLORS = {
+    yellow: "#fcf811", green: "#39ff14", pink: "#fc16ac", cyan: "#04f2d6", white: "#ffffff", offwhite: "#fafcc4", grey: "#b8c4c6"
+  };
+  const switcher   = document.getElementById("theme-switcher");
+  const darkBtn    = document.getElementById("dark-toggle");
+  const currentEl  = document.getElementById("theme-current");
+  const swatches   = document.querySelectorAll(".theme-swatch");
+
+  function applyTheme(theme) {
+    document.body.dataset.theme = theme;
+    currentEl.style.background = SWATCH_COLORS[theme] || "#fcf811";
+    localStorage.setItem("theme", theme);
+    switcher.classList.remove("open");
+  }
+
+  function applyDark(on) {
+    document.body.classList.toggle("dark", on);
+    darkBtn.textContent = on ? "☀" : "☾";
+    localStorage.setItem("darkMode", on ? "1" : "0");
+  }
+
+  applyTheme(localStorage.getItem("theme") || "yellow");
+  applyDark(localStorage.getItem("darkMode") === "1");
+
+  currentEl.addEventListener("click", e => {
+    e.stopPropagation();
+    switcher.classList.toggle("open");
+  });
+
+  swatches.forEach(s => s.addEventListener("click", e => {
+    e.stopPropagation();
+    applyTheme(s.dataset.theme);
+  }));
+
+  darkBtn.addEventListener("click", () => applyDark(!document.body.classList.contains("dark")));
+
+  document.addEventListener("click", () => switcher.classList.remove("open"));
+})();
+
+startCountdown();
+init();
+
+document.getElementById("tax-toggle").addEventListener("change", () => renderOrdersTable());
+
+let _lbImages = [];
+let _lbIndex  = 0;
+
+function openLightbox(index) {
+  const thumbs = document.querySelectorAll(".menu-img-thumb");
+  _lbImages = [...thumbs].map(t => ({ src: t.src, alt: t.alt }));
+  _lbIndex  = index;
+  _renderLightbox();
+  document.getElementById("lightbox").classList.add("open");
+}
+function _renderLightbox() {
+  const lb  = document.getElementById("lightbox");
+  const img = lb.querySelector("img");
+  const counter = lb.querySelector(".lightbox-counter");
+  const prev = lb.querySelector(".lightbox-nav.prev");
+  const next = lb.querySelector(".lightbox-nav.next");
+  img.src = _lbImages[_lbIndex].src;
+  img.alt = _lbImages[_lbIndex].alt;
+  const multi = _lbImages.length > 1;
+  prev.hidden = !multi;
+  next.hidden = !multi;
+  counter.textContent = multi ? `${_lbIndex + 1} / ${_lbImages.length}` : "";
+}
+function closeLightbox() {
+  document.getElementById("lightbox").classList.remove("open");
+}
+function lbPrev() { _lbIndex = (_lbIndex - 1 + _lbImages.length) % _lbImages.length; _renderLightbox(); }
+function lbNext() { _lbIndex = (_lbIndex + 1) % _lbImages.length; _renderLightbox(); }
+document.addEventListener("keydown", e => {
+  if (!document.getElementById("lightbox").classList.contains("open")) return;
+  if (e.key === "Escape")     closeLightbox();
+  if (e.key === "ArrowLeft")  lbPrev();
+  if (e.key === "ArrowRight") lbNext();
+});
+</script>
+
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center">
+  <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:320px;width:90%;text-align:center">
+    <p id="confirm-modal-msg" style="margin-bottom:1.25rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600"></p>
+    <div style="display:flex;gap:0.75rem;justify-content:center">
+      <button id="confirm-modal-ok"  style="padding:0.5rem 1.25rem;border:2px solid #cc0000;background:#cc0000;color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Delete</button>
+      <button id="confirm-modal-cancel" style="padding:0.5rem 1.25rem;border:2px solid #000;background:transparent;color:#000;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <button class="lightbox-nav prev" onclick="event.stopPropagation();lbPrev()" hidden>&#8249;</button>
+  <img src="" alt="" onclick="event.stopPropagation()">
+  <button class="lightbox-nav next" onclick="event.stopPropagation();lbNext()" hidden>&#8250;</button>
+  <div class="lightbox-counter"></div>
+</div>
+</body>
+</html>

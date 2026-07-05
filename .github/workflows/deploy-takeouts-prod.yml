@@ -1,0 +1,64 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate config.js from secrets
+        env:
+          APPS_SCRIPT_URL:  ${{ secrets.APPS_SCRIPT_URL }}
+          FORM_URL:         ${{ secrets.FORM_URL }}
+          FORM_NAME_ENTRY:  ${{ secrets.FORM_NAME_ENTRY }}
+          FORM_ORDER_ENTRY: ${{ secrets.FORM_ORDER_ENTRY }}
+          SHEET_ID:         ${{ secrets.SHEET_ID }}
+          ORDERS_GID:       ${{ secrets.ORDERS_GID }}
+          DRIVERS_GID:      ${{ secrets.DRIVERS_GID }}
+        run: |
+          printf 'window.TAKEOUT_CONFIG = {\n  APPS_SCRIPT_URL:  "%s",\n  FORM_URL:         "%s",\n  FORM_NAME_ENTRY:  "%s",\n  FORM_ORDER_ENTRY: "%s",\n  SHEET_ID:         "%s",\n  ORDERS_GID:       "%s",\n  DRIVERS_GID:      "%s"\n};\n' \
+            "$APPS_SCRIPT_URL" "$FORM_URL" "$FORM_NAME_ENTRY" "$FORM_ORDER_ENTRY" \
+            "$SHEET_ID" "$ORDERS_GID" "$DRIVERS_GID" > takeouts/config.js
+
+      - name: Obfuscate config.js
+        run: |
+          npm install -g javascript-obfuscator
+          javascript-obfuscator takeouts/config.js \
+            --output takeouts/config.js \
+            --compact true \
+            --string-array true \
+            --string-array-encoding 'base64' \
+            --string-array-rotate true \
+            --string-array-shuffle true \
+            --split-strings true \
+            --split-strings-chunk-length 5 \
+            --identifier-names-generator hexadecimal
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
