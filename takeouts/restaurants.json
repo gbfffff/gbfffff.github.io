@@ -1658,192 +1658,233 @@
         {
           "item": "Taco - Pollo",
           "price": 3.5,
-          "desc": "Grilled chicken in an achiote rub on 4\" corn tortilla"
+          "desc": "Grilled chicken in an achiote rub on 4\" corn tortilla",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Mole (contains nuts)",
           "price": 4.0,
-          "desc": "Shredded chicken in mole sauce with queso fresco & crema"
+          "desc": "Shredded chicken in mole sauce with queso fresco & crema",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Carne Asada",
           "price": 3.5,
           "popular": true,
-          "desc": "Grilled steak on corn tortilla"
+          "desc": "Grilled steak on corn tortilla",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Suadero",
           "price": 3.5,
-          "desc": "Beef rib on corn tortilla"
+          "desc": "Beef rib on corn tortilla",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Lengua",
           "price": 5.25,
-          "desc": "Beef tongue on corn tortilla"
+          "desc": "Beef tongue on corn tortilla",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Tripa",
           "price": 3.5,
-          "desc": "Small intestine on corn tortilla"
+          "desc": "Small intestine on corn tortilla",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Cachete",
           "price": 3.5,
-          "desc": "Beef cheek on corn tortilla"
+          "desc": "Beef cheek on corn tortilla",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Al Pastor",
           "price": 3.5,
           "popular": true,
-          "desc": "Roasted pork marinated with pineapple on corn tortilla"
+          "desc": "Roasted pork marinated with pineapple on corn tortilla",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Chorizo",
           "price": 3.5,
-          "desc": "Mexican pork sausage on corn tortilla"
+          "desc": "Mexican pork sausage on corn tortilla",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Cochinita",
           "price": 3.5,
-          "desc": "Slow roasted pork in citrus & achiote marinade"
+          "desc": "Slow roasted pork in citrus & achiote marinade",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Alambre",
           "price": 4.25,
-          "desc": "Any meat with bacon, red bell pepper, grilled onion & melted mozzarella"
+          "desc": "Any meat with bacon, red bell pepper, grilled onion & melted mozzarella",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Pescado",
           "price": 3.75,
-          "desc": "Battered tilapia with pickle purple cabbage & chipotle mayo"
+          "desc": "Battered tilapia with pickle purple cabbage & chipotle mayo",
+          "category": "Tacos"
         },
         {
           "item": "Taco - Veggie",
           "price": 3.0,
-          "desc": "Grilled mushrooms, red bell pepper & onion"
+          "desc": "Grilled mushrooms, red bell pepper & onion",
+          "category": "Tacos"
         },
         {
           "item": "Burrito Clasico",
           "price": 6.5,
           "protein": true,
+          "orOptions": ["Chicken", "Beef", "Al Pastor", "Veggie"],
           "popular": true,
-          "desc": "10\" flour tortilla with pinto beans, rice, crema & choice of protein"
+          "desc": "10\" flour tortilla with pinto beans, rice, crema & choice of protein",
+          "category": "Burritos & Plates"
         },
         {
           "item": "Burrito Bowl",
           "price": 8.0,
           "protein": true,
-          "desc": "Bowl with pinto beans, rice, crema & choice of protein"
+          "orOptions": ["Chicken", "Beef", "Al Pastor", "Veggie"],
+          "desc": "Bowl with pinto beans, rice, crema & choice of protein",
+          "category": "Burritos & Plates"
         },
         {
           "item": "Enchiladas",
           "price": 9.0,
           "protein": true,
-          "desc": "3 corn tortillas filled with shredded pollo, topped with crema & queso fresco"
+          "orOptions": ["Chicken", "Beef", "Al Pastor", "Veggie"],
+          "desc": "3 corn tortillas filled with shredded pollo, topped with crema & queso fresco",
+          "category": "Burritos & Plates"
         },
         {
           "item": "Chilaquiles",
           "price": 9.0,
-          "desc": "Lightly fried corn tortilla chips in salsa verde, topped with shredded chicken, crema, queso fresco, onion & avocado"
+          "desc": "Lightly fried corn tortilla chips in salsa verde, topped with shredded chicken, crema, queso fresco, onion & avocado",
+          "category": "Burritos & Plates"
         },
         {
           "item": "Tostadas",
           "price": 5.0,
           "desc": "Flat deep fried corn tortilla with tinga shredded beef or pata",
-          "orOptions": ["Beef", "Pata"]
+          "orOptions": ["Beef", "Pata"],
+          "category": "Burritos & Plates"
         },
         {
           "item": "Quesadilla",
           "price": 6.0,
           "protein": true,
-          "desc": "Handmade corn tortilla with melted mozzarella, $2 more for protein"
+          "orOptions": ["Chicken", "Beef", "Al Pastor", "Veggie"],
+          "desc": "Handmade corn tortilla with melted mozzarella, $2 more for protein",
+          "category": "Burritos & Plates"
         },
         {
           "item": "Pozole (Large)",
           "price": 10.5,
-          "desc": "Hearty soup with pork & hominy corn"
+          "desc": "Hearty soup with pork & hominy corn",
+          "category": "Soups"
         },
         {
           "item": "Pozole (Small)",
           "price": 8.5,
-          "desc": "Hearty soup with pork & hominy corn"
+          "desc": "Hearty soup with pork & hominy corn",
+          "category": "Soups"
         },
         {
           "item": "Pancita (Large)",
           "price": 12.5,
-          "desc": "Traditional Mexican soup with tripe, beef stomach in red chili broth (Sun & Sat only)"
+          "desc": "Traditional Mexican soup with tripe, beef stomach in red chili broth (Sun & Sat only)",
+          "category": "Soups"
         },
         {
           "item": "Pancita (Small)",
           "price": 10.5,
-          "desc": "Traditional Mexican soup with tripe, beef stomach in red chili broth (Sun & Sat only)"
+          "desc": "Traditional Mexican soup with tripe, beef stomach in red chili broth (Sun & Sat only)",
+          "category": "Soups"
         },
         {
           "item": "Arroz",
           "price": 2.5,
-          "desc": "Mexican style rice"
+          "desc": "Mexican style rice",
+          "category": "Sides"
         },
         {
           "item": "Frijoles",
           "price": 2.5,
-          "desc": "Pinto whole beans"
+          "desc": "Pinto whole beans",
+          "category": "Sides"
         },
         {
           "item": "Chips",
           "price": 2.5,
-          "desc": "Corn tortilla chips"
+          "desc": "Corn tortilla chips",
+          "category": "Sides"
         },
         {
           "item": "Chile Asado",
           "price": 1.0,
-          "desc": "Grilled jalapeño"
+          "desc": "Grilled jalapeño",
+          "category": "Sides"
         },
         {
           "item": "Cebollitas",
           "price": 3.0,
-          "desc": "Grilled spring onion"
+          "desc": "Grilled spring onion",
+          "category": "Sides"
         },
         {
           "item": "Esquites",
           "price": 3.5,
-          "desc": "White corn kernels with epazote, lime, mayo & queso fresco"
+          "desc": "White corn kernels with epazote, lime, mayo & queso fresco",
+          "category": "Sides"
         },
         {
           "item": "Nopales",
           "price": 4.0,
-          "desc": "Grilled cactus pads seasoned in oregano"
+          "desc": "Grilled cactus pads seasoned in oregano",
+          "category": "Sides"
         },
         {
           "item": "Tres Leches Cake",
           "price": 5.5,
-          "desc": "Portioned & ready to go"
+          "desc": "Portioned & ready to go",
+          "category": "Desserts & Drinks"
         },
         {
           "item": "Horchata",
           "price": 3.5,
-          "desc": "Cinnamon rice drink (contains milk)"
+          "desc": "Cinnamon rice drink (contains milk)",
+          "category": "Desserts & Drinks"
         },
         {
           "item": "Aguas Frescas",
           "price": 3.5,
-          "desc": "Seasonal flavors"
+          "desc": "Seasonal flavors",
+          "category": "Desserts & Drinks"
         },
         {
           "item": "Mex Soda",
           "price": 3.0,
-          "desc": "Multi-flavor glass bottle"
+          "desc": "Multi-flavor glass bottle",
+          "category": "Desserts & Drinks"
         },
         {
           "item": "Can Soda",
-          "price": 2.5
+          "price": 2.5,
+          "category": "Desserts & Drinks"
         },
         {
           "item": "Topo Chico",
-          "price": 3.0
+          "price": 3.0,
+          "category": "Desserts & Drinks"
         },
         {
           "item": "Bottled Water",
-          "price": 2.0
+          "price": 2.0,
+          "category": "Desserts & Drinks"
         }
       ]
     },
