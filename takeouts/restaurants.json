@@ -3,6 +3,7 @@
   "restaurants": [
     {
       "name": "Yia Yia's Kitchen",
+      "cuisine": "Greek",
       "phone": "+13015951855",
       "orderUrl": "https://order.toasttab.com/online/yia-yias-kitchen",
       "mapUrl": "https://maps.app.goo.gl/CjWfEY3Wrm7jzwmn6",
@@ -520,6 +521,7 @@
     },
     {
       "name": "Shanghai Taste",
+      "cuisine": "Chinese",
       "phone": "301-279-0806",
       "orderUrl": "https://www.shanghaitastemd.com/order",
       "mapUrl": "https://maps.app.goo.gl/JhXJZMouWbLWKJ748",
@@ -571,13 +573,19 @@
           "item": "Steamed or Pan Fried Dumpling (6pcs) 蒸餃或鍋貼",
           "price": 7.5,
           "popular": true,
-          "orOptions": ["Steamed", "Pan Fried"],
+          "orOptions": [
+            "Steamed",
+            "Pan Fried"
+          ],
           "category": "Appetizers"
         },
         {
           "item": "Steamed or Fried Veggie Dumplings (6pcs) 素水餃或素鍋貼",
           "price": 7.95,
-          "orOptions": ["Steamed", "Fried"],
+          "orOptions": [
+            "Steamed",
+            "Fried"
+          ],
           "category": "Appetizers"
         },
         {
@@ -1096,7 +1104,10 @@
           "item": "Shanghai Wong Pan Fried Noodles — Pork or Chicken 上海王家炒二面黃（肉絲/雞絲）",
           "price": 16.95,
           "popular": true,
-          "orOptions": ["Pork", "Chicken"],
+          "orOptions": [
+            "Pork",
+            "Chicken"
+          ],
           "category": "Chef's Suggestions"
         },
         {
@@ -1147,7 +1158,10 @@
         {
           "item": "Shredded Pork or Chicken with Bamboo Shoot and Chili Pepper 小椒筍尖肉絲/雞絲",
           "price": 17.95,
-          "orOptions": ["Pork", "Chicken"],
+          "orOptions": [
+            "Pork",
+            "Chicken"
+          ],
           "category": "Chef's Suggestions"
         },
         {
@@ -1645,6 +1659,7 @@
     },
     {
       "name": "Ixtapalapa",
+      "cuisine": "Mexican",
       "phone": "240-702-0217",
       "orderUrl": "https://direct.chownow.com/order/14052/locations/19722",
       "mapUrl": "https://maps.app.goo.gl/gnFwy3pAxEhqkZH3A",
@@ -1739,7 +1754,12 @@
           "item": "Burrito Clasico",
           "price": 6.5,
           "protein": true,
-          "orOptions": ["Chicken", "Beef", "Al Pastor", "Veggie"],
+          "orOptions": [
+            "Chicken",
+            "Beef",
+            "Al Pastor",
+            "Veggie"
+          ],
           "popular": true,
           "desc": "10\" flour tortilla with pinto beans, rice, crema & choice of protein",
           "category": "Burritos & Plates"
@@ -1748,7 +1768,12 @@
           "item": "Burrito Bowl",
           "price": 8.0,
           "protein": true,
-          "orOptions": ["Chicken", "Beef", "Al Pastor", "Veggie"],
+          "orOptions": [
+            "Chicken",
+            "Beef",
+            "Al Pastor",
+            "Veggie"
+          ],
           "desc": "Bowl with pinto beans, rice, crema & choice of protein",
           "category": "Burritos & Plates"
         },
@@ -1756,7 +1781,12 @@
           "item": "Enchiladas",
           "price": 9.0,
           "protein": true,
-          "orOptions": ["Chicken", "Beef", "Al Pastor", "Veggie"],
+          "orOptions": [
+            "Chicken",
+            "Beef",
+            "Al Pastor",
+            "Veggie"
+          ],
           "desc": "3 corn tortillas filled with shredded pollo, topped with crema & queso fresco",
           "category": "Burritos & Plates"
         },
@@ -1770,14 +1800,22 @@
           "item": "Tostadas",
           "price": 5.0,
           "desc": "Flat deep fried corn tortilla with tinga shredded beef or pata",
-          "orOptions": ["Beef", "Pata"],
+          "orOptions": [
+            "Beef",
+            "Pata"
+          ],
           "category": "Burritos & Plates"
         },
         {
           "item": "Quesadilla",
           "price": 6.0,
           "protein": true,
-          "orOptions": ["Chicken", "Beef", "Al Pastor", "Veggie"],
+          "orOptions": [
+            "Chicken",
+            "Beef",
+            "Al Pastor",
+            "Veggie"
+          ],
           "desc": "Handmade corn tortilla with melted mozzarella, $2 more for protein",
           "category": "Burritos & Plates"
         },
@@ -1890,6 +1928,7 @@
     },
     {
       "name": "Ah'Haan",
+      "cuisine": "Thai",
       "phone": "",
       "orderUrl": "https://ahhaan.com/menu/",
       "mapUrl": "",
@@ -2037,7 +2076,10 @@
           "item": "Larb",
           "price": 10,
           "protein": true,
-          "orOptions": ["Chicken", "Pork"],
+          "orOptions": [
+            "Chicken",
+            "Pork"
+          ],
           "desc": "Spicy ground chicken or pork with rice powder, scallions, red onion, cilantro, chili pepper, fish sauce, and lime juice"
         },
         {
@@ -2351,7 +2393,8 @@
       "address": "",
       "menuUrl": "",
       "menuImages": [],
-      "menu": []
+      "menu": [],
+      "cuisine": "Peruvian"
     },
     {
       "name": "Mi La Cay",
@@ -2361,7 +2404,8 @@
       "address": "",
       "menuUrl": "",
       "menuImages": [],
-      "menu": []
+      "menu": [],
+      "cuisine": "Vietnamese"
     },
     {
       "name": "偉記",
@@ -2371,7 +2415,8 @@
       "address": "",
       "menuUrl": "",
       "menuImages": [],
-      "menu": []
+      "menu": [],
+      "cuisine": "Chinese"
     },
     {
       "name": "Big Greek",
@@ -2381,7 +2426,8 @@
       "address": "",
       "menuUrl": "",
       "menuImages": [],
-      "menu": []
+      "menu": [],
+      "cuisine": "Greek"
     },
     {
       "name": "Shanghai Taste",
@@ -2389,7 +2435,8 @@
       "orderUrl": "https://www.shanghaitastemd.com/menu",
       "mapUrl": "",
       "address": "",
-      "ref": "Shanghai Taste"
+      "ref": "Shanghai Taste",
+      "cuisine": "Chinese"
     },
     {
       "name": "Taco Madre",
@@ -2399,7 +2446,8 @@
       "address": "",
       "menuUrl": "https://www.tacosalamadre.com/",
       "menuImages": [],
-      "menu": []
+      "menu": [],
+      "cuisine": "Mexican"
     },
     {
       "name": "Thai Cottage",
@@ -2409,7 +2457,8 @@
       "address": "",
       "menuUrl": "",
       "menuImages": [],
-      "menu": []
+      "menu": [],
+      "cuisine": "Thai"
     },
     {
       "name": "Pollo Cabana",
@@ -2419,7 +2468,8 @@
       "address": "",
       "menuUrl": "",
       "menuImages": [],
-      "menu": []
+      "menu": [],
+      "cuisine": "Peruvian"
     },
     {
       "name": "Mi La Cay",
@@ -2427,7 +2477,8 @@
       "orderUrl": "",
       "mapUrl": "",
       "address": "",
-      "ref": "Mi La Cay"
+      "ref": "Mi La Cay",
+      "cuisine": "Vietnamese"
     },
     {
       "name": "羊城",
@@ -2437,7 +2488,8 @@
       "address": "",
       "menuUrl": "",
       "menuImages": [],
-      "menu": []
+      "menu": [],
+      "cuisine": "Chinese"
     }
   ]
 }

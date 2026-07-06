@@ -32,10 +32,12 @@ jobs:
           SHEET_ID:         ${{ secrets.SHEET_ID }}
           ORDERS_GID:       ${{ secrets.ORDERS_GID }}
           DRIVERS_GID:      ${{ secrets.DRIVERS_GID }}
+          HISTORY_GID:      ${{ secrets.HISTORY_GID }}
+          RATINGS_GID:      ${{ secrets.RATINGS_GID }}
         run: |
-          printf 'window.TAKEOUT_CONFIG = {\n  APPS_SCRIPT_URL:  "%s",\n  FORM_URL:         "%s",\n  FORM_NAME_ENTRY:  "%s",\n  FORM_ORDER_ENTRY: "%s",\n  SHEET_ID:         "%s",\n  ORDERS_GID:       "%s",\n  DRIVERS_GID:      "%s"\n};\n' \
+          printf 'window.TAKEOUT_CONFIG = {\n  APPS_SCRIPT_URL:  "%s",\n  FORM_URL:         "%s",\n  FORM_NAME_ENTRY:  "%s",\n  FORM_ORDER_ENTRY: "%s",\n  SHEET_ID:         "%s",\n  ORDERS_GID:       "%s",\n  DRIVERS_GID:      "%s",\n  HISTORY_GID:      "%s",\n  RATINGS_GID:      "%s"\n};\n' \
             "$APPS_SCRIPT_URL" "$FORM_URL" "$FORM_NAME_ENTRY" "$FORM_ORDER_ENTRY" \
-            "$SHEET_ID" "$ORDERS_GID" "$DRIVERS_GID" > takeouts/config.js
+            "$SHEET_ID" "$ORDERS_GID" "$DRIVERS_GID" "$HISTORY_GID" "$RATINGS_GID" > takeouts/config.js
 
       - name: Obfuscate config.js
         run: |

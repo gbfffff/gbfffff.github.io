@@ -8,17 +8,21 @@
 //    • Execute as: Me
 //    • Who has access: Anyone
 // 4. Copy the web app URL into config.js → APPS_SCRIPT_URL
-// 5. Make sure your sheet has two tabs named "Orders" and "Drivers"
-//    (the script will create headers automatically on first write)
+// 5. Tabs "Orders", "Drivers", "History", and "Ratings" are created
+//    automatically (with headers) on first write to each -- no manual setup.
 //
 // SHEET READING (for displaying orders on the site):
 // 6. In your Google Sheet → File → Share → Publish to web
 //    • Choose "Entire Document" and format "Comma-separated values (.csv)"
 //    • Click Publish — this lets the site read orders without an API key
+// 7. Note the "gid" of the "History" and "Ratings" tabs (visible in the URL
+//    when that tab is open) → config.js needs these as HISTORY_GID/RATINGS_GID
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ORDERS_SHEET  = "Orders";
 const DRIVERS_SHEET = "Drivers";
+const HISTORY_SHEET = "History";
+const RATINGS_SHEET = "Ratings";
 
 function doGet(e) {
   const ss   = SpreadsheetApp.getActiveSpreadsheet();
@@ -40,6 +44,29 @@ function doGet(e) {
         sheet.appendRow(["Timestamp", "Date", "Name"]);
       }
       sheet.appendRow([now, data.date, data.name]);
+    }
+
+    // Logged once per week via the "Order Complete" button -- one row per
+    // individual dish ordered that week, for future per-item rating/metrics.
+    if (data.type === "history") {
+      const sheet = getOrCreateSheet(ss, HISTORY_SHEET);
+      if (sheet.getLastRow() === 0) {
+        sheet.appendRow(["Timestamp", "Date", "Restaurant", "Item", "Qty", "Names"]);
+      }
+      const items = JSON.parse(data.items || "[]");
+      items.forEach(function(it) {
+        sheet.appendRow([now, data.date, data.restaurant, it.name, it.qty, (it.names || []).join(", ")]);
+      });
+    }
+
+    // Submitted from the "Rate Your Order" table, shown once the week's
+    // History has been logged. One row per person+item rating.
+    if (data.type === "rating") {
+      const sheet = getOrCreateSheet(ss, RATINGS_SHEET);
+      if (sheet.getLastRow() === 0) {
+        sheet.appendRow(["Timestamp", "Date", "Restaurant", "Item", "Name", "Rating"]);
+      }
+      sheet.appendRow([now, data.date, data.restaurant, data.item, data.name, data.rating]);
     }
   } catch (err) {
     return ContentService
