@@ -26,6 +26,29 @@ const DEBUG_MODE = location.hostname !== "gbfffff.github.io" ||
 let _debugNowOverride = null; // epoch ms, or null to use real time
 function debugNow() { return _debugNowOverride ?? Date.now(); }
 
+// Shown in the footer on QA/localhost only (see DEBUG_MODE above). Bump
+// APP_VERSION and add an entry here whenever a meaningful batch of changes
+// ships -- newest entry first.
+const APP_VERSION = "1.3.0";
+const CHANGELOG = [
+  { version: "1.3.0", date: "2026-07-06", notes: [
+    "Add QA deployment (takeouts-qa/) alongside prod, with its own config/secrets",
+    "Weekly rotation now resets Monday 6:00 AM ET instead of the prior Wednesday boundary",
+    "Add GBF Favs/Dislikes menu insights and an Order History & Ratings report",
+    "Add order-freeze + Rate Your Order flow after Order Complete is logged",
+    "Add Test Clock and Force Reopen QA tools (DEBUG_MODE only)",
+  ]},
+  { version: "1.2.0", date: "2026-07-05", notes: [
+    "Add access-code gate, Grouped Worksheet view, and Grand Total bar",
+    "Add category shortcuts, cuisine tags, and the rotation-schedule slidedown",
+    "Extract inline styles/scripts into styles.css, gate.js, and app.js",
+  ]},
+  { version: "1.1.0", date: "2026-07-05", notes: [
+    "Add menu categorization, required protein/or-options selection",
+    "Add show-prices toggle, duplicate-order grouping, and new-order notifications",
+  ]},
+];
+
 let currentFriday = null;
 let takenItems    = {};
 let allMenuItems  = [];
@@ -1959,6 +1982,28 @@ function startCountdown() {
 
 startCountdown();
 init();
+
+if (DEBUG_MODE) {
+  const buildInfo = document.getElementById("build-info");
+  const versionEl = document.getElementById("build-version");
+  const toggleBtn = document.getElementById("changelog-toggle-btn");
+  const clPanel   = document.getElementById("changelog-panel");
+  if (buildInfo && versionEl && toggleBtn && clPanel) {
+    buildInfo.style.display = "block";
+    versionEl.textContent = `v${APP_VERSION}`;
+    clPanel.innerHTML = CHANGELOG.map(entry => `
+      <div class="changelog-entry">
+        <div class="changelog-entry-header"><span>v${esc(entry.version)}</span><span>${esc(entry.date)}</span></div>
+        <ul>${entry.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>
+      </div>
+    `).join("");
+    toggleBtn.addEventListener("click", () => {
+      const open = !toggleBtn.classList.contains("open");
+      toggleBtn.classList.toggle("open", open);
+      clPanel.classList.toggle("open", open);
+    });
+  }
+}
 
 if (DEBUG_MODE) {
   const panel     = document.getElementById("debug-clock");
