@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>::::/ Friday Takeout /::: GBF :::://///</title>
+  <meta name="theme-color" id="theme-color-meta" content="#fcf811">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="gate-overlay" class="gate-overlay">
+  <div class="gate-box gate-box-wide">
+    <div class="gate-label">GBF Takeout &mdash; Group Access</div>
+    <h2 class="gate-question">Enter Access Code</h2>
+    <div class="gate-otp" id="gate-otp"></div>
+    <div class="gate-error" id="gate-error" style="display:none">Incorrect code &mdash; try again.</div>
+    <button type="button" id="gate-submit" class="btn btn-primary" style="margin-top:1rem">Enter</button>
+  </div>
+</div>
+<script src="gate.js"></script>
+<div class="debug-clock" id="debug-clock" style="display:none">
+  <div class="debug-clock-label">Test Clock <span id="debug-clock-status"></span></div>
+  <input type="datetime-local" id="debug-clock-input">
+  <div class="debug-clock-actions">
+    <button type="button" id="debug-clock-apply">Jump</button>
+    <button type="button" id="debug-clock-reset">Reset</button>
+  </div>
+  <label class="debug-clock-checkbox">
+    <input type="checkbox" id="debug-force-reopen">
+    Force reopen (ignore finalized)
+  </label>
+</div>
+<div class="theme-switcher" id="theme-switcher">
+  <button class="theme-dark-btn" id="dark-toggle" title="Toggle dark mode">☾</button>
+  <div class="theme-swatch-current" id="theme-current" title="Change color"></div>
+  <div class="theme-options" id="theme-options">
+    <div class="theme-swatch" data-theme="yellow" style="background:#fcf811" title="Acid Yellow"></div>
+    <div class="theme-swatch" data-theme="green"  style="background:#39ff14" title="Acid Green"></div>
+    <div class="theme-swatch" data-theme="pink"   style="background:#fc16ac" title="Acid Pink"></div>
+    <div class="theme-swatch" data-theme="lightpink" style="background:#ffd1e8" title="Light Pink"></div>
+    <div class="theme-swatch" data-theme="cyan"   style="background:#04f2d6" title="Cyan"></div>
+    <div class="theme-swatch" data-theme="white"    style="background:#ffffff" title="White"></div>
+    <div class="theme-swatch" data-theme="offwhite" style="background:#fafcc4" title="Off White"></div>
+    <div class="theme-swatch" data-theme="grey"     style="background:#b8c4c6" title="Grey"></div>
+  </div>
+</div>
+<div class="container">
+
+  <header>
+    <div class="marquee-sign"><span class="marquee-friday-text">TAKEOUT ORDER</span></div>
+    <div class="header-body">
+      <div class="header-left">
+        <p class="site-label">Weekly Group Order</p>
+        <div class="big-date" id="friday-date"></div>
+        <span class="restaurant-badge" id="restaurant-name">Loading</span>
+      </div>
+      <div class="calendar-col">
+        <div id="friday-calendar" class="friday-calendar" style="display:none"></div>
+        <button type="button" id="rotation-toggle-btn" class="rotation-toggle-btn" style="display:none">
+          View Rotation <span class="rotation-toggle-arrow">&#9660;</span>
+        </button>
+        <div id="rotation-panel" class="rotation-panel"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="stripe-divider" aria-hidden="true"></div>
+
+  <!-- MENU PANEL -->
+  <div class="card" id="menu-panel-card" style="display:none">
+    <div class="card-header">
+      <h2 id="menu-panel-title">Menu</h2>
+    </div>
+    <div class="menu-panel-shortcuts" id="menu-panel-shortcuts"></div>
+    <div class="menu-panel" id="menu-panel"></div>
+  </div>
+
+  <!-- ORDER FORM -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Place Your Order</h2>
+    </div>
+    <div id="order-countdown" class="order-countdown"></div>
+    <div class="card-body" style="position:relative">
+      <div class="closed-overlay" id="closed-overlay" style="display:none">
+        <div class="closed-overlay-box">
+          <span class="closed-overlay-text">Orders Closed</span>
+          <button type="button" id="closed-overlay-unlock" class="btn closed-overlay-unlock-btn">Order Anyway</button>
+          <p class="closed-overlay-note">Your order may not reach the handler after this time, but you can try</p>
+        </div>
+      </div>
+      <div class="closed-overlay" id="frozen-overlay" style="display:none">
+        <div class="closed-overlay-box">
+          <span class="closed-overlay-text">Order Finalized</span>
+          <p class="closed-overlay-note">This week's order has been logged. Editing is locked — see the Worksheet below.</p>
+        </div>
+      </div>
+      <form id="order-form">
+
+        <div class="field-group">
+          <label class="field-label" for="order-name">Name</label>
+          <input type="text" id="order-name" placeholder="Your name" required />
+        </div>
+
+        <div class="field-group" id="menu-section">
+          <!-- built from restaurants.json -->
+        </div>
+
+        <div class="dup-warning" id="dup-warning">
+          <span id="dup-warning-text"></span>
+        </div>
+
+        <div class="field-group" style="margin-top:1rem">
+          <label class="field-label" for="order-notes">Special Requests</label>
+          <textarea id="order-notes" placeholder="No onions, extra sauce…"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="order-btn">Submit Order</button>
+      </form>
+      <div class="success-msg" id="order-success">
+        Order submitted. See you Friday.
+        <div id="order-success-items" style="margin-top:0.5rem;font-size:0.82rem;color:var(--text-muted);line-height:1.5"></div>
+        <br><button type="button" class="btn btn-secondary" id="edit-order-btn" style="margin-top:0.5rem;font-size:0.8rem">Edit My Order</button>
+      </div>
+      <div id="form-trending" style="display:none;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border)">
+        <div class="field-label" id="form-trending-title" style="margin-bottom:0.6rem"></div>
+        <div id="form-trending-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDERS LIST -->
+  <div class="card">
+    <div class="card-header toggle-header">
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <h2>Orders Worksheet</h2>
+        <span class="order-count-icon">
+          <svg viewBox="0 0 24 30" width="42" height="42" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="4" width="20" height="24" rx="2" stroke="currentColor" stroke-width="2"/>
+            <rect x="8" y="1" width="8" height="5" rx="1.5" stroke="currentColor" stroke-width="2" fill="var(--bg)"/>
+          </svg>
+          <span class="order-count-num" id="order-count">0</span>
+        </span>
+      </div>
+      <div class="toggle-row">
+        <label class="toggle-label">
+          <input type="checkbox" id="show-prices-toggle" class="toggle-checkbox">
+          Show Prices
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="tax-toggle" class="toggle-checkbox">
+          +6% Tax
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="group-dupes-toggle" class="toggle-checkbox">
+          Grouped View
+        </label>
+      </div>
+    </div>
+    <div id="order-info-strip" style="display:none"></div>
+    <div id="orders-container">
+      <div class="placeholder">No orders yet.</div>
+    </div>
+    <div style="padding:1.25rem">
+      <button type="button" id="order-complete-btn" class="btn btn-primary">Order Complete</button>
+      <div id="order-complete-status" style="display:none;margin-top:0.6rem;font-size:0.8rem;color:var(--text-dim);text-align:center"></div>
+      <div class="worksheet-info-wrap" id="worksheet-info-wrap">
+        <button type="button" id="worksheet-info-btn" class="worksheet-info-btn">Info</button>
+        <div id="worksheet-reset-notice" class="worksheet-reset-notice"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RATE YOUR ORDER (shown once the week's order is marked complete) -->
+  <div class="card" id="rating-card" style="display:none">
+    <div class="card-header">
+      <h2>Rate Your Order</h2>
+    </div>
+    <div class="card-body">
+      <div class="field-group">
+        <label class="field-label" for="rating-name-select">Your Name</label>
+        <select id="rating-name-select">
+          <option value="">Select your name…</option>
+        </select>
+      </div>
+      <div id="rating-items-list"></div>
+      <button type="button" id="rating-submit-btn" class="btn btn-primary" style="margin-top:1rem">Submit Ratings</button>
+      <div id="rating-status" style="display:none;margin-top:0.6rem;font-size:0.8rem;color:var(--text-dim);text-align:center"></div>
+    </div>
+  </div>
+
+  <!-- TRENDING -->
+  <div class="card" id="trending-card" style="display:none">
+    <div class="card-header">
+      <h2>Trending Dishes</h2>
+      <span class="badge badge-dim" id="trending-restaurant-label"></span>
+    </div>
+    <div id="trending-container" class="card-body" style="padding-bottom:1rem">
+      <div class="placeholder">Loading…</div>
+    </div>
+  </div>
+
+
+  <!-- TRAFFIC -->
+  <div class="card">
+    <div class="card-header"><h2>Traffic</h2></div>
+    <div class="traffic-map-wrap">
+      <span class="traffic-coming-soon">Coming Soon</span>
+    </div>
+  </div>
+
+  <footer>
+    <span id="last-updated" style="display:none"></span>
+  </footer>
+
+</div>
+<script src="config.js"></script>
+<script src="app.js"></script>
+
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center">
+  <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:320px;width:90%;text-align:center">
+    <p id="confirm-modal-msg" style="margin-bottom:1.25rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600"></p>
+    <div style="display:flex;gap:0.75rem;justify-content:center">
+      <button id="confirm-modal-ok"  style="padding:0.5rem 1.25rem;border:2px solid #cc0000;background:#cc0000;color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Delete</button>
+      <button id="confirm-modal-cancel" style="padding:0.5rem 1.25rem;border:2px solid #000;background:transparent;color:#000;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="report-modal" id="report-modal" onclick="closeMenuReport(event)">
+  <div class="report-modal-box" onclick="event.stopPropagation()">
+    <div class="report-modal-header">
+      <h2 id="report-modal-title">Order History &amp; Ratings</h2>
+      <button type="button" class="report-modal-close" onclick="closeMenuReport()">&times;</button>
+    </div>
+    <div class="report-modal-body">
+      <div id="report-modal-total" class="report-modal-total" style="display:none"></div>
+      <table class="report-table">
+        <thead><tr><th>Item</th><th>Times Ordered</th><th>Avg Rating</th></tr></thead>
+        <tbody id="report-modal-tbody"></tbody>
+      </table>
+      <div id="report-modal-empty" class="placeholder" style="display:none">No order history or ratings logged yet for this restaurant.</div>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <button class="lightbox-nav prev" onclick="event.stopPropagation();lbPrev()" hidden>&#8249;</button>
+  <img src="" alt="" onclick="event.stopPropagation()">
+  <button class="lightbox-nav next" onclick="event.stopPropagation();lbNext()" hidden>&#8250;</button>
+  <div class="lightbox-counter"></div>
+</div>
+</body>
+</html>
