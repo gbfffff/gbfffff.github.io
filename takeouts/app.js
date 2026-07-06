@@ -2009,7 +2009,19 @@ if (DEBUG_MODE) {
   const panel     = document.getElementById("debug-clock");
   const input     = document.getElementById("debug-clock-input");
   const statusEl  = document.getElementById("debug-clock-status");
+  const toggleBtn = document.getElementById("debug-clock-toggle");
+  const body      = document.getElementById("debug-clock-body");
   panel.style.display = "flex";
+
+  const startOpen = localStorage.getItem("debugClockOpen") === "1";
+  toggleBtn.classList.toggle("open", startOpen);
+  body.classList.toggle("open", startOpen);
+  toggleBtn.addEventListener("click", () => {
+    const open = !toggleBtn.classList.contains("open");
+    toggleBtn.classList.toggle("open", open);
+    body.classList.toggle("open", open);
+    localStorage.setItem("debugClockOpen", open ? "1" : "0");
+  });
 
   function updateStatus() {
     statusEl.textContent = _debugNowOverride

@@ -19,16 +19,21 @@
 </div>
 <script src="gate.js"></script>
 <div class="debug-clock" id="debug-clock" style="display:none">
-  <div class="debug-clock-label">Test Clock <span id="debug-clock-status"></span></div>
-  <input type="datetime-local" id="debug-clock-input">
-  <div class="debug-clock-actions">
-    <button type="button" id="debug-clock-apply">Jump</button>
-    <button type="button" id="debug-clock-reset">Reset</button>
+  <button type="button" class="debug-clock-label" id="debug-clock-toggle">
+    Test Clock <span id="debug-clock-status"></span>
+    <span class="debug-clock-arrow">&#9660;</span>
+  </button>
+  <div class="debug-clock-body" id="debug-clock-body">
+    <input type="datetime-local" id="debug-clock-input">
+    <div class="debug-clock-actions">
+      <button type="button" id="debug-clock-apply">Jump</button>
+      <button type="button" id="debug-clock-reset">Reset</button>
+    </div>
+    <label class="debug-clock-checkbox">
+      <input type="checkbox" id="debug-force-reopen">
+      Force reopen (ignore finalized)
+    </label>
   </div>
-  <label class="debug-clock-checkbox">
-    <input type="checkbox" id="debug-force-reopen">
-    Force reopen (ignore finalized)
-  </label>
 </div>
 <div class="theme-switcher" id="theme-switcher">
   <button class="theme-dark-btn" id="dark-toggle" title="Toggle dark mode">☾</button>

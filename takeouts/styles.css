@@ -1875,12 +1875,32 @@
       gap: 0.4rem;
     }
     .debug-clock-label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      width: 100%;
+      background: none;
+      border: none;
+      font-family: inherit;
       font-size: 0.65rem;
       font-weight: 900;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: #cc0000;
+      cursor: pointer;
+      padding: 0;
     }
+    .debug-clock-arrow { margin-left: auto; transition: transform 0.2s ease; }
+    .debug-clock-label.open .debug-clock-arrow { transform: rotate(180deg); }
+    .debug-clock-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+    }
+    .debug-clock-body.open { max-height: 12rem; }
     .debug-clock input[type="datetime-local"] {
       font-family: inherit;
       font-size: 0.75rem;
