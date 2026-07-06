@@ -1983,14 +1983,19 @@ function startCountdown() {
 startCountdown();
 init();
 
-if (DEBUG_MODE) {
-  const buildInfo = document.getElementById("build-info");
+// Version tag shows everywhere (prod included) so you can cross-check which
+// build is live where. The Changelog slidedown next to it stays QA/localhost
+// only, gated by DEBUG_MODE like the rest of the debug tooling.
+{
   const versionEl = document.getElementById("build-version");
+  if (versionEl) versionEl.textContent = `v${APP_VERSION}`;
+}
+
+if (DEBUG_MODE) {
   const toggleBtn = document.getElementById("changelog-toggle-btn");
   const clPanel   = document.getElementById("changelog-panel");
-  if (buildInfo && versionEl && toggleBtn && clPanel) {
-    buildInfo.style.display = "block";
-    versionEl.textContent = `v${APP_VERSION}`;
+  if (toggleBtn && clPanel) {
+    toggleBtn.style.display = "inline-flex";
     clPanel.innerHTML = CHANGELOG.map(entry => `
       <div class="changelog-entry">
         <div class="changelog-entry-header"><span>v${esc(entry.version)}</span><span>${esc(entry.date)}</span></div>
