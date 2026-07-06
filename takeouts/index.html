@@ -64,6 +64,84 @@
     * { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0 !important; }
     * { box-shadow: none !important; }
 
+    /* ── Access gate ── */
+    .gate-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      background-color: var(--accent);
+      background-image: repeating-linear-gradient(
+        45deg,
+        #000 0px, #000 22px,
+        var(--accent) 22px, var(--accent) 48px
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .gate-overlay.hidden { display: none; }
+    .gate-box {
+      max-width: 420px;
+      width: 100%;
+      background: var(--bg);
+      border: 3px solid #000;
+      padding: 2.25rem 1.75rem;
+      text-align: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .gate-label {
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #000;
+      opacity: 0.7;
+      margin-bottom: 1rem;
+    }
+    .gate-question {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #000;
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
+    }
+    .gate-box-wide { max-width: 560px; }
+    .gate-otp {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.3rem;
+      max-width: 22rem;
+      margin: 0 auto;
+    }
+    #gate-otp .gate-otp-cell {
+      width: 100%;
+      height: 2.1rem;
+      border: 2px solid #000;
+      background: var(--bg);
+      color: #000;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 1.05rem;
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+      outline: none;
+      padding: 0;
+    }
+    #gate-otp .gate-otp-cell:focus { background: color-mix(in srgb, var(--accent) 60%, #fff); }
+    .gate-error {
+      color: var(--red);
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-top: 0.65rem;
+    }
+    body.dark .gate-box { border-color: var(--ink); }
+    body.dark .gate-label,
+    body.dark .gate-question,
+    body.dark .gate-otp-cell { color: var(--ink); }
+    body.dark .gate-otp-cell { border-color: var(--ink); }
+    body.dark .gate-otp-cell:focus { background: #1a1a00; }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg);
@@ -321,6 +399,51 @@
       align-items: center;
       justify-content: space-between;
     }
+    .toggle-header {
+      flex-wrap: wrap;
+      row-gap: 0.6rem;
+    }
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 1rem;
+    }
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      cursor: pointer;
+      color: var(--text);
+    }
+    .toggle-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      border: 2px solid #000;
+      background: var(--bg);
+      cursor: pointer;
+      position: relative;
+    }
+    .toggle-checkbox:checked { background: #000; }
+    .toggle-checkbox:checked::after {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: -1px;
+      width: 4px;
+      height: 8px;
+      border: solid var(--accent);
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
 
     .card-header h2 {
       font-size: 2rem;
@@ -331,28 +454,6 @@
     }
 
     .card-body { padding: 1.25rem; }
-
-    /* ── Orders-so-far summary ── */
-    .orders-summary {
-      background: transparent;
-      border: 2px solid #000;
-      border-left: 4px solid #000;
-      padding: 0.75rem 1rem;
-      margin-bottom: 1.25rem;
-      font-size: 1rem;
-    }
-
-    .orders-summary-title {
-      font-size: 1rem;
-      font-weight: 900;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #000;
-      margin-bottom: 0.5rem;
-    }
-
-    .orders-summary-row { color: #000; line-height: 1.8; font-size: 1rem; }
-    .orders-summary-name { color: #000; font-weight: 700; font-size: 1.15rem; }
 
     /* ── Form elements ── */
     .field-label {
@@ -575,7 +676,7 @@
     table colgroup .col-name    { width: 18%; }
     table colgroup .col-items   { width: auto; }
     table colgroup .col-total   { width: 10%; }
-    table colgroup .col-actions { width: 5.5rem; }
+    table colgroup .col-actions { width: 3.6rem; }
 
     thead th {
       text-align: left;
@@ -596,36 +697,44 @@
     tbody tr:hover .td-notes, tbody tr:hover .td-total { color: var(--accent) !important; }
 
     tbody td { padding: 0.8rem 1.25rem; font-size: 1.1rem; vertical-align: top; }
-    .td-name  { font-weight: 700; color: var(--text); word-break: break-word; }
+    .td-name  {
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: clamp(0.72rem, 2.6vw, 1.1rem);
+    }
     .td-items { color: var(--text-muted); }
     .td-actions {
-      text-align: center;
+      text-align: right;
       vertical-align: top;
-      padding: 0.4rem 0.5rem;
+      padding: 0.4rem 0.25rem 0.4rem 0.15rem;
       white-space: nowrap;
     }
     .td-actions-inner {
       display: flex;
       flex-direction: row;
       align-items: center;
+      justify-content: flex-end;
       gap: 0;
     }
     @media (max-width: 520px) {
       .td-actions-inner { flex-direction: column; }
     }
     .td-total-cell { white-space: nowrap; vertical-align: top; padding-top: 0.8rem; }
-    .td-total { font-weight: 700; font-size: 1rem; display: block; padding-top: 0.15rem; }
+    .td-total { font-weight: 700; font-size: 0.85rem; display: block; padding-top: 0.15rem; }
     .td-item-row { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; line-height: 1.7; font-size: 0.92rem; }
-    .td-item-price { font-size: 1rem; color: var(--text-dim); font-weight: 600; white-space: nowrap; }
+    .td-item-price { font-size: 0.85rem; color: var(--text-dim); font-weight: 600; white-space: nowrap; }
     .order-row-edit-btn, .order-row-delete-btn {
       background: none; border: none; cursor: pointer;
-      font-size: 1.25rem; padding: 0.3rem;
+      font-size: 1.1rem; padding: 0.15rem;
       opacity: 0.4; line-height: 1;
       color: inherit; transition: color 0.15s, opacity 0.15s;
-      width: 2.2rem; height: 2.2rem;
+      width: 1.6rem; height: 1.6rem;
       display: flex; align-items: center; justify-content: center;
     }
-    .order-row-edit-btn svg { width: 1.25rem; height: 1.25rem; }
+    .order-row-edit-btn svg { width: 1rem; height: 1rem; }
     .order-row-edit-btn:hover { opacity: 1; }
     .order-row-delete-btn:hover { opacity: 1; color: #e05555; }
     .td-notes { color: var(--text-dim); font-size: 0.78rem; }
@@ -642,6 +751,49 @@
     }
 
     /* ── Grand total ── */
+    .grouped-items-list { display: flex; flex-direction: column; }
+    .grouped-item-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.85rem;
+      padding: 0.65rem 1.25rem;
+      border-bottom: 1px solid #000;
+    }
+    .grouped-item-row:last-child { border-bottom: none; }
+    .grouped-item-qty {
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 900;
+      font-size: 1.1rem;
+      min-width: 1.5rem;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .grouped-item-sep {
+      font-weight: 900;
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
+    .grouped-item-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      min-width: 0;
+    }
+    .grouped-item-name { font-weight: 700; color: var(--text); }
+    .grouped-item-names {
+      margin-left: 0.5rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      opacity: 0.8;
+    }
+    .grouped-item-note {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .grouped-item-price { font-weight: 600; color: var(--text-dim); white-space: nowrap; font-size: 0.85em; }
+
     .grand-total-bar {
       display: flex;
       align-items: center;
@@ -968,6 +1120,7 @@
       color: var(--accent);
       -webkit-text-stroke: 1.5px #000;
       paint-order: stroke fill;
+      text-shadow: 3px 3px 0 #000;
       padding: 0.85rem 1.25rem;
       margin-bottom: 0.25rem;
       background: transparent;
@@ -1077,10 +1230,9 @@
       .orders-table-wrap { margin: 0; }
       table { table-layout: fixed; width: 100%; }
       .col-name    { width: 22%; }
-      .td-name { font-size: 0.85rem; }
       .col-items   { width: auto; }
       .col-total   { width: 4.5rem; }
-      .col-actions { width: 2.8rem; }
+      .col-actions { width: 2rem; }
       tbody td { padding: 0.6rem 0.5rem; }
       .td-total-cell { padding-left: 0.25rem; }
       .td-actions { padding: 0.4rem 0.15rem; }
@@ -1166,10 +1318,6 @@
     body.dark .countdown-time-input { border-color: var(--bg); color: var(--bg); }
     body.dark .countdown-unit { border-right-color: rgba(0,0,0,0.25); }
     body.dark .card { border-color: var(--ink); }
-    body.dark .orders-summary { border-color: var(--ink); }
-    body.dark .orders-summary-title,
-    body.dark .orders-summary-row,
-    body.dark .orders-summary-name { color: var(--ink); }
     body.dark input[type="text"],
     body.dark textarea { border-color: var(--ink); color: var(--ink); }
     body.dark input[type="text"]:focus,
@@ -1206,6 +1354,10 @@
     body.dark .trend-bar-wrap,
     body.dark .trend-bar { background: var(--ink); }
     body.dark .grand-total-bar { background: var(--ink); color: var(--bg); }
+    body.dark .toggle-checkbox { border-color: var(--ink); }
+    body.dark .toggle-checkbox:checked { background: var(--ink); }
+    body.dark .toggle-checkbox:checked::after { border-color: var(--bg); }
+    body.dark .grouped-item-row { border-bottom-color: var(--ink); }
     body.dark .oi-link { color: var(--ink); border-color: var(--ink); }
     body.dark .oi-link:hover { background: var(--ink); color: var(--bg); }
     body.dark .oi-phone { color: var(--ink); }
@@ -1226,7 +1378,7 @@
     body.dark .mpi-name { color: var(--ink); }
     body.dark .mpi-desc { color: #aaa800; }
     body.dark .mpi-price { color: var(--ink); }
-    body.dark .mpi-section-label { color: var(--ink); }
+    body.dark .mpi-section-label { color: var(--ink); text-shadow: 3px 3px 0 rgba(255,255,255,0.3); }
     body.dark .mpi-popular-block,
     body.dark .mpi-cat-block { border-color: var(--ink); }
     body.dark .menu-panel-shortcuts { border-color: var(--ink); }
@@ -1350,6 +1502,103 @@
   </style>
 </head>
 <body>
+<div id="gate-overlay" class="gate-overlay">
+  <div class="gate-box gate-box-wide">
+    <div class="gate-label">GBF Takeout &mdash; Group Access</div>
+    <h2 class="gate-question">Enter Access Code</h2>
+    <div class="gate-otp" id="gate-otp"></div>
+    <div class="gate-error" id="gate-error" style="display:none">Incorrect code &mdash; try again.</div>
+    <button type="button" id="gate-submit" class="btn btn-primary" style="margin-top:1rem">Enter</button>
+  </div>
+</div>
+<script>
+(function() {
+  // Casual gate only -- keeps out randoms/crawlers, not a real secret.
+  // The code is stored as a SHA-256 hash (not plaintext) so it isn't
+  // copy-paste readable from view-source, but this is still defeatable by
+  // anyone willing to read the check logic or brute-force short codes --
+  // it's not a substitute for real server-side auth.
+  //
+  // To change the code: hash the new UPPERCASE code with e.g.
+  // `python3 -c "import hashlib;print(hashlib.sha256(b'YOURCODE').hexdigest())"`
+  // and replace CODE_LENGTH / CODE_HASH below.
+  const GATE_KEY    = "gbf_gate_ok";
+  const CODE_LENGTH = 20;
+  const CODE_HASH   = "6b81a63c5b8c5aba8c3bec7d395cf82ea0f8292d8a05a1dc58225abdc0feaa2d";
+
+  if (localStorage.getItem(GATE_KEY) === "1") {
+    document.getElementById("gate-overlay").classList.add("hidden");
+    return;
+  }
+
+  const otpEl   = document.getElementById("gate-otp");
+  const errorEl = document.getElementById("gate-error");
+  const submit  = document.getElementById("gate-submit");
+
+  const cells = [];
+  for (let i = 0; i < CODE_LENGTH; i++) {
+    const cell = document.createElement("input");
+    cell.type = "text";
+    cell.className = "gate-otp-cell";
+    cell.maxLength = 1;
+    cell.autocomplete = "off";
+    cell.inputMode = "text";
+    otpEl.appendChild(cell);
+    cells.push(cell);
+  }
+
+  function sanitize(ch) {
+    return (ch || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  }
+
+  cells.forEach((cell, i) => {
+    cell.addEventListener("input", () => {
+      cell.value = sanitize(cell.value).slice(-1);
+      errorEl.style.display = "none";
+      if (cell.value && i < cells.length - 1) cells[i + 1].focus();
+    });
+    cell.addEventListener("keydown", e => {
+      if (e.key === "Backspace" && !cell.value && i > 0) {
+        cells[i - 1].focus();
+      } else if (e.key === "ArrowLeft" && i > 0) {
+        e.preventDefault(); cells[i - 1].focus();
+      } else if (e.key === "ArrowRight" && i < cells.length - 1) {
+        e.preventDefault(); cells[i + 1].focus();
+      } else if (e.key === "Enter") {
+        e.preventDefault(); tryCode();
+      }
+    });
+    cell.addEventListener("paste", e => {
+      e.preventDefault();
+      const chars = sanitize(e.clipboardData.getData("text")).split("");
+      cells.forEach(c => c.value = "");
+      chars.forEach((ch, j) => { if (cells[j]) cells[j].value = ch; });
+      const next = Math.min(chars.length, cells.length - 1);
+      cells[next].focus();
+    });
+  });
+
+  async function sha256Hex(str) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function tryCode() {
+    const code = cells.map(c => c.value).join("");
+    const hash = await sha256Hex(code);
+    if (hash === CODE_HASH) {
+      localStorage.setItem(GATE_KEY, "1");
+      document.getElementById("gate-overlay").classList.add("hidden");
+    } else {
+      errorEl.style.display = "block";
+      cells.forEach(c => c.value = "");
+      cells[0].focus();
+    }
+  }
+  submit.addEventListener("click", tryCode);
+  cells[0].focus();
+})();
+</script>
 <div class="theme-switcher" id="theme-switcher">
   <button class="theme-dark-btn" id="dark-toggle" title="Toggle dark mode">☾</button>
   <div class="theme-swatch-current" id="theme-current" title="Change color"></div>
@@ -1392,17 +1641,12 @@
   <!-- ORDER FORM -->
   <div class="card">
     <div class="card-header">
-      <h2>Place Order</h2>
+      <h2>Place Your Order</h2>
       <span class="badge badge-yellow" id="order-count">0</span>
     </div>
     <div id="order-countdown" class="order-countdown"></div>
     <div class="card-body">
       <form id="order-form">
-
-        <div class="orders-summary" id="orders-summary" style="display:none">
-          <div class="orders-summary-title">Orders so far</div>
-          <div id="orders-summary-body"></div>
-        </div>
 
         <div class="field-group">
           <label class="field-label" for="order-name">Name</label>
@@ -1438,16 +1682,20 @@
 
   <!-- ORDERS LIST -->
   <div class="card">
-    <div class="card-header">
+    <div class="card-header toggle-header">
       <h2>Orders Worksheet</h2>
-      <div style="display:flex;align-items:center;gap:0.9rem">
-        <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.04em">
-          <input type="checkbox" id="show-prices-toggle" style="accent-color:#000;width:13px;height:13px">
-          SHOW PRICES
+      <div class="toggle-row">
+        <label class="toggle-label">
+          <input type="checkbox" id="show-prices-toggle" class="toggle-checkbox">
+          Show Prices
         </label>
-        <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.04em">
-          <input type="checkbox" id="tax-toggle" style="accent-color:#000;width:13px;height:13px">
-          +6% TAX
+        <label class="toggle-label">
+          <input type="checkbox" id="tax-toggle" class="toggle-checkbox">
+          +6% Tax
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="group-dupes-toggle" class="toggle-checkbox">
+          Grouped View
         </label>
       </div>
     </div>
@@ -2364,20 +2612,6 @@ async function loadOrders() {
 
     countEl.textContent = rows.length;
 
-    const summaryEl = document.getElementById("orders-summary");
-    const bodyEl    = document.getElementById("orders-summary-body");
-    if (rows.length) {
-      summaryEl.style.display = "block";
-      bodyEl.innerHTML = rows.map(r =>
-        `<div class="orders-summary-row">
-          <span class="orders-summary-name">${esc(r[1] ?? "")}</span>
-          &nbsp;—&nbsp;${esc(r[2] ?? "")}
-        </div>`
-      ).join("");
-    } else {
-      summaryEl.style.display = "none";
-    }
-
     if (!rows.length) {
       container.innerHTML = `<div class="placeholder">No orders yet.</div>`;
       return;
@@ -2398,24 +2632,31 @@ async function loadOrders() {
   }
 }
 
+function extractNotes(orderText) {
+  const m = (orderText ?? "").match(/\|\s*Notes:\s*(.*)$/);
+  return m ? m[1].trim() : "";
+}
+
 function renderOrdersTable(dupCount) {
   const container   = document.getElementById("orders-container");
   const rows        = _lastOrderRows;
   const withTax     = document.getElementById("tax-toggle")?.checked;
   const showPrices  = document.getElementById("show-prices-toggle")?.checked;
+  const groupDupes  = document.getElementById("group-dupes-toggle")?.checked;
   const TAX         = 1.06;
 
   if (!rows.length) return;
 
   const itemCounts = {};
   rows.forEach(r => {
-    (r[2] ?? "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean)
+    smartSplit(r[2] ?? "").map(s => s.toLowerCase())
       .forEach(item => { itemCounts[item] = (itemCounts[item] || 0) + 1; });
   });
 
     const trs = rows.map(r => {
       const rowName  = (r[1] ?? "").trim();
       const items    = smartSplit(r[2] ?? "");
+      const notes    = extractNotes(r[2] ?? "");
       const itemHtml = items.map(item => {
         const isDup    = (itemCounts[item.toLowerCase()] || 0) > 1;
         const baseName = item.replace(/\s*\+.*$/, "").trim();
@@ -2425,7 +2666,7 @@ function renderOrdersTable(dupCount) {
           ? `<span class="dup-item" title="Ordered by multiple people">${esc(item)}</span>`
           : esc(item);
         return `<div class="td-item-row">${label}${price}</div>`;
-      }).join("");
+      }).join("") + (notes ? `<div class="td-notes">&#128221; ${esc(notes)}</div>` : "");
       const rawTotal = calcOrderTotal(r[2] ?? "");
       const total    = withTax ? rawTotal * TAX : rawTotal;
       const totalHtml = rawTotal > 0
@@ -2463,13 +2704,53 @@ function renderOrdersTable(dupCount) {
       </div>
     </div>`;
 
-    container.innerHTML = `${dupBanner}<div class="orders-table-wrap"><table>
-      <colgroup>
-        <col class="col-name"><col class="col-items">${showPrices ? `<col class="col-total">` : ""}<col class="col-actions">
-      </colgroup>
-      <thead><tr><th>Name</th><th>Items</th>${showPrices ? `<th style="white-space:nowrap">Total ${taxLabel}</th>` : ""}<th></th></tr></thead>
-      <tbody>${trs}</tbody>
-    </table></div>${grandTotalHtml}`;
+    let mainHtml;
+    if (groupDupes) {
+      // Group by item + notes together -- an item with a note and the same
+      // item without one are kept as separate lines, never merged.
+      const groups = new Map();
+      rows.forEach(r => {
+        const rowName = (r[1] ?? "").trim();
+        const notes   = extractNotes(r[2] ?? "");
+        smartSplit(r[2] ?? "").forEach(item => {
+          const key = `${item.toLowerCase()}||${notes.toLowerCase()}`;
+          if (!groups.has(key)) groups.set(key, { label: item, notes, count: 0, names: [] });
+          const g = groups.get(key);
+          g.count++;
+          g.names.push(rowName);
+        });
+      });
+      const sorted = [...groups.values()].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+      const groupRows = sorted.map(g => {
+        const baseName  = g.label.replace(/\s*\+.*$/, "").trim();
+        const meta      = findMenuItem(baseName);
+        const priceHtml = (showPrices && meta?.price)
+          ? `<span class="grouped-item-price">$${(meta.price * g.count).toFixed(2)}</span>`
+          : "";
+        const namesHtml = `<span class="grouped-item-names">${esc(g.names.join(", "))}</span>`;
+        const notesHtml = g.notes ? `<span class="grouped-item-note">&#128221; ${esc(g.notes)}</span>` : "";
+        return `<div class="grouped-item-row">
+          <span class="grouped-item-qty">${g.count}</span>
+          <span class="grouped-item-sep">|</span>
+          <span class="grouped-item-main">
+            <span class="grouped-item-name">${esc(g.label)}</span>${namesHtml}
+            ${notesHtml}
+          </span>
+          ${priceHtml}
+        </div>`;
+      }).join("");
+      mainHtml = `<div class="grouped-items-list">${groupRows}</div>`;
+    } else {
+      mainHtml = `${dupBanner}<div class="orders-table-wrap"><table>
+        <colgroup>
+          <col class="col-name"><col class="col-items">${showPrices ? `<col class="col-total">` : ""}<col class="col-actions">
+        </colgroup>
+        <thead><tr><th>Name</th><th>Items</th>${showPrices ? `<th style="white-space:nowrap">Total ${taxLabel}</th>` : ""}<th></th></tr></thead>
+        <tbody>${trs}</tbody>
+      </table></div>`;
+    }
+
+    container.innerHTML = `${mainHtml}${grandTotalHtml}`;
 
     container.querySelectorAll(".order-row-edit-btn").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -2866,6 +3147,7 @@ init();
 
 document.getElementById("tax-toggle").addEventListener("change", () => renderOrdersTable());
 document.getElementById("show-prices-toggle").addEventListener("change", () => renderOrdersTable());
+document.getElementById("group-dupes-toggle").addEventListener("change", () => renderOrdersTable());
 
 let _lbImages = [];
 let _lbIndex  = 0;
