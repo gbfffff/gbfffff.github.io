@@ -29,8 +29,13 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // Shown in the footer on QA/localhost only (see DEBUG_MODE above). Bump
 // APP_VERSION and add an entry here whenever a meaningful batch of changes
 // ships -- newest entry first.
-const APP_VERSION = "1.3.0";
+const APP_VERSION = "1.4.0";
 const CHANGELOG = [
+  { version: "1.4.0", date: "2026-07-06", notes: [
+    "Add Traffic card: TomTom-powered Good/OK/Bad gauge and live road-conditions map for 495/270/95",
+    "Add map style switcher (Light/Dark/TomTom Day/TomTom Night) and legend in a collapsible Map Tools panel",
+    "Add PIN-gated Reset/Reopen New Round button after Order Complete is logged",
+  ]},
   { version: "1.3.0", date: "2026-07-06", notes: [
     "Add QA deployment (takeouts-qa/) alongside prod, with its own config/secrets",
     "Weekly rotation now resets Monday 6:00 AM ET instead of the prior Wednesday boundary",
@@ -939,8 +944,13 @@ let weekComplete   = false;
 // (order form/edit-delete lock) can be re-tested without deleting real
 // sheet data. Never true on prod (gated by DEBUG_MODE).
 let _debugForceReopen = false;
+// Production "Reset / Reopen New Round" button (PIN-gated) -- session-only,
+// lets an organizer reopen ordering after Order Complete was logged too
+// early, without touching the History sheet.
+let _pinForceReopen = false;
+const _reopenPin = atob("MjA3NDA=");
 function isWeekEffectivelyComplete() {
-  return weekComplete && !(DEBUG_MODE && _debugForceReopen);
+  return weekComplete && !(DEBUG_MODE && _debugForceReopen) && !_pinForceReopen;
 }
 let _historyRows   = [];  // all-time, all restaurants -- Timestamp, Date, Restaurant, Item, Qty, Names
 let _ratingRows    = [];  // this week only -- Timestamp, Date, Restaurant, Item, Name, Rating
@@ -987,6 +997,9 @@ function applyOrderFreezeState() {
     completeBtn.disabled    = complete;
     completeBtn.textContent = complete ? "Order Logged" : "Order Complete";
   }
+
+  const reopenBtn = document.getElementById("reopen-round-btn");
+  if (reopenBtn) reopenBtn.style.display = complete ? "flex" : "none";
 
   if (_lastOrderRows.length) renderOrdersTable();
 }
@@ -2130,6 +2143,52 @@ document.getElementById("order-complete-btn").addEventListener("click", async ()
     status.style.display = "block";
     status.textContent = "Could not log — " + err.message;
   }
+});
+
+function promptPin() {
+  return new Promise(resolve => {
+    const modal = document.getElementById("pin-modal");
+    const input = document.getElementById("pin-modal-input");
+    const error = document.getElementById("pin-modal-error");
+    const okBtn = document.getElementById("pin-modal-ok");
+    const cancel = document.getElementById("pin-modal-cancel");
+
+    input.value = "";
+    error.style.display = "none";
+    modal.style.display = "flex";
+    input.focus();
+
+    function close(result) {
+      modal.style.display = "none";
+      okBtn.removeEventListener("click", onOk);
+      cancel.removeEventListener("click", onCancel);
+      input.removeEventListener("keydown", onKeydown);
+      resolve(result);
+    }
+    function onOk() {
+      if (input.value === _reopenPin) { close(true); }
+      else { error.style.display = "block"; input.value = ""; input.focus(); }
+    }
+    function onCancel() { close(false); }
+    function onKeydown(e) { if (e.key === "Enter") onOk(); }
+
+    okBtn.addEventListener("click", onOk);
+    cancel.addEventListener("click", onCancel);
+    input.addEventListener("keydown", onKeydown);
+  });
+}
+
+document.getElementById("reopen-round-btn").addEventListener("click", async () => {
+  const unlocked = await promptPin();
+  if (!unlocked) return;
+
+  _pinForceReopen = true;
+  const status = document.getElementById("order-complete-status");
+  status.style.display = "block";
+  status.textContent = "Reopened for a new ordering round.";
+  applyOrderFreezeState();
+  await loadRestaurant();
+  await loadData();
 });
 
 function openMenuReport(restaurantName) {

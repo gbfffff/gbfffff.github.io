@@ -1,0 +1,202 @@
+:root {
+  --bg:        #0a0a0a;
+  --surface:   #141414;
+  --border:    #2a2a2a;
+  --text:      #f2f2f2;
+  --text-dim:  #9a9a9a;
+  --green:     #1fa855;
+  --yellow:    #d9a92e;
+  --red:       #d33d3d;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+header {
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: 0.01em;
+}
+
+.subtitle {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.1rem 1.2rem;
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.card-head h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+}
+
+.last-updated {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+/* Gauge */
+
+.gauge-wrap {
+  padding: 0.25rem 0.25rem 0;
+}
+
+.gauge-track {
+  position: relative;
+  display: flex;
+  height: 14px;
+  border-radius: 7px;
+  overflow: visible;
+}
+
+.gauge-zone {
+  flex: 1 1 0;
+  height: 100%;
+}
+
+.zone-good { background: var(--green); border-radius: 7px 0 0 7px; }
+.zone-ok   { background: var(--yellow); }
+.zone-bad  { background: var(--red); border-radius: 0 7px 7px 0; }
+
+.gauge-needle {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 3px;
+  height: 24px;
+  background: var(--text);
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: left 0.4s ease;
+}
+
+.gauge-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.gauge-readout {
+  margin-top: 1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.gauge-status {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.gauge-detail {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* Map */
+
+.refresh-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.refresh-btn:hover {
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+
+#map {
+  width: 100%;
+  height: 420px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 0.7rem;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.swatch-green  { background: var(--green); }
+.swatch-yellow { background: var(--yellow); }
+.swatch-red    { background: var(--red); }
+
+.swatch-incident {
+  width: auto;
+  height: auto;
+  background: none;
+  font-size: 0.85rem;
+  color: var(--red);
+}
+
+.incident-marker {
+  color: var(--red);
+  font-size: 1.1rem;
+  text-shadow: 0 0 3px #000, 0 0 3px #000;
+}
+
+.leaflet-control-attribution {
+  background: rgba(10,10,10,0.7) !important;
+  color: var(--text-dim) !important;
+}
+.leaflet-control-attribution a { color: var(--text-dim) !important; }

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beltway Traffic</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Beltway Traffic</h1>
+    <span class="subtitle">495 / 270 / 95 &mdash; Upper Montgomery &amp; Prince George's</span>
+  </header>
+
+  <main>
+    <section class="card gauge-card">
+      <div class="card-head">
+        <h2>Right Now</h2>
+        <span id="last-updated" class="last-updated"></span>
+      </div>
+
+      <div class="gauge-wrap">
+        <div class="gauge-track">
+          <div class="gauge-zone zone-good"></div>
+          <div class="gauge-zone zone-ok"></div>
+          <div class="gauge-zone zone-bad"></div>
+          <div class="gauge-needle" id="gauge-needle"></div>
+        </div>
+        <div class="gauge-labels">
+          <span>Good</span>
+          <span>OK</span>
+          <span>Bad</span>
+        </div>
+      </div>
+
+      <div class="gauge-readout">
+        <span id="gauge-status" class="gauge-status">Loading&hellip;</span>
+        <span id="gauge-detail" class="gauge-detail"></span>
+      </div>
+    </section>
+
+    <section class="card map-card">
+      <div class="card-head">
+        <h2>Road Conditions</h2>
+        <button type="button" id="refresh-btn" class="refresh-btn">Refresh</button>
+      </div>
+      <div id="map"></div>
+      <div class="map-legend">
+        <span><i class="legend-swatch swatch-green"></i>Free flow</span>
+        <span><i class="legend-swatch swatch-yellow"></i>Slow</span>
+        <span><i class="legend-swatch swatch-red"></i>Heavy / stopped</span>
+        <span><i class="legend-swatch swatch-incident">&#9888;</i>Incident</span>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

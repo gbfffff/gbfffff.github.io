@@ -1199,36 +1199,162 @@
     }
 
     /* ── Traffic card ── */
-    .traffic-map-wrap {
-      overflow: hidden;
-      height: 160px;
+    #traffic-card .card-body { padding: 0; }
+    .traffic-frame {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
       background-color: var(--accent);
       background-image: repeating-linear-gradient(
         45deg,
         #000 0px, #000 10px,
         var(--accent) 10px, var(--accent) 24px
       );
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-    .traffic-coming-soon {
-      background: #000;
-      color: var(--accent);
-      font-weight: 900;
-      font-size: 0.72rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      padding: 0.35rem 1rem;
+    .traffic-panel {
+      background: var(--bg);
+      border: 2px solid #000;
+      padding: 1rem;
     }
 
-    .traffic-note {
-      padding: 0.55rem 1.25rem;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border);
-      letter-spacing: 0.03em;
+    .traffic-gauge-wrap { margin-bottom: 0; }
+
+    .traffic-gauge-track {
+      position: relative;
+      display: flex;
+      height: 18px;
+      border: 2px solid #000;
+      background: var(--bg);
     }
+    /* Widths mirror the Good/OK/Bad thresholds (>=75 / >=45 / below), laid
+       out left-to-right on a badness scale (100 - speed ratio). Pattern
+       density (not color) reads as severity: empty = good, thin stripes =
+       ok, dense dots = bad. */
+    .traffic-gauge-zone { height: 100%; flex: 0 0 auto; }
+    .traffic-gauge-zone.zone-good {
+      flex-basis: 25%;
+      background: var(--bg);
+    }
+    .traffic-gauge-zone.zone-ok {
+      flex-basis: 30%;
+      background-image: repeating-linear-gradient(
+        45deg,
+        #000 0px, #000 2px,
+        transparent 2px, transparent 7px
+      );
+      border-left: 2px solid #000;
+    }
+    .traffic-gauge-zone.zone-bad {
+      flex-basis: 45%;
+      background: #000;
+      border-left: 2px solid #000;
+    }
+
+    .traffic-gauge-needle {
+      position: absolute;
+      top: -7px;
+      left: 50%;
+      width: 10px;
+      height: 32px;
+      background: var(--accent);
+      border: 2px solid #000;
+      transform: translateX(-50%);
+      transition: left 0.4s ease;
+    }
+
+    .traffic-gauge-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.35rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .traffic-gauge-detail {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .traffic-map-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .traffic-updated { font-size: 0.7rem; color: var(--text-dim); }
+    .traffic-refresh-btn {
+      width: auto;
+      margin-top: 0;
+      padding: 0.35rem 1rem;
+      font-size: 0.7rem;
+      background: #000;
+      border: 2px solid #000;
+      color: var(--accent);
+    }
+    .traffic-refresh-btn:hover {
+      color: #000;
+      background-color: var(--accent);
+      background-image: repeating-linear-gradient(
+        45deg,
+        #000 0px, #000 6px,
+        var(--accent) 6px, var(--accent) 14px
+      );
+    }
+
+    .traffic-map {
+      width: 100%;
+      height: 300px;
+      border: 2px solid #000;
+    }
+
+    .traffic-map .leaflet-control-attribution { display: none; }
+
+    #traffic-tools-panel.open { padding: 0.75rem 0.85rem; }
+
+    .traffic-style-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+    }
+    .traffic-style-btn {
+      width: auto;
+      margin-top: 0;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: transparent;
+      border: 2px solid #000;
+      color: #000;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .traffic-style-btn:hover { background: #000; color: var(--accent); }
+    .traffic-style-btn.active { background: #000; color: var(--accent); }
+
+    .traffic-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+    .traffic-legend span { display: inline-flex; align-items: center; gap: 0.3rem; }
+    .traffic-swatch { display: inline-block; width: 10px; height: 10px; }
+    .swatch-green  { background: var(--green); }
+    .swatch-yellow { background: #cc9900; }
+    .swatch-red    { background: var(--red); }
+    .swatch-incident { width: auto; height: auto; background: none; color: var(--red); font-size: 0.8rem; }
+
+    .traffic-incident-marker { color: var(--red); font-size: 1.1rem; text-shadow: 0 0 2px #fff, 0 0 2px #fff; }
 
     /* ── Menu URL link ── */
     .menu-title-btns {
@@ -1798,11 +1924,14 @@
     body.dark .stripe-divider {
       background-image: repeating-linear-gradient(90deg, var(--ink) 0px, var(--ink) 14px, var(--bg) 14px, var(--bg) 28px);
     }
-    body.dark .traffic-map-wrap {
+    body.dark .traffic-gauge-track { border-color: var(--ink); }
+    body.dark .traffic-gauge-needle { background: var(--ink); }
+    body.dark .traffic-map { border-color: var(--ink); }
+    body.dark .traffic-panel { border-color: var(--ink); }
+    body.dark .traffic-frame {
       background-color: var(--bg);
       background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 10px, var(--bg) 10px, var(--bg) 24px);
     }
-    body.dark .traffic-coming-soon { background: var(--ink); color: var(--bg); }
     body.dark .mpi { border-color: var(--ink); }
     body.dark .mpi:hover { background: var(--ink); color: var(--bg); }
     body.dark .mpi:hover .mpi-name,
