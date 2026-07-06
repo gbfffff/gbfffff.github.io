@@ -171,8 +171,8 @@
     <div style="padding:1.25rem">
       <button type="button" id="order-complete-btn" class="btn btn-primary">Order Complete</button>
       <div id="order-complete-status" style="display:none;margin-top:0.6rem;font-size:0.8rem;color:var(--text-dim);text-align:center"></div>
-      <button type="button" id="reopen-round-btn" class="btn btn-secondary" style="display:none">
-        &#128274; Reset / Reopen New Round
+      <button type="button" id="reopen-round-btn" class="btn" style="display:none">
+        <span class="reopen-lock-icon">&#128274;</span> Reset / Reopen New Round
       </button>
       <div class="worksheet-info-wrap" id="worksheet-info-wrap">
         <button type="button" id="worksheet-info-btn" class="worksheet-info-btn">Info</button>
@@ -187,14 +187,9 @@
       <h2>Rate Your Order</h2>
     </div>
     <div class="card-body">
-      <div class="field-group">
-        <label class="field-label" for="rating-name-select">Your Name</label>
-        <select id="rating-name-select">
-          <option value="">Select your name…</option>
-        </select>
-      </div>
+      <div id="rating-names-table" class="rating-names-table"></div>
       <div id="rating-items-list"></div>
-      <button type="button" id="rating-submit-btn" class="btn btn-primary" style="margin-top:1rem">Submit Ratings</button>
+      <button type="button" id="rating-submit-btn" class="btn btn-primary" style="display:none">Submit Ratings</button>
       <div id="rating-status" style="display:none;margin-top:0.6rem;font-size:0.8rem;color:var(--text-dim);text-align:center"></div>
     </div>
   </div>
@@ -227,7 +222,7 @@
             <div class="traffic-gauge-needle" id="traffic-gauge-needle"></div>
           </div>
           <div class="traffic-gauge-labels">
-            <span>Good</span><span>OK</span><span>Bad</span>
+            <span class="label-good">Good</span><span class="label-ok">OK</span><span class="label-bad">Bad</span>
           </div>
           <div class="traffic-gauge-detail" id="traffic-gauge-detail"></div>
         </div>
@@ -244,10 +239,10 @@
           </button>
           <div id="traffic-tools-panel" class="rotation-panel">
             <div class="traffic-style-btns">
-              <button type="button" class="traffic-style-btn active" data-style="carto-light">Light</button>
+              <button type="button" class="traffic-style-btn" data-style="carto-light">Light</button>
               <button type="button" class="traffic-style-btn" data-style="carto-dark">Dark</button>
               <button type="button" class="traffic-style-btn" data-style="tomtom-day">TomTom Day</button>
-              <button type="button" class="traffic-style-btn" data-style="tomtom-night">TomTom Night</button>
+              <button type="button" class="traffic-style-btn active" data-style="tomtom-night">TomTom Night</button>
             </div>
             <div class="traffic-legend">
               <span><i class="traffic-swatch swatch-green"></i>Free flow</span>

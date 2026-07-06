@@ -190,10 +190,11 @@ main {
 }
 
 .incident-marker {
-  color: var(--red);
   font-size: 1.1rem;
   text-shadow: 0 0 3px #000, 0 0 3px #000;
 }
+.incident-accident { color: var(--red); }
+.incident-closed { color: #fff; }
 
 .leaflet-control-attribution {
   background: rgba(10,10,10,0.7) !important;

@@ -29,8 +29,22 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // Shown in the footer on QA/localhost only (see DEBUG_MODE above). Bump
 // APP_VERSION and add an entry here whenever a meaningful batch of changes
 // ships -- newest entry first.
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "1.6.0";
 const CHANGELOG = [
+  { version: "1.6.0", date: "2026-07-06", notes: [
+    "Rate Your Order redesigned: name table with per-person status (N to rate / All rated) instead of a dropdown",
+    "Review view shows already-given ratings; scoped to the latest rotation only (pending items still never expire)",
+    "GBF Favs threshold lowered to 2+ distinct weeks ordered (was 3+)",
+    "Traffic gauge points now trace the real 270-to-College-Park route (geocoded from restaurant map links), with eastbound-495 segments weighted double",
+    "Traffic gauge thresholds tightened (Good >=92%, OK >=60%) and now shows only Accident/Road Closed incidents with distinct icons",
+    "Traffic no longer auto-refreshes on a timer -- only on page load or the Refresh button, to conserve API credits",
+    "Separate TomTom API keys for QA vs prod (TOMTOM_KEY_QA / TOMTOM_KEY_PROD)",
+  ]},
+  { version: "1.5.0", date: "2026-07-06", notes: [
+    "Rate Your Order is now an all-time, per-person queue grouped by order date instead of current-week-only",
+    "Reset/Reopen New Round now clears both the finalized-week lock and the deadline-passed overlay",
+    "Traffic map now defaults to the Dark base style",
+  ]},
   { version: "1.4.0", date: "2026-07-06", notes: [
     "Add Traffic card: TomTom-powered Good/OK/Bad gauge and live road-conditions map for 495/270/95",
     "Add map style switcher (Light/Dark/TomTom Day/TomTom Night) and legend in a collapsible Map Tools panel",
@@ -183,7 +197,7 @@ function renderWorksheetResetNotice(friday) {
   const nextReset = new Date(friday);
   nextReset.setDate(nextReset.getDate() + 3); // Fri -> Sat -> Sun -> Mon
   const label = nextReset.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-  el.textContent = `This worksheet stays open until ${label}, 6:00 AM ET — then the menu switches to the next restaurant.`;
+  el.innerHTML = `<span class="worksheet-reset-notice-text">This worksheet stays open until ${esc(label)}, 6:00 AM ET — then the menu switches to the next restaurant.</span>`;
 }
 
 async function loadRestaurant() {
@@ -953,8 +967,7 @@ function isWeekEffectivelyComplete() {
   return weekComplete && !(DEBUG_MODE && _debugForceReopen) && !_pinForceReopen;
 }
 let _historyRows   = [];  // all-time, all restaurants -- Timestamp, Date, Restaurant, Item, Qty, Names
-let _ratingRows    = [];  // this week only -- Timestamp, Date, Restaurant, Item, Name, Rating
-let _allRatingRows = [];  // all-time, all restaurants
+let _allRatingRows = [];  // all-time, all restaurants -- Timestamp, Date, Restaurant, Item, Name, Rating
 const _ratingTouched = new Set(); // item keys the user has actually moved the slider on
 
 // ── Mock/demo data (MOCK_MODE only) ─────────────────────────────────────
@@ -1030,19 +1043,16 @@ async function loadHistory() {
 async function loadRatings() {
   if (MOCK_MODE) {
     _allRatingRows = _mockRatings;
-    _ratingRows    = _mockRatings.filter(r => r[1] === currentFriday);
     renderRatingCard();
     refreshMenuInsights();
     return;
   }
-  if (!RATINGS_GID) { _ratingRows = []; _allRatingRows = []; renderRatingCard(); return; }
+  if (!RATINGS_GID) { _allRatingRows = []; renderRatingCard(); return; }
   try {
     const csv  = await fetchCSV(RATINGS_GID);
     const rows = parseCSV(csv).slice(1); // Timestamp, Date, Restaurant, Item, Name, Rating
     _allRatingRows = rows;
-    _ratingRows    = rows.filter(r => (r[1] || "").trim() === currentFriday);
   } catch {
-    _ratingRows = [];
     _allRatingRows = [];
   }
   renderRatingCard();
@@ -1114,7 +1124,7 @@ function refreshMenuInsights() {
   const favSet   = new Set();
   const dislikeMap = new Map();
   stats.forEach((s, key) => {
-    if (s.weeksOrdered.size > 2) favSet.add(key);
+    if (s.weeksOrdered.size >= 2) favSet.add(key);
     if (s.ratingCount > 0 && (s.ratingSum / s.ratingCount) < 3) dislikeMap.set(key, s.ratingSum / s.ratingCount);
   });
   const imgs = currentRestaurantObj.menuImages ||
@@ -1122,75 +1132,182 @@ function refreshMenuInsights() {
   buildMenuPanel(currentRestaurantObj.menu || [], currentRestaurantObj.name, currentRestaurantObj.menuUrl || "", imgs, favSet, dislikeMap);
 }
 
-function alreadyRated(name, item) {
-  return _ratingRows.some(r =>
+// A rating task is keyed by date+restaurant+item+name -- the same dish name
+// can legitimately appear across different weeks (or twice in one week, if
+// a round was reopened), so all four fields must match for something to
+// count as already rated.
+function isRated(date, restaurant, item, name) {
+  return _allRatingRows.some(r =>
+    (r[1] || "").trim() === date &&
+    (r[2] || "").trim().toLowerCase() === restaurant.trim().toLowerCase() &&
     (r[3] || "").trim().toLowerCase() === item.toLowerCase() &&
     (r[4] || "").trim().toLowerCase() === name.toLowerCase()
   );
 }
 
+// Pending ratings for a person, across all-time History (not just the
+// current week) -- grouped by "date|restaurant" so old unrated dishes stay
+// reachable indefinitely instead of disappearing once the week rotates.
+// Sorted most-recent first.
+function getPendingRatings(name) {
+  const lname = name.trim().toLowerCase();
+  const groups = new Map(); // "date|restaurant" -> Map(itemLower -> item)
+  _historyRows.forEach(r => {
+    const date       = (r[1] || "").trim();
+    const restaurant = (r[2] || "").trim();
+    const item       = (r[3] || "").trim();
+    const names      = (r[5] || "").split(",").map(n => n.trim().toLowerCase());
+    if (!date || !item || !names.includes(lname)) return;
+    if (isRated(date, restaurant, item, name)) return;
+    const key = `${date}|${restaurant}`;
+    // Same item can appear in multiple History rows for the same date+
+    // restaurant (e.g. a reopened round re-logging the same dish) -- only
+    // one rating task per item should show, not one per History row.
+    if (!groups.has(key)) groups.set(key, new Map());
+    const itemMap = groups.get(key);
+    itemMap.set(item.toLowerCase(), item);
+  });
+  return [...groups.entries()]
+    .map(([key, itemMap]) => [key, [...itemMap.values()]])
+    .sort((a, b) => b[0].localeCompare(a[0]));
+}
+
+function fmtRatingDate(ymd) {
+  const [y, m, d] = ymd.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+// The most recent Ordered Date present in History -- i.e. the latest
+// rotation's round. Used to scope the Review (already-rated) view so it
+// resets on the next rotation instead of accumulating all-time.
+function latestHistoryDate() {
+  return _historyRows.reduce((latest, r) => {
+    const date = (r[1] || "").trim();
+    return date > latest ? date : latest;
+  }, "");
+}
+
+// What a person has already rated for the latest rotation only -- read-only,
+// for the "Review" view once someone has no pending items left. Unlike
+// getPendingRatings (which stays reachable indefinitely until rated), this
+// resets on the next rotation so old ratings don't pile up forever.
+function getRatedHistory(name) {
+  const lname  = name.trim().toLowerCase();
+  const latest = latestHistoryDate();
+  const groups = new Map(); // "date|restaurant" -> Map(itemLower -> {item, rating})
+  _allRatingRows.forEach(r => {
+    const date       = (r[1] || "").trim();
+    const restaurant = (r[2] || "").trim();
+    const item       = (r[3] || "").trim();
+    const rowName    = (r[4] || "").trim();
+    const rating     = r[5];
+    if (!date || !item || date !== latest || rowName.toLowerCase() !== lname) return;
+    const key = `${date}|${restaurant}`;
+    if (!groups.has(key)) groups.set(key, new Map());
+    groups.get(key).set(item.toLowerCase(), { item, rating });
+  });
+  return [...groups.entries()]
+    .map(([key, itemMap]) => [key, [...itemMap.values()]])
+    .sort((a, b) => b[0].localeCompare(a[0]));
+}
+
+function pendingCountFor(name) {
+  return getPendingRatings(name).reduce((sum, [, items]) => sum + items.length, 0);
+}
+
+let _selectedRatingName = "";
+
 function renderRatingCard() {
   const card = document.getElementById("rating-card");
   if (!card) return;
 
-  if (!isWeekEffectivelyComplete() || !_lastOrderRows.length) {
+  if (!_historyRows.length) {
     card.style.display = "none";
     return;
   }
   card.style.display = "block";
 
-  const nameSelect = document.getElementById("rating-name-select");
-  const prevName   = nameSelect.value;
-  const names = [...new Set(_lastOrderRows.map(r => (r[1] || "").trim()).filter(Boolean))]
+  const names = [...new Set(_historyRows.flatMap(r => (r[5] || "").split(",").map(n => n.trim()).filter(Boolean)))]
     .sort((a, b) => a.localeCompare(b));
-  nameSelect.innerHTML = `<option value="">Select your name…</option>` +
-    names.map(n => `<option value="${escAttr(n)}">${esc(n)}</option>`).join("");
-  if (names.includes(prevName)) nameSelect.value = prevName;
+
+  if (!names.includes(_selectedRatingName)) _selectedRatingName = "";
+
+  const tableEl = document.getElementById("rating-names-table");
+  tableEl.innerHTML = names.map(n => {
+    const pending = pendingCountFor(n);
+    const active  = n === _selectedRatingName;
+    const status  = pending > 0 ? `${pending} to rate` : "All rated";
+    return `<div class="rating-name-row${active ? " active" : ""}" data-name="${escAttr(n)}">
+      <span class="rating-name">${esc(n)}</span>
+      <span class="rating-name-status${pending > 0 ? "" : " rating-name-status-done"}">${status}</span>
+      <button type="button" class="btn-secondary rating-name-btn">${pending > 0 ? "Rate" : "Review"}</button>
+    </div>`;
+  }).join("");
+
+  tableEl.querySelectorAll(".rating-name-row").forEach(row => {
+    row.addEventListener("click", () => {
+      _selectedRatingName = row.dataset.name;
+      _ratingTouched.clear();
+      renderRatingCard();
+    });
+  });
 
   renderRatingItems();
 }
 
 function renderRatingItems() {
-  const listEl     = document.getElementById("rating-items-list");
-  const nameSelect = document.getElementById("rating-name-select");
-  const name       = nameSelect.value;
+  const listEl   = document.getElementById("rating-items-list");
+  const submitBtn = document.getElementById("rating-submit-btn");
+  const name = _selectedRatingName;
 
   if (!name) {
-    listEl.innerHTML = `<div class="placeholder">Select your name to rate the items you had.</div>`;
+    listEl.innerHTML = `<div class="placeholder">Pick your name above to rate items from any past order.</div>`;
+    submitBtn.style.display = "none";
     return;
   }
 
-  const items = new Map();
-  _lastOrderRows
-    .filter(r => (r[1] || "").trim().toLowerCase() === name.toLowerCase())
-    .forEach(r => {
-      smartSplit(r[2] ?? "").forEach(item => {
-        const key = item.toLowerCase();
-        if (!items.has(key)) items.set(key, item);
-      });
-    });
-  const sortedItems = [...items.values()].sort((a, b) => a.localeCompare(b));
+  const groups = getPendingRatings(name);
 
-  if (!sortedItems.length) {
-    listEl.innerHTML = `<div class="placeholder">No items found for this name.</div>`;
-    return;
-  }
-
-  listEl.innerHTML = sortedItems.map(item => {
-    const key  = item.toLowerCase();
-    const done = alreadyRated(name, item);
-    if (done) {
-      return `<div class="rating-item-row">
-        <span class="rating-item-name">${esc(item)}</span>
-        <span class="rating-item-done">&#10003; Rated</span>
-      </div>`;
+  if (!groups.length) {
+    submitBtn.style.display = "none";
+    const rated = getRatedHistory(name);
+    if (!rated.length) {
+      listEl.innerHTML = `<div class="placeholder">${esc(name)} hasn't rated anything yet.</div>`;
+      return;
     }
-    return `<div class="rating-item-row" data-item="${escAttr(item)}">
-      <span class="rating-item-name">${esc(item)}</span>
-      <div class="rating-item-input-wrap">
-        <input type="range" class="rating-item-slider" min="1" max="10" step="1" value="5" data-key="${escAttr(key)}">
-        <span class="rating-item-value">&mdash;</span>
-      </div>
+    listEl.innerHTML = `<div class="placeholder">${esc(name)} is all caught up &mdash; here's what they've rated.</div>` +
+      rated.map(([groupKey, items]) => {
+        const [date, restaurant] = groupKey.split("|");
+        const rows = items.slice().sort((a, b) => a.item.localeCompare(b.item)).map(({ item, rating }) =>
+          `<div class="rating-item-row">
+            <span class="rating-item-name">${esc(item)}</span>
+            <span class="rating-item-given">${esc(rating)}/10</span>
+          </div>`
+        ).join("");
+        return `<div class="rating-date-group">
+          <div class="rating-date-header">${esc(fmtRatingDate(date))} &mdash; ${esc(restaurant)}</div>
+          ${rows}
+        </div>`;
+      }).join("");
+    return;
+  }
+
+  submitBtn.style.display = "flex";
+  listEl.innerHTML = groups.map(([groupKey, items]) => {
+    const [date, restaurant] = groupKey.split("|");
+    const rows = items.slice().sort((a, b) => a.localeCompare(b)).map(item => {
+      const key = `${groupKey}|${item.toLowerCase()}`;
+      return `<div class="rating-item-row" data-date="${escAttr(date)}" data-restaurant="${escAttr(restaurant)}" data-item="${escAttr(item)}">
+        <span class="rating-item-name">${esc(item)}</span>
+        <div class="rating-item-input-wrap">
+          <input type="range" class="rating-item-slider" min="1" max="10" step="1" value="5" data-key="${escAttr(key)}">
+          <span class="rating-item-value">&mdash;</span>
+        </div>
+      </div>`;
+    }).join("");
+    return `<div class="rating-date-group">
+      <div class="rating-date-header">${esc(fmtRatingDate(date))} &mdash; ${esc(restaurant)}</div>
+      ${rows}
     </div>`;
   }).join("");
 
@@ -1202,26 +1319,25 @@ function renderRatingItems() {
   });
 }
 
-document.getElementById("rating-name-select")?.addEventListener("change", () => {
-  _ratingTouched.clear();
-  renderRatingItems();
-});
-
 document.getElementById("rating-submit-btn")?.addEventListener("click", async () => {
-  const nameSelect = document.getElementById("rating-name-select");
-  const name = nameSelect.value;
+  const name = _selectedRatingName;
   const status = document.getElementById("rating-status");
   status.style.display = "none";
 
   if (!name) {
     status.style.display = "block";
-    status.textContent = "Select your name first.";
+    status.textContent = "Pick your name first.";
     return;
   }
 
   const rows = [...document.querySelectorAll(".rating-item-row[data-item]")];
   const toSubmit = rows
-    .map(row => ({ item: row.dataset.item, slider: row.querySelector(".rating-item-slider") }))
+    .map(row => ({
+      date: row.dataset.date,
+      restaurant: row.dataset.restaurant,
+      item: row.dataset.item,
+      slider: row.querySelector(".rating-item-slider"),
+    }))
     .filter(r => _ratingTouched.has(r.slider.dataset.key));
 
   if (!toSubmit.length) {
@@ -1234,29 +1350,33 @@ document.getElementById("rating-submit-btn")?.addEventListener("click", async ()
   btn.disabled = true;
   btn.textContent = "Submitting…";
 
-  const restaurant = document.getElementById("restaurant-name")?.textContent || "";
   try {
+    const now = new Date().toISOString();
     if (MOCK_MODE) {
-      const now = new Date().toISOString();
-      toSubmit.forEach(r => _mockRatings.push([now, currentFriday, restaurant, r.item, name, r.slider.value]));
+      toSubmit.forEach(r => _mockRatings.push([now, r.date, r.restaurant, r.item, name, r.slider.value]));
     } else {
       if (!APPS_SCRIPT_URL) throw new Error("APPS_SCRIPT_URL not configured");
       await Promise.all(toSubmit.map(r => {
         const params = new URLSearchParams({
           type: "rating",
-          date: currentFriday,
-          restaurant,
+          date: r.date,
+          restaurant: r.restaurant,
           item: r.item,
           name,
           rating: r.slider.value,
         });
         return fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { mode: "no-cors" });
       }));
+      // Apply optimistically -- the Sheet's CSV export can lag a few
+      // seconds behind a write, so waiting on a refetch alone would make
+      // just-submitted items look like they never went away.
+      toSubmit.forEach(r => _allRatingRows.push([now, r.date, r.restaurant, r.item, name, r.slider.value]));
     }
     _ratingTouched.clear();
     status.style.display = "block";
     status.textContent = `Submitted ${toSubmit.length} rating${toSubmit.length === 1 ? "" : "s"}. Thank you!`;
-    setTimeout(loadRatings, 300);
+    renderRatingCard();
+    setTimeout(loadRatings, 2000);
   } catch (err) {
     status.style.display = "block";
     status.textContent = "Could not submit — " + err.message;
@@ -2135,6 +2255,10 @@ document.getElementById("order-complete-btn").addEventListener("click", async ()
     status.style.display = "block";
     status.textContent = `Logged ${items.length} item${items.length === 1 ? "" : "s"} for this week.`;
     delete btn.dataset.busy;
+    // A prior PIN reopen only unlocks for one new round -- once that round
+    // is logged, let the normal freeze take over again instead of staying
+    // permanently unlocked for the rest of this tab's session.
+    _pinForceReopen = false;
     await loadHistory(); // sets weekComplete + freezes the form/buttons via applyOrderFreezeState()
   } catch (err) {
     delete btn.dataset.busy;
@@ -2183,6 +2307,11 @@ document.getElementById("reopen-round-btn").addEventListener("click", async () =
   if (!unlocked) return;
 
   _pinForceReopen = true;
+  // The finalized-week freeze and the deadline-passed overlay are two
+  // independent locks (the latter driven by its own 1s countdown timer) --
+  // a full reopen needs to dismiss both, not just the finalized one.
+  document.getElementById("closed-overlay-unlock")?.click();
+
   const status = document.getElementById("order-complete-status");
   status.style.display = "block";
   status.textContent = "Reopened for a new ordering round.";
@@ -2228,7 +2357,7 @@ function openMenuReport(restaurantName) {
     tbody.innerHTML = rows.map(s => {
       const avg = s.ratingCount ? (s.ratingSum / s.ratingCount) : null;
       const avgLabel = avg === null ? "—" : `${avg.toFixed(1)}/10`;
-      const cls = s.weeksOrdered.size > 2 ? "report-fav" : (avg !== null && avg < 3 ? "report-dislike" : "");
+      const cls = s.weeksOrdered.size >= 2 ? "report-fav" : (avg !== null && avg < 3 ? "report-dislike" : "");
       return `<tr>
         <td class="${cls}">${esc(s.label)}</td>
         <td>${s.qty}</td>

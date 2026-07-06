@@ -5,18 +5,24 @@ const TOMTOM_KEY = (window.TRAFFIC_CONFIG && window.TRAFFIC_CONFIG.TOMTOM_KEY) |
 const BBOX = { north: 39.14, south: 38.96, west: -77.20, east: -76.90 };
 const MAP_CENTER = [39.05, -77.05];
 
-// A handful of representative points spread across the covered highways,
-// used to sample real-time speed vs free-flow speed for the gauge.
+// Traces the actual route from the restaurant rotation's home turf (270
+// corridor, Rockville/Gaithersburg -- geocoded from each restaurant's own
+// mapUrl in restaurants.json) down to College Park: 270 S -> 495 E through
+// Silver Spring/New Hampshire Ave (the segment most reliably congested)
+// -> 95 S/College Park. Eastbound-495 points (Georgia Ave onward) carry
+// double weight in the gauge average since that's the stretch that most
+// determines the real trip to College Park.
 const GAUGE_POINTS = [
-  { name: "495 @ I-270 spur (Bethesda)", lat: 39.0334, lon: -77.1198 },
-  { name: "495 @ Georgia Ave (Silver Spring)", lat: 39.0421, lon: -77.0492 },
-  { name: "495 @ New Hampshire Ave", lat: 39.0295, lon: -76.9718 },
-  { name: "270 @ Montrose Rd", lat: 39.0839, lon: -77.1528 },
-  { name: "270 @ Shady Grove", lat: 39.1157, lon: -77.1699 },
-  { name: "95 @ College Park", lat: 38.9897, lon: -76.9378 },
+  { name: "270 @ Ixtapalapa (Gaithersburg)", lat: 39.1466, lon: -77.2041, weight: 1 },
+  { name: "270 @ Shanghai Taste (Rockville)", lat: 39.0920, lon: -77.1746, weight: 1 },
+  { name: "270 @ Randolph Rd (Rockville)", lat: 39.0600, lon: -77.1467, weight: 1 },
+  { name: "495 @ I-270 spur (Bethesda)", lat: 39.0334, lon: -77.1198, weight: 1 },
+  { name: "495 @ Georgia Ave (Silver Spring)", lat: 39.0421, lon: -77.0492, weight: 2 },
+  { name: "495 @ New Hampshire Ave", lat: 39.0295, lon: -76.9718, weight: 2 },
+  { name: "495 @ New Hampshire Ave exit (interchange)", lat: 39.0335, lon: -76.9724, weight: 2 },
+  { name: "495 @ Kenilworth Ave (Greenbelt)", lat: 38.9958, lon: -76.9058, weight: 2 },
+  { name: "95 @ College Park", lat: 38.9897, lon: -76.9378, weight: 1 },
 ];
-
-const REFRESH_MS = 2 * 60 * 1000;
 
 function setNeedle(pct) {
   const needle = document.getElementById("gauge-needle");
@@ -25,15 +31,19 @@ function setNeedle(pct) {
 }
 
 function classify(pct) {
-  if (pct >= 75) return { label: "Good", color: "var(--green)" };
-  if (pct >= 45) return { label: "OK", color: "var(--yellow)" };
+  if (pct >= 92) return { label: "Good", color: "var(--green)" };
+  if (pct >= 60) return { label: "OK", color: "var(--yellow)" };
   return { label: "Bad", color: "var(--red)" };
 }
 
 async function fetchFlowPoint(point) {
   const url = `https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json?point=${point.lat},${point.lon}&key=${TOMTOM_KEY}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`flowSegmentData ${res.status}`);
+  if (!res.ok) {
+    const err = new Error(`HTTP ${res.status}`);
+    err.status = res.status;
+    throw err;
+  }
   const data = await res.json();
   const seg = data.flowSegmentData;
   if (!seg || !seg.freeFlowSpeed) return null;
@@ -46,11 +56,23 @@ async function updateGauge() {
   const updatedEl = document.getElementById("last-updated");
 
   try {
-    const ratios = await Promise.all(GAUGE_POINTS.map(p => fetchFlowPoint(p).catch(() => null)));
-    const valid = ratios.filter(r => r !== null);
-    if (!valid.length) throw new Error("no data");
+    const results = await Promise.all(GAUGE_POINTS.map(async p => {
+      try {
+        return { ratio: await fetchFlowPoint(p), weight: p.weight || 1, status: null };
+      } catch (err) {
+        return { ratio: null, weight: p.weight || 1, status: err.status || null };
+      }
+    }));
+    const valid = results.filter(r => r.ratio !== null);
+    if (!valid.length) {
+      const status = results.find(r => r.status)?.status;
+      const err = new Error("no data");
+      err.status = status;
+      throw err;
+    }
 
-    const avgPct = Math.round((valid.reduce((a, b) => a + b, 0) / valid.length) * 100);
+    const weightSum = valid.reduce((a, r) => a + r.weight, 0);
+    const avgPct = Math.round((valid.reduce((a, r) => a + r.ratio * r.weight, 0) / weightSum) * 100);
     const { label, color } = classify(avgPct);
 
     setNeedle(avgPct);
@@ -61,7 +83,7 @@ async function updateGauge() {
   } catch (err) {
     statusEl.textContent = "Unavailable";
     statusEl.style.color = "var(--text-dim)";
-    detailEl.textContent = "Couldn't reach TomTom traffic data.";
+    detailEl.textContent = err.status ? `Not enough API credit. (${err.status})` : "Not enough API credit.";
   }
 }
 
@@ -92,11 +114,13 @@ function initMap() {
   map.fitBounds([[BBOX.south, BBOX.west], [BBOX.north, BBOX.east]]);
 }
 
-const incidentIcon = L.divIcon({
-  className: "incident-marker",
-  html: "&#9888;",
-  iconSize: [16, 16],
-});
+// TomTom iconCategory: 1 = Accident, 8 = Road Closed. Others (6 Jam,
+// 9 Road Works/Construction, etc.) are excluded. Each gets its own glyph
+// so the two are visually distinct on the map.
+const INCIDENT_ICONS = {
+  1: L.divIcon({ className: "incident-marker incident-accident", html: "&#9888;", iconSize: [16, 16] }),
+  8: L.divIcon({ className: "incident-marker incident-closed", html: "&#9940;", iconSize: [16, 16] }),
+};
 
 async function updateIncidents() {
   const bboxParam = `${BBOX.west},${BBOX.south},${BBOX.east},${BBOX.north}`;
@@ -110,10 +134,12 @@ async function updateIncidents() {
 
     incidentLayer.clearLayers();
     (data.incidents || []).forEach(incident => {
+      const icon = INCIDENT_ICONS[incident.properties?.iconCategory];
+      if (!icon) return;
       const coords = incident.geometry && incident.geometry.coordinates;
       if (!coords) return;
       const [lon, lat] = Array.isArray(coords[0]) ? coords[0] : coords;
-      L.marker([lat, lon], { icon: incidentIcon }).addTo(incidentLayer);
+      L.marker([lat, lon], { icon }).addTo(incidentLayer);
     });
   } catch (err) {
     // Leave existing markers in place rather than clearing on a transient failure.
@@ -133,5 +159,4 @@ if (!TOMTOM_KEY) {
 } else {
   initMap();
   refreshAll();
-  setInterval(refreshAll, REFRESH_MS);
 }

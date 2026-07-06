@@ -278,7 +278,7 @@
       border: none;
       border-bottom: 1px solid var(--accent);
       color: var(--accent);
-      font-family: "Courier New", Courier, monospace;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       font-size: 1rem;
       font-weight: 900;
       width: 5ch;
@@ -301,7 +301,7 @@
     .countdown-sep {
       font-size: clamp(2rem, 7vw, 3rem);
       font-weight: 900;
-      font-family: "Courier New", Courier, monospace;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       line-height: 1;
       padding: 0 0.15rem;
       padding-bottom: 1rem;
@@ -312,7 +312,7 @@
       font-weight: 900;
       line-height: 1;
       letter-spacing: 0.04em;
-      font-family: "Courier New", Courier, monospace;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
     .countdown-unit-label {
       font-size: 0.7rem;
@@ -508,17 +508,27 @@
       left: 50%;
       transform: translateX(-50%);
       margin-bottom: 0.5rem;
+      padding: 8px;
+      background-color: var(--accent);
+      background-image: repeating-linear-gradient(
+        45deg,
+        #000 0px, #000 10px,
+        var(--accent) 10px, var(--accent) 24px
+      );
+      width: max-content;
+      max-width: 260px;
+      z-index: 20;
+    }
+    .worksheet-reset-notice-text {
+      display: block;
       background: #000;
       color: var(--accent);
       font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.01em;
       padding: 0.65rem 0.9rem;
-      width: max-content;
-      max-width: 260px;
       text-align: center;
       line-height: 1.4;
-      z-index: 20;
     }
     .worksheet-info-wrap:hover .worksheet-reset-notice,
     .worksheet-info-wrap.open .worksheet-reset-notice { display: block; }
@@ -572,7 +582,6 @@
       position: absolute;
       inset: 0;
       z-index: 50;
-      background-color: color-mix(in srgb, var(--accent) 55%, transparent);
       background-image: repeating-linear-gradient(
         45deg,
         #5a5a5a 0px, #5a5a5a 24px,
@@ -822,7 +831,8 @@
     #order-btn:hover,
     #order-complete-btn:hover,
     #rating-submit-btn:hover,
-    #gate-submit:hover {
+    #gate-submit:hover,
+    #reopen-round-btn:hover {
       color: #000;
       background-color: var(--accent);
       background-image: repeating-linear-gradient(
@@ -832,6 +842,8 @@
       );
     }
     .btn-primary:disabled { background: #ccc; color: #888; cursor: not-allowed; }
+
+    #reopen-round-btn { background: #000; color: var(--accent); }
 
     .btn-secondary {
       background: transparent;
@@ -1105,6 +1117,43 @@
     }
 
     /* ── Rate Your Order ── */
+    .rating-names-table { margin-bottom: 1rem; }
+    .rating-name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid #000;
+      cursor: pointer;
+    }
+    .rating-name-row:last-child { border-bottom: none; }
+    .rating-name-row:hover { background: color-mix(in srgb, var(--accent) 60%, transparent); }
+    .rating-name-row.active { background: #000; }
+    .rating-name-row.active .rating-name,
+    .rating-name-row.active .rating-name-status { color: var(--accent); }
+    .rating-name { font-weight: 700; color: var(--text); flex: 1; min-width: 0; }
+    .rating-name-status { font-size: 0.75rem; font-weight: 700; color: var(--red); flex-shrink: 0; }
+    .rating-name-status-done { color: var(--green); opacity: 0.85; }
+    .rating-name-row.active .rating-name-status-done { color: var(--green); }
+    .rating-name-btn {
+      width: auto;
+      margin-top: 0;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.7rem;
+      flex-shrink: 0;
+    }
+
+    .rating-date-group { margin-bottom: 0.5rem; }
+    .rating-date-group:last-child { margin-bottom: 0; }
+    .rating-date-header {
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0.6rem 0 0.3rem;
+      border-bottom: 2px solid #000;
+    }
     .rating-item-row {
       display: flex;
       align-items: center;
@@ -1133,10 +1182,10 @@
       min-width: 1.4rem;
       text-align: right;
     }
-    .rating-item-done {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--green);
+    .rating-item-given {
+      font-weight: 900;
+      font-family: "Courier New", Courier, monospace;
+      color: var(--text-muted);
       flex-shrink: 0;
     }
 
@@ -1227,17 +1276,17 @@
       border: 2px solid #000;
       background: var(--bg);
     }
-    /* Widths mirror the Good/OK/Bad thresholds (>=75 / >=45 / below), laid
+    /* Widths mirror the Good/OK/Bad thresholds (>=92 / >=60 / below), laid
        out left-to-right on a badness scale (100 - speed ratio). Pattern
        density (not color) reads as severity: empty = good, thin stripes =
        ok, dense dots = bad. */
     .traffic-gauge-zone { height: 100%; flex: 0 0 auto; }
     .traffic-gauge-zone.zone-good {
-      flex-basis: 25%;
+      flex-basis: 8%;
       background: var(--bg);
     }
     .traffic-gauge-zone.zone-ok {
-      flex-basis: 30%;
+      flex-basis: 32%;
       background-image: repeating-linear-gradient(
         45deg,
         #000 0px, #000 2px,
@@ -1246,7 +1295,7 @@
       border-left: 2px solid #000;
     }
     .traffic-gauge-zone.zone-bad {
-      flex-basis: 45%;
+      flex-basis: 60%;
       background: #000;
       border-left: 2px solid #000;
     }
@@ -1264,8 +1313,8 @@
     }
 
     .traffic-gauge-labels {
-      display: flex;
-      justify-content: space-between;
+      position: relative;
+      height: 1rem;
       margin-top: 0.35rem;
       font-size: 0.68rem;
       font-weight: 700;
@@ -1273,6 +1322,17 @@
       letter-spacing: 0.05em;
       color: var(--text-muted);
     }
+    /* Centered over each zone's actual width (8% / 32% / 60%), not evenly
+       spaced -- so the label sits over its own section of the bar. */
+    .traffic-gauge-labels span {
+      position: absolute;
+      top: 0;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    .traffic-gauge-labels .label-good { left: 4%; }
+    .traffic-gauge-labels .label-ok   { left: 24%; }
+    .traffic-gauge-labels .label-bad  { left: 70%; }
 
     .traffic-gauge-detail {
       margin-top: 0.5rem;
@@ -1354,7 +1414,9 @@
     .swatch-red    { background: var(--red); }
     .swatch-incident { width: auto; height: auto; background: none; color: var(--red); font-size: 0.8rem; }
 
-    .traffic-incident-marker { color: var(--red); font-size: 1.1rem; text-shadow: 0 0 2px #fff, 0 0 2px #fff; }
+    .traffic-incident-marker { font-size: 1.1rem; text-shadow: 0 0 2px #fff, 0 0 2px #fff; }
+    .traffic-incident-accident { color: var(--red); }
+    .traffic-incident-closed { color: #000; }
 
     /* ── Menu URL link ── */
     .menu-title-btns {
@@ -1648,7 +1710,6 @@
       paint-order: stroke fill;
       text-shadow: 3px 3px 0 #000;
       padding: 0.85rem 1.25rem;
-      margin-bottom: 0.25rem;
       background: transparent;
     }
     .mpi-popular-block, .mpi-cat-block, .mpi-dislike-block {
@@ -1914,9 +1975,18 @@
     body.dark .worksheet-info-btn:hover { background: var(--ink); color: var(--bg); }
     body.dark .changelog-toggle-btn { border-color: var(--ink); }
     body.dark .changelog-entry { border-color: var(--ink); }
-    body.dark .worksheet-reset-notice { background: var(--ink); color: var(--bg); }
+    body.dark .worksheet-reset-notice {
+      background-color: var(--bg);
+      background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 10px, var(--bg) 10px, var(--bg) 24px);
+    }
+    body.dark .worksheet-reset-notice-text { background: var(--ink); color: var(--bg); }
     body.dark .grouped-item-row { border-bottom-color: var(--ink); }
     body.dark .rating-item-row { border-bottom-color: var(--ink); }
+    body.dark .rating-date-header { border-bottom-color: var(--ink); }
+    body.dark .rating-name-row { border-bottom-color: var(--ink); }
+    body.dark .rating-name-row.active { background: var(--ink); }
+    body.dark .rating-name-row.active .rating-name,
+    body.dark .rating-name-row.active .rating-name-status { color: var(--bg); }
     body.dark .rating-item-input-wrap input[type="range"] { accent-color: var(--ink); }
     body.dark .oi-link { color: var(--ink); border-color: var(--ink); }
     body.dark .oi-link:hover { background: var(--ink); color: var(--bg); }
