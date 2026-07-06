@@ -795,6 +795,40 @@
     }
     .grouped-item-price { font-weight: 600; color: var(--text-dim); white-space: nowrap; font-size: 0.85em; }
 
+    .order-toast {
+      position: fixed;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(-1rem);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--accent);
+      background-image: repeating-linear-gradient(
+        45deg,
+        #000 0px, #000 12px,
+        var(--accent) 12px, var(--accent) 26px
+      );
+      padding: 0.85rem 1.75rem;
+      border: 3px solid #000;
+      z-index: 4000;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .order-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .order-toast-text {
+      background: var(--bg);
+      border: 2px solid #000;
+      color: var(--red);
+      font-weight: 900;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.4rem 0.85rem;
+    }
+
     .grand-total-bar {
       display: flex;
       align-items: center;
@@ -1232,9 +1266,10 @@
       table { table-layout: fixed; width: 100%; }
       .col-name    { width: 22%; }
       .col-items   { width: auto; }
-      .col-total   { width: 4.5rem; }
+      .col-total   { width: 3.75rem; }
       .col-actions { width: 2rem; }
       tbody td { padding: 0.6rem 0.5rem; }
+      thead th { padding: 0.6rem 0.4rem; font-size: 0.62rem; letter-spacing: 0.06em; }
       .td-total-cell { padding-left: 0.25rem; }
       .td-actions { padding: 0.4rem 0.15rem; }
 
@@ -1355,6 +1390,7 @@
     body.dark .trend-bar-wrap,
     body.dark .trend-bar { background: var(--ink); }
     body.dark .grand-total-bar { background: var(--ink); color: var(--bg); }
+    body.dark .order-toast-text { border-color: var(--ink); }
     body.dark .toggle-checkbox { border-color: var(--ink); }
     body.dark .toggle-checkbox:checked { background: var(--ink); }
     body.dark .toggle-checkbox:checked::after { border-color: var(--bg); }
@@ -2560,7 +2596,43 @@ function calcOrderTotal(orderText) {
   return total;
 }
 
-let _lastOrderRows = [];
+let _lastOrderRows  = [];
+let _prevOrderCount = null;
+let _titleFlashTimer = null;
+const _originalTitle = document.title;
+
+function showOrderToast(message) {
+  const toast = document.createElement("div");
+  toast.className = "order-toast";
+  toast.innerHTML = `<span class="order-toast-text"></span>`;
+  toast.querySelector(".order-toast-text").textContent = message;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add("show"));
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  }, 5000);
+}
+
+function notifyNewOrder(count) {
+  showOrderToast(count === 1 ? "New order added" : `${count} new orders added`);
+  if (document.hidden) {
+    if (_titleFlashTimer) clearInterval(_titleFlashTimer);
+    let flip = false;
+    _titleFlashTimer = setInterval(() => {
+      document.title = flip ? _originalTitle : "NEW ORDER!";
+      flip = !flip;
+    }, 1000);
+  }
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && _titleFlashTimer) {
+    clearInterval(_titleFlashTimer);
+    _titleFlashTimer = null;
+    document.title = _originalTitle;
+  }
+});
 
 async function loadOrders() {
   const container = document.getElementById("orders-container");
@@ -2613,6 +2685,11 @@ async function loadOrders() {
 
     countEl.textContent = rows.length;
 
+    if (_prevOrderCount !== null && rows.length > _prevOrderCount) {
+      notifyNewOrder(rows.length - _prevOrderCount);
+    }
+    _prevOrderCount = rows.length;
+
     if (!rows.length) {
       container.innerHTML = `<div class="placeholder">No orders yet.</div>`;
       return;
@@ -2620,7 +2697,7 @@ async function loadOrders() {
 
     const itemCounts = {};
     rows.forEach(r => {
-      (r[2] ?? "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean)
+      smartSplit(r[2] ?? "").map(s => s.toLowerCase())
         .forEach(item => { itemCounts[item] = (itemCounts[item] || 0) + 1; });
     });
 
@@ -2746,7 +2823,7 @@ function renderOrdersTable(dupCount) {
         <colgroup>
           <col class="col-name"><col class="col-items">${showPrices ? `<col class="col-total">` : ""}<col class="col-actions">
         </colgroup>
-        <thead><tr><th>Name</th><th>Items</th>${showPrices ? `<th style="white-space:nowrap">Total ${taxLabel}</th>` : ""}<th></th></tr></thead>
+        <thead><tr><th>Name</th><th>Items</th>${showPrices ? `<th>Total ${taxLabel}</th>` : ""}<th></th></tr></thead>
         <tbody>${trs}</tbody>
       </table></div>`;
     }
