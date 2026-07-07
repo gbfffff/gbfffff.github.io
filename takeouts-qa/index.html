@@ -63,6 +63,9 @@
       </div>
       <div class="calendar-col">
         <div id="friday-calendar" class="friday-calendar" style="display:none"></div>
+        <button type="button" id="override-restaurant-btn" class="override-restaurant-btn">
+          &#128274; Override Restaurant
+        </button>
         <button type="button" id="rotation-toggle-btn" class="rotation-toggle-btn" style="display:none">
           View Rotation & Data <span class="rotation-toggle-arrow">&#9660;</span>
         </button>
@@ -89,17 +92,9 @@
     </div>
     <div id="order-countdown" class="order-countdown"></div>
     <div class="card-body" style="position:relative">
-      <div class="closed-overlay" id="closed-overlay" style="display:none">
-        <div class="closed-overlay-box">
-          <span class="closed-overlay-text">Orders Closed</span>
-          <button type="button" id="closed-overlay-unlock" class="btn closed-overlay-unlock-btn">Order Anyway</button>
-          <p class="closed-overlay-note">Your order may not reach the handler after this time, but you can try</p>
-        </div>
-      </div>
       <div class="closed-overlay" id="frozen-overlay" style="display:none">
         <div class="closed-overlay-box">
-          <span class="closed-overlay-text">Order Finalized</span>
-          <p class="closed-overlay-note">This week's order has been logged. Editing is locked — see the Worksheet below.</p>
+          <span class="closed-overlay-text">Order Completed &amp; Closed</span>
         </div>
       </div>
       <form id="order-form">
@@ -128,10 +123,6 @@
         Order submitted. See you Friday.
         <div id="order-success-items" style="margin-top:0.5rem;font-size:0.82rem;color:var(--text-muted);line-height:1.5"></div>
         <br><button type="button" class="btn btn-secondary" id="edit-order-btn" style="margin-top:0.5rem;font-size:0.8rem">Edit My Order</button>
-      </div>
-      <div id="form-trending" style="display:none;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border)">
-        <div class="field-label" id="form-trending-title" style="margin-bottom:0.6rem"></div>
-        <div id="form-trending-list"></div>
       </div>
     </div>
   </div>
@@ -193,18 +184,6 @@
       <div id="rating-status" style="display:none;margin-top:0.6rem;font-size:0.8rem;color:var(--text-dim);text-align:center"></div>
     </div>
   </div>
-
-  <!-- TRENDING -->
-  <div class="card" id="trending-card" style="display:none">
-    <div class="card-header">
-      <h2>Trending Dishes</h2>
-      <span class="badge badge-dim" id="trending-restaurant-label"></span>
-    </div>
-    <div id="trending-container" class="card-body" style="padding-bottom:1rem">
-      <div class="placeholder">Loading…</div>
-    </div>
-  </div>
-
 
   <!-- TRAFFIC -->
   <div class="card" id="traffic-card">
@@ -286,7 +265,7 @@
 
 <div id="pin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center">
   <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:320px;width:90%;text-align:center">
-    <p style="margin-bottom:1rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600">Enter PIN to reopen ordering for a new round.</p>
+    <p id="pin-modal-msg" style="margin-bottom:1rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600">Enter PIN to reopen ordering for a new round.</p>
     <input type="password" id="pin-modal-input" inputmode="numeric" maxlength="5" placeholder="PIN" style="width:100%;padding:0.6rem;border:2px solid #000;font-size:1rem;font-family:inherit;text-align:center;letter-spacing:0.2em;box-sizing:border-box">
     <div id="pin-modal-error" style="display:none;margin-top:0.6rem;color:#cc0000;font-size:0.8rem;font-weight:700">Incorrect PIN &mdash; try again.</div>
     <div style="display:flex;gap:0.75rem;justify-content:center;margin-top:1.1rem">
@@ -296,19 +275,54 @@
   </div>
 </div>
 
+<div id="override-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center">
+  <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:340px;width:90%;text-align:center">
+    <p style="margin-bottom:1rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600">Pick a restaurant to override this week's rotation. Everyone will see this change.</p>
+    <div id="override-modal-list" style="display:flex;flex-direction:column;gap:0.5rem;max-height:260px;overflow-y:auto;text-align:left"></div>
+    <button id="override-modal-cancel" style="margin-top:1.1rem;padding:0.5rem 1.25rem;border:2px solid #000;background:transparent;color:#000;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Cancel</button>
+  </div>
+</div>
+
+<div id="override-reason-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center">
+  <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:340px;width:90%;text-align:center">
+    <p id="override-reason-msg" style="margin-bottom:1rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600"></p>
+    <textarea id="override-reason-input" placeholder="Reason for the override (shown on hover)" rows="3" style="width:100%;padding:0.6rem;border:2px solid #000;font-size:0.85rem;font-family:inherit;box-sizing:border-box;resize:vertical"></textarea>
+    <div style="display:flex;gap:0.75rem;justify-content:center;margin-top:1.1rem">
+      <button id="override-reason-ok" style="padding:0.5rem 1.25rem;border:2px solid #000;background:#ff8c00;color:#000;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Confirm Override</button>
+      <button id="override-reason-cancel" style="padding:0.5rem 1.25rem;border:2px solid #000;background:transparent;color:#000;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="report-modal" id="report-modal" onclick="closeMenuReport(event)">
-  <div class="report-modal-box" onclick="event.stopPropagation()">
+  <div class="report-modal-box" id="report-modal-box" onclick="event.stopPropagation()">
     <div class="report-modal-header">
       <h2 id="report-modal-title">Order History &amp; Ratings</h2>
       <button type="button" class="report-modal-close" onclick="closeMenuReport()">&times;</button>
     </div>
     <div class="report-modal-body">
+      <button type="button" id="report-stats-toggle-btn" class="report-stats-toggle-btn">
+        Item Stats <span class="rotation-toggle-arrow">&#9660;</span>
+      </button>
+      <div id="report-stats-panel" class="rotation-panel">
+        <table class="report-table">
+          <thead><tr><th>Item</th><th>Times<br>Ordered</th><th>Avg<br>Rating</th></tr></thead>
+          <tbody id="report-modal-tbody"></tbody>
+        </table>
+        <div id="report-modal-empty" class="placeholder" style="display:none">No order history or ratings logged yet for this restaurant.</div>
+      </div>
+
+      <div id="report-history-titlebar" class="report-history-titlebar" style="display:none">
+        <span class="report-history-titlebar-text">Past Orders</span>
+        <div class="report-modal-options">
+          <label class="toggle-label"><input type="checkbox" id="report-show-names" class="toggle-checkbox" checked> Names</label>
+          <label class="toggle-label"><input type="checkbox" id="report-show-tax" class="toggle-checkbox"> +6% Tax</label>
+          <label class="toggle-label"><input type="checkbox" id="report-show-ratings" class="toggle-checkbox" checked> Ratings</label>
+        </div>
+      </div>
+      <div id="report-modal-history" class="report-modal-history"></div>
+
       <div id="report-modal-total" class="report-modal-total" style="display:none"></div>
-      <table class="report-table">
-        <thead><tr><th>Item</th><th>Times Ordered</th><th>Avg Rating</th></tr></thead>
-        <tbody id="report-modal-tbody"></tbody>
-      </table>
-      <div id="report-modal-empty" class="placeholder" style="display:none">No order history or ratings logged yet for this restaurant.</div>
     </div>
   </div>
 </div>

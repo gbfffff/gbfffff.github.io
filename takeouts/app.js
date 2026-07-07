@@ -8,6 +8,7 @@ const SHEET_ID        = _cfg.SHEET_ID         || "";
 const ORDERS_GID      = _cfg.ORDERS_GID       || "0";
 const HISTORY_GID     = _cfg.HISTORY_GID      || "";
 const RATINGS_GID     = _cfg.RATINGS_GID      || "";
+const OVERRIDES_GID   = _cfg.OVERRIDES_GID    || "";
 
 // Local-only demo mode: when testing on localhost with no real Sheet
 // configured yet, run the whole order/history/rating flow on fake
@@ -29,8 +30,16 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // Shown in the footer on QA/localhost only (see DEBUG_MODE above). Bump
 // APP_VERSION and add an entry here whenever a meaningful batch of changes
 // ships -- newest entry first.
-const APP_VERSION = "1.6.0";
+const APP_VERSION = "1.7.0";
 const CHANGELOG = [
+  { version: "1.7.0", date: "2026-07-07", notes: [
+    "Restaurant rotation override (PIN + reason, global via new Overrides sheet): red flag + reason tooltip on the calendar, cancels any earlier completion, and starts a clean ordering round",
+    "Deadline no longer blocks the form: Submit turns orange '(Late)' past the cutoff with a confirm step instead of the Orders Closed overlay",
+    "Rounds are timestamp-bounded: reopened/overridden weeks clear the Worksheet and accept fresh orders; old rows stay in the sheet",
+    "Report modal: collapsible Item Stats, per-person Past Orders (name/item/price/individual rating) with Names/Tax/Ratings toggles, Total Spent moved to bottom",
+    "Rate Your Order lists only people with unrated completed items; rated items and fully-rated names disappear (data lives in reports)",
+    "Order Completed & Closed overlay restyled to thin see-through stripes; removed the unrequested Trending Dishes section",
+  ]},
   { version: "1.6.0", date: "2026-07-06", notes: [
     "Rate Your Order redesigned: name table with per-person status (N to rate / All rated) instead of a dropdown",
     "Review view shows already-given ratings; scoped to the latest rotation only (pending items still never expire)",
@@ -72,7 +81,6 @@ let currentFriday = null;
 let takenItems    = {};
 let allMenuItems  = [];
 let selectedItems = [];
-let trendingItems = new Set(); // base names of top-trending dishes
 
 // ── Date helpers ────────────────────────────────────────────────────
 
@@ -148,9 +156,17 @@ function buildFridayCalendar(config) {
 
   el.innerHTML = rows.map(r => {
     const cur = r.ymd === currentFriday;
+    const info = getOverrideInfo(r.ymd);
+    // No flag if there's no override, or if the override just matches the
+    // originally-scheduled restaurant (effectively a no-op swap).
+    const isRealOverride = info && info.restaurant.trim().toLowerCase() !== r.name.trim().toLowerCase();
+    const tooltip = `Overridden to: ${info?.restaurant || ""}${info?.reason ? " — " + info.reason : ""}`;
+    const flag = isRealOverride
+      ? ` <span class="fcal-override-flag" data-tip="${escAttr(tooltip)}">&#9888;</span>`
+      : "";
     return `<div class="fcal-row${cur ? " fcal-current" : ""}">
       <span class="fcal-date">${r.mon} ${r.day}</span>
-      <span class="fcal-name">${esc(r.name)}</span>
+      <span class="fcal-name">${esc(r.name)}${flag}</span>
     </div>`;
   }).join("");
   el.style.display = "flex";
@@ -210,6 +226,8 @@ async function loadRestaurant() {
   document.getElementById("friday-date").innerHTML =
     `${weekday}<br>${monthDay}<br><span class="big-date-year">${year}</span>`;
 
+  await loadOverrides();
+
   let restaurant = null;
   try {
     const res    = await fetch("restaurants.json?v=" + Date.now());
@@ -226,6 +244,16 @@ async function loadRestaurant() {
     restaurant = raw.ref
       ? config.restaurants.find(r => r.name === raw.ref) || raw
       : raw;
+
+    // A manual override (unpredictable event forcing a restaurant swap) is
+    // keyed by date and visible to everyone -- it wins over the normal
+    // rotation-index pick for the active Friday.
+    const overrideName = getOverrideRestaurant(currentFriday);
+    if (overrideName) {
+      const match = findRestaurantByName(overrideName);
+      if (match) restaurant = match;
+    }
+
     buildFridayCalendar(config);
     buildRotationPanel(config);
   } catch (e) {
@@ -363,7 +391,6 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     document.getElementById(btn.dataset.target)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  applyMenuTrendMarks();
   applyMenuTakenMarks();
 
   // Clicking a menu panel item adds it to the order.
@@ -845,6 +872,14 @@ document.getElementById("order-form").addEventListener("submit", async e => {
 
   if (!name || !items) { alert("Please enter your name and at least one item."); return; }
 
+  if (debugNow() > getOrderDeadline().getTime()) {
+    const proceed = await confirmModal(
+      "This order is late — it may not reach the handler and isn't guaranteed to be included. Submit anyway?",
+      { okLabel: "Submit Anyway", okColor: "#ff8c00" }
+    );
+    if (!proceed) return;
+  }
+
   console.log("[order] name:", name, "| items:", items, "| date:", currentFriday);
   console.log("[order] APPS_SCRIPT_URL:", APPS_SCRIPT_URL || "(empty!)");
 
@@ -942,7 +977,7 @@ async function post(payload) {
 
 async function loadData() {
   await loadOrders();
-  await Promise.all([loadTrending(), loadHistory(), loadRatings()]);
+  await Promise.all([loadHistory(), loadRatings()]);
   document.getElementById("last-updated").textContent =
     `Updated ${new Date().toLocaleTimeString()}`;
 }
@@ -992,6 +1027,7 @@ function mockOrdersCSV() {
 // no real Apps Script backend to write to.
 let _mockHistory = [];
 let _mockRatings = [];
+let _mockOverrides = [];
 
 // Once this week's order has been logged (via "Order Complete"), lock the
 // order form and the Worksheet's edit/delete controls -- from that point
@@ -1000,10 +1036,6 @@ function applyOrderFreezeState() {
   const complete = isWeekEffectivelyComplete();
   const frozen = document.getElementById("frozen-overlay");
   if (frozen) frozen.style.display = complete ? "flex" : "none";
-
-  // The finalized state takes priority over the deadline-closed overlay.
-  const closedOverlay = document.getElementById("closed-overlay");
-  if (complete && closedOverlay) closedOverlay.style.display = "none";
 
   const completeBtn = document.getElementById("order-complete-btn");
   if (completeBtn && !completeBtn.dataset.busy) {
@@ -1017,10 +1049,84 @@ function applyOrderFreezeState() {
   if (_lastOrderRows.length) renderOrdersTable();
 }
 
+// Manual restaurant-rotation override -- append-only, like History/Ratings,
+// so an admin re-overriding the same week just adds another row and the
+// latest one wins. An empty Restaurant value means "explicitly cleared,
+// fall back to the normal rotation."
+let _overrideRows = []; // Timestamp, Date, Restaurant, Reason
+
+// Overrides submitted this session, always merged back in on refetch -- the
+// Sheet's CSV export lags several seconds behind a write, so the immediate
+// refetch right after applying an override would otherwise come back
+// WITHOUT it, leaving the old round's orders/freeze visible until a later
+// reload. Duplicates once the sheet catches up are harmless (latest-row-
+// wins semantics, and both rows say the same thing).
+let _optimisticOverrides = [];
+
+async function loadOverrides() {
+  if (MOCK_MODE) { _overrideRows = _mockOverrides; return; }
+  if (!OVERRIDES_GID) { _overrideRows = [..._optimisticOverrides]; return; }
+  try {
+    const csv = await fetchCSV(OVERRIDES_GID);
+    _overrideRows = parseCSV(csv).slice(1).concat(_optimisticOverrides);
+  } catch {
+    _overrideRows = [..._optimisticOverrides];
+  }
+}
+
+function getOverrideRestaurant(date) {
+  return getOverrideInfo(date)?.restaurant || null;
+}
+
+// Latest override row for a date, with its reason -- or null if there's no
+// active override (either none was ever set, or the latest one was an
+// explicit "clear"). Picked by timestamp, not array position, since
+// _overrideRows can mix fetched sheet rows with session-optimistic ones.
+function getOverrideInfo(date) {
+  const rows = _overrideRows.filter(r => (r[1] || "").trim() === date);
+  if (!rows.length) return null;
+  const latest = rows.reduce((best, r) =>
+    new Date(r[0]).getTime() >= new Date(best[0]).getTime() ? r : best);
+  const restaurant = (latest[2] || "").trim();
+  if (!restaurant) return null;
+  return { restaurant, reason: (latest[3] || "").trim() };
+}
+
+// A finalized round's own History log timestamp -- or a restaurant override
+// -- acts as the "round boundary" for a date. No new Orders/Drivers sheet
+// column needed. Before any completion/override, everything shows (round
+// 1). After either one, only orders submitted after that moment count as
+// the new round -- old rows stay untouched in the sheet, just hidden. An
+// override needs this too: switching restaurants means old orders were for
+// a DIFFERENT restaurant's menu entirely, not just an earlier round of the
+// same one.
+function latestTimestampFor(rows, date) {
+  return rows
+    .filter(r => (r[1] || "").trim() === date)
+    .map(r => new Date(r[0]).getTime())
+    .filter(t => !isNaN(t))
+    .reduce((a, b) => Math.max(a, b), 0);
+}
+
+function getRoundCutoff(date) {
+  return Math.max(latestTimestampFor(_historyRows, date), latestTimestampFor(_overrideRows, date));
+}
+
+// The week counts as complete only if the most recent completion (History
+// log) is NEWER than the most recent restaurant override for the date. An
+// override starts a brand-new ordering session, cancelling any earlier
+// completion for everyone -- persistently, across reloads and devices --
+// until a fresh Order Complete is logged for the new round.
+function computeWeekComplete() {
+  const histTs = latestTimestampFor(_historyRows, currentFriday);
+  const ovTs   = latestTimestampFor(_overrideRows, currentFriday);
+  return histTs > 0 && histTs > ovTs;
+}
+
 async function loadHistory() {
   if (MOCK_MODE) {
     _historyRows = _mockHistory;
-    weekComplete = _mockHistory.some(r => r[1] === currentFriday);
+    weekComplete = computeWeekComplete();
     renderRatingCard();
     refreshMenuInsights();
     applyOrderFreezeState();
@@ -1031,7 +1137,7 @@ async function loadHistory() {
     const csv  = await fetchCSV(HISTORY_GID);
     const rows = parseCSV(csv).slice(1); // Timestamp, Date, Restaurant, Item, Qty, Names
     _historyRows = rows;
-    weekComplete = rows.some(r => (r[1] || "").trim() === currentFriday);
+    weekComplete = computeWeekComplete();
   } catch {
     weekComplete = false;
   }
@@ -1039,6 +1145,13 @@ async function loadHistory() {
   refreshMenuInsights();
   applyOrderFreezeState();
 }
+
+// Ratings submitted this session, kept separately and always merged into
+// _allRatingRows on refetch -- the Sheet's CSV export can lag several
+// seconds behind a write, so a refetch alone could return data WITHOUT the
+// just-submitted rows and make already-rated items pop back into the
+// pending list. Duplicates (once the sheet catches up) are harmless.
+let _optimisticRatings = [];
 
 async function loadRatings() {
   if (MOCK_MODE) {
@@ -1051,9 +1164,9 @@ async function loadRatings() {
   try {
     const csv  = await fetchCSV(RATINGS_GID);
     const rows = parseCSV(csv).slice(1); // Timestamp, Date, Restaurant, Item, Name, Rating
-    _allRatingRows = rows;
+    _allRatingRows = rows.concat(_optimisticRatings);
   } catch {
-    _allRatingRows = [];
+    _allRatingRows = [..._optimisticRatings];
   }
   renderRatingCard();
   refreshMenuInsights();
@@ -1177,40 +1290,6 @@ function fmtRatingDate(ymd) {
   return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-// The most recent Ordered Date present in History -- i.e. the latest
-// rotation's round. Used to scope the Review (already-rated) view so it
-// resets on the next rotation instead of accumulating all-time.
-function latestHistoryDate() {
-  return _historyRows.reduce((latest, r) => {
-    const date = (r[1] || "").trim();
-    return date > latest ? date : latest;
-  }, "");
-}
-
-// What a person has already rated for the latest rotation only -- read-only,
-// for the "Review" view once someone has no pending items left. Unlike
-// getPendingRatings (which stays reachable indefinitely until rated), this
-// resets on the next rotation so old ratings don't pile up forever.
-function getRatedHistory(name) {
-  const lname  = name.trim().toLowerCase();
-  const latest = latestHistoryDate();
-  const groups = new Map(); // "date|restaurant" -> Map(itemLower -> {item, rating})
-  _allRatingRows.forEach(r => {
-    const date       = (r[1] || "").trim();
-    const restaurant = (r[2] || "").trim();
-    const item       = (r[3] || "").trim();
-    const rowName    = (r[4] || "").trim();
-    const rating     = r[5];
-    if (!date || !item || date !== latest || rowName.toLowerCase() !== lname) return;
-    const key = `${date}|${restaurant}`;
-    if (!groups.has(key)) groups.set(key, new Map());
-    groups.get(key).set(item.toLowerCase(), { item, rating });
-  });
-  return [...groups.entries()]
-    .map(([key, itemMap]) => [key, [...itemMap.values()]])
-    .sort((a, b) => b[0].localeCompare(a[0]));
-}
-
 function pendingCountFor(name) {
   return getPendingRatings(name).reduce((sum, [, items]) => sum + items.length, 0);
 }
@@ -1221,26 +1300,29 @@ function renderRatingCard() {
   const card = document.getElementById("rating-card");
   if (!card) return;
 
-  if (!_historyRows.length) {
+  // Only people with something left to rate appear -- once someone's fully
+  // rated, their row disappears too, and with no one pending the whole card
+  // hides. Rated data lives on in the sheet for the Rotation & Data reports.
+  const names = [...new Set(_historyRows.flatMap(r => (r[5] || "").split(",").map(n => n.trim()).filter(Boolean)))]
+    .map(n => ({ name: n, pending: pendingCountFor(n) }))
+    .filter(n => n.pending > 0)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  if (!names.length) {
     card.style.display = "none";
     return;
   }
   card.style.display = "block";
 
-  const names = [...new Set(_historyRows.flatMap(r => (r[5] || "").split(",").map(n => n.trim()).filter(Boolean)))]
-    .sort((a, b) => a.localeCompare(b));
-
-  if (!names.includes(_selectedRatingName)) _selectedRatingName = "";
+  if (!names.some(n => n.name === _selectedRatingName)) _selectedRatingName = "";
 
   const tableEl = document.getElementById("rating-names-table");
-  tableEl.innerHTML = names.map(n => {
-    const pending = pendingCountFor(n);
-    const active  = n === _selectedRatingName;
-    const status  = pending > 0 ? `${pending} to rate` : "All rated";
+  tableEl.innerHTML = names.map(({ name: n, pending }) => {
+    const active = n === _selectedRatingName;
     return `<div class="rating-name-row${active ? " active" : ""}" data-name="${escAttr(n)}">
       <span class="rating-name">${esc(n)}</span>
-      <span class="rating-name-status${pending > 0 ? "" : " rating-name-status-done"}">${status}</span>
-      <button type="button" class="btn-secondary rating-name-btn">${pending > 0 ? "Rate" : "Review"}</button>
+      <span class="rating-name-status">${pending} to rate</span>
+      <button type="button" class="btn-secondary rating-name-btn">Rate</button>
     </div>`;
   }).join("");
 
@@ -1268,27 +1350,11 @@ function renderRatingItems() {
 
   const groups = getPendingRatings(name);
 
+  // Rated items disappear entirely -- the data lives in the Ratings sheet
+  // and surfaces only through the Rotation & Data restaurant reports.
   if (!groups.length) {
     submitBtn.style.display = "none";
-    const rated = getRatedHistory(name);
-    if (!rated.length) {
-      listEl.innerHTML = `<div class="placeholder">${esc(name)} hasn't rated anything yet.</div>`;
-      return;
-    }
-    listEl.innerHTML = `<div class="placeholder">${esc(name)} is all caught up &mdash; here's what they've rated.</div>` +
-      rated.map(([groupKey, items]) => {
-        const [date, restaurant] = groupKey.split("|");
-        const rows = items.slice().sort((a, b) => a.item.localeCompare(b.item)).map(({ item, rating }) =>
-          `<div class="rating-item-row">
-            <span class="rating-item-name">${esc(item)}</span>
-            <span class="rating-item-given">${esc(rating)}/10</span>
-          </div>`
-        ).join("");
-        return `<div class="rating-date-group">
-          <div class="rating-date-header">${esc(fmtRatingDate(date))} &mdash; ${esc(restaurant)}</div>
-          ${rows}
-        </div>`;
-      }).join("");
+    listEl.innerHTML = `<div class="placeholder">${esc(name)} is all caught up &mdash; nothing to rate.</div>`;
     return;
   }
 
@@ -1367,10 +1433,14 @@ document.getElementById("rating-submit-btn")?.addEventListener("click", async ()
         });
         return fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { mode: "no-cors" });
       }));
-      // Apply optimistically -- the Sheet's CSV export can lag a few
-      // seconds behind a write, so waiting on a refetch alone would make
-      // just-submitted items look like they never went away.
-      toSubmit.forEach(r => _allRatingRows.push([now, r.date, r.restaurant, r.item, name, r.slider.value]));
+      // Apply optimistically -- and remember in _optimisticRatings so a
+      // later refetch against a still-stale CSV export can't revive the
+      // just-rated items (loadRatings always merges these back in).
+      toSubmit.forEach(r => {
+        const row = [now, r.date, r.restaurant, r.item, name, r.slider.value];
+        _allRatingRows.push(row);
+        _optimisticRatings.push(row);
+      });
     }
     _ratingTouched.clear();
     status.style.display = "block";
@@ -1489,10 +1559,13 @@ async function loadOrders() {
     const saturday  = new Date(friday);
     saturday.setDate(saturday.getDate() - 6);
     saturday.setHours(0, 0, 0, 0);
+    const roundCutoff = getRoundCutoff(currentFriday);
     const allRows = parseCSV(csv).slice(1).filter(r => {
       if (!r[1]) return false;
       const ts = r[0] ? new Date(r[0]) : null;
-      return ts && ts >= saturday && ts <= friday;
+      if (!ts || ts < saturday || ts > friday) return false;
+      if (roundCutoff && ts.getTime() <= roundCutoff) return false;
+      return true;
     });
     // Keep only the latest submission per person (for edits)
     const latest = new Map();
@@ -1727,130 +1800,6 @@ function renderOrdersTable(dupCount) {
 }
 
 
-function applyMenuTrendMarks() {
-  document.querySelectorAll(".mpi").forEach(el => {
-    const name = (el.dataset.name || "").toLowerCase();
-    const existing = el.querySelector(".mpi-trend-mark");
-    if (trendingItems.has(name)) {
-      if (!existing) {
-        const mark = document.createElement("span");
-        mark.className = "mpi-trend-mark";
-        mark.textContent = "▲";
-        el.querySelector(".mpi-name")?.prepend(mark);
-      }
-    } else {
-      existing?.remove();
-    }
-  });
-}
-
-async function loadTrending() {
-  const card      = document.getElementById("trending-card");
-  const container = document.getElementById("trending-container");
-  const label     = document.getElementById("trending-restaurant-label");
-
-  if (!restaurant || !restaurant.menu || !restaurant.menu.length) {
-    card.style.display = "none";
-    return;
-  }
-
-  try {
-    const csv = MOCK_MODE ? mockOrdersCSV() : await fetchCSV(ORDERS_GID);
-    const allRows = parseCSV(csv).slice(1).filter(r => r[1] && r[2]);
-    console.log("[trending] total order rows:", allRows.length, "| restaurant:", restaurant?.name);
-
-    // Find all past Fridays where this restaurant was active
-    const total      = config.restaurants.length;
-    const startMs    = new Date(config.startDate + "T12:00:00").getTime();
-    const weekMs     = 7 * 24 * 60 * 60 * 1000;
-    const todayMs    = Date.now();
-    const activeFridays = new Set();
-
-    for (let w = 0; w <= 104; w++) {
-      const fridayMs = startMs + w * weekMs;
-      if (fridayMs > todayMs + weekMs) break;
-      const rotIdx = ((w % total) + total) % total;
-      const raw = config.restaurants[rotIdx];
-      const resolved = raw.ref ? config.restaurants.find(r => r.name === raw.ref) || raw : raw;
-      if (resolved.name === restaurant.name) {
-        const d = new Date(fridayMs);
-        activeFridays.add(toYMD(d));
-      }
-    }
-    console.log("[trending] activeFridays for", restaurant.name, ":", [...activeFridays]);
-
-    // Group rows by their week-Friday, then deduplicate per person (latest entry wins)
-    const byWeek = {};
-    allRows.forEach(r => {
-      const ts = r[0] ? new Date(r[0]) : null;
-      if (!ts) return;
-      const d    = new Date(ts);
-      const diff = ((5 - d.getDay()) + 7) % 7;
-      const fri  = new Date(d);
-      fri.setDate(d.getDate() + diff);
-      const friStr = toYMD(fri);
-      console.log("[trending] row ts:", r[0], "→ friday:", friStr, "| match:", activeFridays.has(friStr));
-      if (!activeFridays.has(friStr)) return;
-      if (!byWeek[friStr]) byWeek[friStr] = new Map();
-      byWeek[friStr].set(r[1].trim().toLowerCase(), r);
-    });
-
-    // Count dishes across deduplicated rows only
-    const counts = {};
-    let totalOrders = 0;
-    Object.values(byWeek).forEach(weekMap => {
-      weekMap.forEach(r => {
-        (r[2] ?? "").split(",").map(s => s.trim()).filter(Boolean).forEach(item => {
-          const base = item.replace(/\s*\(.*?\)\s*$/, "").trim();
-          counts[base] = (counts[base] || 0) + 1;
-          totalOrders++;
-        });
-      });
-    });
-    console.log("[trending] totalOrders:", totalOrders, "| counts:", counts);
-
-    if (!totalOrders) {
-      card.style.display = "none";
-      return;
-    }
-
-    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 15);
-    const max    = sorted[0][1];
-    const weeks  = activeFridays.size;
-
-    // Mark top-trending items (top 5) for menu panel indicators
-    trendingItems = new Set(sorted.slice(0, 5).map(([name]) => name.toLowerCase()));
-    applyMenuTrendMarks();
-
-    const trendHtml = sorted.map(([name, count]) =>
-      `<div class="trend-row">
-        <span class="trend-name">${trendingItems.has(name.toLowerCase()) ? "▲ " : ""}${esc(name)}</span>
-        <div class="trend-bar-wrap"><div class="trend-bar" style="width:${Math.round(count/max*100)}%"></div></div>
-        <span class="trend-count">${count}×</span>
-      </div>`
-    ).join("");
-    const noteHtml = `<p class="trending-note">Based on ${totalOrders} items across ${weeks} visit${weeks !== 1 ? "s" : ""}.</p>`;
-
-    // Bottom card
-    label.textContent = restaurant.name;
-    card.style.display = "block";
-    container.innerHTML = trendHtml + noteHtml;
-
-    // In-form section
-    const formTrending = document.getElementById("form-trending");
-    const formTitle    = document.getElementById("form-trending-title");
-    const formList     = document.getElementById("form-trending-list");
-    if (formTrending) {
-      formTitle.textContent = `Trending at ${restaurant.name}`;
-      formList.innerHTML = trendHtml;
-      formTrending.style.display = "block";
-    }
-
-  } catch {
-    card.style.display = "none";
-  }
-}
-
 async function fetchCSV(gid) {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}&t=${Date.now()}`;
   console.log("[fetchCSV] →", url);
@@ -1957,6 +1906,14 @@ function getOrderDeadline() {
 // timestamp. Keyed by lowercase name -> fake epoch ms at submission time.
 const _debugLateOverrides = new Map();
 
+// The deadline no longer hard-blocks the form -- it just warns via the
+// Submit button's own styling, gated by a confirm step at actual submit
+// time (see the order-form submit handler).
+function updateLateWarning(isLate) {
+  const btn = document.getElementById("order-btn");
+  if (btn) btn.classList.toggle("late", isLate);
+}
+
 function startCountdown() {
   const el = document.getElementById("order-countdown");
   if (!el) return;
@@ -1980,12 +1937,6 @@ function startCountdown() {
   function pad(n) { return String(n).padStart(2, "0"); }
 
   let editing = false;
-  let overlayDismissed = false;
-  document.getElementById("closed-overlay-unlock")?.addEventListener("click", () => {
-    overlayDismissed = true;
-    const overlay = document.getElementById("closed-overlay");
-    if (overlay) overlay.style.display = "none";
-  });
 
   function showEditor() {
     if (editing) return;
@@ -2025,17 +1976,13 @@ function startCountdown() {
   function tick() {
     if (editing) return;
     const diff = getDeadline() - debugNow();
+    updateLateWarning(diff <= 0);
     if (diff <= 0) {
       el.innerHTML = `<span class="countdown-label" style="flex:1;cursor:pointer" id="deadline-label">ORDER BY<br><span class="countdown-label-time">${fmtTime()}</span></span>
         <span style="padding:0.75rem 1rem;font-weight:900;letter-spacing:0.18em;font-size:0.85rem;flex:1;text-align:center">ORDERS CLOSED</span>`;
       document.getElementById("deadline-label")?.addEventListener("click", showEditor);
-      const overlay = document.getElementById("closed-overlay");
-      if (overlay && !overlayDismissed) overlay.style.display = "flex";
       return;
     }
-    overlayDismissed = false;
-    const overlay = document.getElementById("closed-overlay");
-    if (overlay) overlay.style.display = "none";
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
@@ -2269,14 +2216,16 @@ document.getElementById("order-complete-btn").addEventListener("click", async ()
   }
 });
 
-function promptPin() {
+function promptPin(message) {
   return new Promise(resolve => {
     const modal = document.getElementById("pin-modal");
+    const msg   = document.getElementById("pin-modal-msg");
     const input = document.getElementById("pin-modal-input");
     const error = document.getElementById("pin-modal-error");
     const okBtn = document.getElementById("pin-modal-ok");
     const cancel = document.getElementById("pin-modal-cancel");
 
+    if (msg && message) msg.textContent = message;
     input.value = "";
     error.style.display = "none";
     modal.style.display = "flex";
@@ -2303,14 +2252,10 @@ function promptPin() {
 }
 
 document.getElementById("reopen-round-btn").addEventListener("click", async () => {
-  const unlocked = await promptPin();
+  const unlocked = await promptPin("Enter PIN to reopen ordering for a new round.");
   if (!unlocked) return;
 
   _pinForceReopen = true;
-  // The finalized-week freeze and the deadline-passed overlay are two
-  // independent locks (the latter driven by its own 1s countdown timer) --
-  // a full reopen needs to dismiss both, not just the finalized one.
-  document.getElementById("closed-overlay-unlock")?.click();
 
   const status = document.getElementById("order-complete-status");
   status.style.display = "block";
@@ -2320,33 +2265,150 @@ document.getElementById("reopen-round-btn").addEventListener("click", async () =
   await loadData();
 });
 
+function promptOverridePicker() {
+  return new Promise(resolve => {
+    const modal  = document.getElementById("override-modal");
+    const list   = document.getElementById("override-modal-list");
+    const cancel = document.getElementById("override-modal-cancel");
+
+    const names = [...new Set((_restaurantsConfig?.restaurants || []).map(r => r.name).filter(Boolean))];
+    list.innerHTML = names.map(n => `
+      <button type="button" class="btn-secondary override-modal-item" data-name="${escAttr(n)}" style="margin-top:0">${esc(n)}</button>
+    `).join("") + `
+      <button type="button" class="btn-secondary override-modal-item" data-name="" style="margin-top:0">Clear override (use scheduled rotation)</button>
+    `;
+
+    modal.style.display = "flex";
+
+    function close(result) {
+      modal.style.display = "none";
+      list.removeEventListener("click", onItemClick);
+      cancel.removeEventListener("click", onCancel);
+      resolve(result);
+    }
+    function onItemClick(e) {
+      const btn = e.target.closest(".override-modal-item");
+      if (!btn) return;
+      close(btn.dataset.name);
+    }
+    function onCancel() { close(null); }
+
+    list.addEventListener("click", onItemClick);
+    cancel.addEventListener("click", onCancel);
+  });
+}
+
+function promptOverrideReason(label) {
+  return new Promise(resolve => {
+    const modal  = document.getElementById("override-reason-modal");
+    const msg    = document.getElementById("override-reason-msg");
+    const input  = document.getElementById("override-reason-input");
+    const okBtn  = document.getElementById("override-reason-ok");
+    const cancel = document.getElementById("override-reason-cancel");
+
+    msg.textContent = `Override this week's restaurant to ${label}? Everyone will see this change.`;
+    input.value = "";
+    modal.style.display = "flex";
+    input.focus();
+
+    function close(result) {
+      modal.style.display = "none";
+      okBtn.removeEventListener("click", onOk);
+      cancel.removeEventListener("click", onCancel);
+      resolve(result);
+    }
+    function onOk() { close(input.value.trim()); }
+    function onCancel() { close(null); }
+
+    okBtn.addEventListener("click", onOk);
+    cancel.addEventListener("click", onCancel);
+  });
+}
+
+document.getElementById("override-restaurant-btn")?.addEventListener("click", async () => {
+  const unlocked = await promptPin("Enter PIN to override this week's restaurant.");
+  if (!unlocked) return;
+
+  const picked = await promptOverridePicker();
+  if (picked === null) return; // cancelled
+
+  const label = picked || "the scheduled rotation";
+  const reason = await promptOverrideReason(label);
+  if (reason === null) return; // cancelled
+
+  try {
+    if (MOCK_MODE) {
+      _mockOverrides.push([new Date().toISOString(), currentFriday, picked, reason]);
+    } else {
+      if (!APPS_SCRIPT_URL) throw new Error("APPS_SCRIPT_URL not configured");
+      const params = new URLSearchParams({ type: "override", date: currentFriday, restaurant: picked, reason });
+      await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { mode: "no-cors" });
+      // Remember it locally too -- the immediate refetch below usually hits
+      // a still-stale CSV export that doesn't include this write yet, which
+      // would leave the old round's orders/freeze visible until a later
+      // reload. loadOverrides() merges these back in on every refetch.
+      _optimisticOverrides.push([new Date().toISOString(), currentFriday, picked, reason]);
+    }
+    await loadRestaurant();
+    await loadData();
+  } catch (err) {
+    alert("Could not apply override — " + err.message);
+  }
+});
+
+const TAX_RATE = 1.06;
+let _reportRestaurant = null;
+let _reportMenu = null;
+// Which Past Orders date groups are expanded. null = "not initialized yet";
+// on first render all dates default open, and the set then persists across
+// checkbox-driven re-renders so toggling an option never collapses a group
+// the user had open.
+let _openReportDates = null;
+
 function openMenuReport(restaurantName) {
+  ensureReportListeners();
+
   const modal = document.getElementById("report-modal");
   const title = document.getElementById("report-modal-title");
+  title.textContent = `${restaurantName} — Order History & Ratings`;
+
+  _openReportDates = null;
+  _reportRestaurant = restaurantName;
+  // Looked up from the target restaurant's own menu (not just whichever one
+  // happens to be on screen), so this works correctly from the rotation list.
+  _reportMenu = findRestaurantByName(restaurantName)?.menu || allMenuItems;
+
+  refreshReportModal();
+  modal.classList.add("open");
+}
+
+function refreshReportModal() {
+  if (!_reportRestaurant) return;
+  // The checkboxes only shape the Past Orders section (per-person view) and
+  // the Total Spent line -- the Item Stats table always shows its all-time
+  // aggregate columns as-is.
+  const showTax     = document.getElementById("report-show-tax")?.checked;
+  const showRatings = document.getElementById("report-show-ratings")?.checked;
+  const showNames   = document.getElementById("report-show-names")?.checked;
+
   const tbody = document.getElementById("report-modal-tbody");
   const empty = document.getElementById("report-modal-empty");
 
-  title.textContent = `${restaurantName} — Order History & Ratings`;
-
-  const stats = computeItemStats(restaurantName);
+  const stats = computeItemStats(_reportRestaurant);
   const rows = [...stats.values()].filter(s => s.qty > 0 || s.ratingCount > 0);
   rows.sort((a, b) => b.qty - a.qty || a.label.localeCompare(b.label));
 
-  // Total spent uses each item's *current* menu price (History only stores
-  // qty, not price-at-the-time), so this is an approximation if prices
-  // have since changed. Looked up from the target restaurant's own menu
-  // (not just whichever one happens to be on screen), so this works
-  // correctly when opened from the rotation list too.
-  const targetMenu = findRestaurantByName(restaurantName)?.menu || allMenuItems;
+  const groups = computeDateBreakdown();
+
+  // Total spent sums the per-person breakdown (each person's dish at the
+  // item's *current* menu price -- an approximation if prices have since
+  // changed), so duplicate History logs don't inflate it.
   const totalEl = document.getElementById("report-modal-total");
-  let totalSpent = 0;
-  rows.forEach(s => {
-    const meta = findMenuItem(s.label, targetMenu);
-    if (meta?.price) totalSpent += Number(meta.price) * s.qty;
-  });
+  let totalSpent = groups.reduce((sum, g) => sum + g.subtotal, 0);
+  if (showTax) totalSpent *= TAX_RATE;
   if (totalEl) {
-    totalEl.textContent = rows.length ? `Total Spent: $${totalSpent.toFixed(2)}` : "";
-    totalEl.style.display = rows.length ? "block" : "none";
+    totalEl.textContent = groups.length ? `Total Spent: $${totalSpent.toFixed(2)}${showTax ? " (+6% tax)" : ""}` : "";
+    totalEl.style.display = groups.length ? "block" : "none";
   }
 
   if (!rows.length) {
@@ -2366,7 +2428,126 @@ function openMenuReport(restaurantName) {
     }).join("");
   }
 
-  modal.classList.add("open");
+  renderReportHistory(groups, showNames, showTax, showRatings);
+}
+
+// Per-date breakdown for the "Past Orders" section: one entry PER PERSON
+// per item (from History's Names column), not aggregated by item -- so each
+// person's dish shows individually with its price and THAT person's own
+// rating for that date, not an average. The same person+item across
+// duplicate History logs (re-completed rounds) dedupes to one entry. Old
+// pre-Names History rows fall back to a nameless aggregated entry.
+function computeDateBreakdown() {
+  const name = _reportRestaurant.trim().toLowerCase();
+  const byDate = new Map(); // date -> Map("person|item" -> {person, item, qty})
+  _historyRows.forEach(r => {
+    if ((r[2] || "").trim().toLowerCase() !== name) return;
+    const date   = (r[1] || "").trim();
+    const item   = (r[3] || "").trim();
+    const qty    = Number(r[4]) || 0;
+    const people = (r[5] || "").split(",").map(n => n.trim()).filter(Boolean);
+    if (!date || !item) return;
+    if (!byDate.has(date)) byDate.set(date, new Map());
+    const entries = byDate.get(date);
+    if (people.length) {
+      people.forEach(p => {
+        const key = `${p.toLowerCase()}|${item.toLowerCase()}`;
+        if (!entries.has(key)) entries.set(key, { person: p, item, qty: 1 });
+      });
+    } else {
+      const key = `|${item.toLowerCase()}`;
+      if (!entries.has(key)) entries.set(key, { person: "", item, qty: 0 });
+      entries.get(key).qty += qty;
+    }
+  });
+
+  return [...byDate.entries()].map(([date, entries]) => {
+    const items = [...entries.values()].map(e => {
+      const meta  = findMenuItem(e.item, _reportMenu);
+      const price = meta?.price ? Number(meta.price) : null;
+      const ratingRow = e.person ? _allRatingRows.find(r =>
+        (r[1] || "").trim() === date &&
+        (r[2] || "").trim().toLowerCase() === name &&
+        (r[3] || "").trim().toLowerCase() === e.item.toLowerCase() &&
+        (r[4] || "").trim().toLowerCase() === e.person.toLowerCase()
+      ) : null;
+      const rating = ratingRow ? Number(ratingRow[5]) : NaN;
+      return { person: e.person, item: e.item, qty: e.qty || 1, price, rating: isNaN(rating) ? null : rating };
+    }).sort((a, b) => a.person.localeCompare(b.person) || a.item.localeCompare(b.item));
+    const subtotal = items.reduce((sum, it) => sum + (it.price ? it.price * it.qty : 0), 0);
+    return { date, items, subtotal };
+  }).sort((a, b) => b.date.localeCompare(a.date));
+}
+
+function renderReportHistory(groups, showNames, showTax, showRatings) {
+  const container = document.getElementById("report-modal-history");
+  const titlebar  = document.getElementById("report-history-titlebar");
+  if (!container) return;
+
+  if (titlebar) titlebar.style.display = groups.length ? "flex" : "none";
+  if (!groups.length) { container.innerHTML = ""; return; }
+
+  // First render for this restaurant: everything expanded by default.
+  if (_openReportDates === null) _openReportDates = new Set(groups.map(g => g.date));
+
+  container.innerHTML = groups.map(g => {
+    const subtotal = showTax ? g.subtotal * TAX_RATE : g.subtotal;
+    const open = _openReportDates.has(g.date);
+    // Flat rows sorted by username (computeDateBreakdown already sorts by
+    // person, then item): name on top, item under it, price/rating right.
+    const rows = g.items.map(it => {
+      const qtyLabel    = it.qty > 1 ? ` &times;${it.qty}` : "";
+      const price       = it.price !== null ? it.price * it.qty * (showTax ? TAX_RATE : 1) : null;
+      const priceLabel  = price !== null ? `$${price.toFixed(2)}` : "";
+      const ratingLabel = showRatings && it.rating !== null ? `${it.rating}/10` : "";
+      const metaBits = [priceLabel, ratingLabel].filter(Boolean).join(" &middot; ");
+      return `<div class="report-history-item">
+        <div class="rhi-main">
+          ${showNames && it.person ? `<span class="rhi-user">${esc(it.person)}</span>` : ""}
+          <span class="rhi-item">${esc(it.item)}${qtyLabel}</span>
+        </div>
+        <span class="report-history-item-meta">${metaBits}</span>
+      </div>`;
+    }).join("");
+    return `<div class="report-history-group">
+      <button type="button" class="report-history-header${open ? " open" : ""}" data-date="${escAttr(g.date)}">
+        <span>${esc(fmtRatingDate(g.date))}</span>
+        <span>${subtotal ? `$${subtotal.toFixed(2)} ` : ""}<span class="report-history-arrow">&#9660;</span></span>
+      </button>
+      <div class="report-history-body${open ? " open" : ""}">${rows}</div>
+    </div>`;
+  }).join("");
+
+  container.querySelectorAll(".report-history-header").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const open = !btn.classList.contains("open");
+      btn.classList.toggle("open", open);
+      btn.nextElementSibling.classList.toggle("open", open);
+      if (open) _openReportDates.add(btn.dataset.date);
+      else _openReportDates.delete(btn.dataset.date);
+    });
+  });
+}
+
+// The report modal's markup sits after this <script> tag in index.html, so
+// top-level getElementById calls here would run before it exists in the DOM
+// and silently no-op. Attach lazily instead, on the first actual open.
+let _reportListenersReady = false;
+function ensureReportListeners() {
+  if (_reportListenersReady) return;
+  _reportListenersReady = true;
+
+  document.getElementById("report-show-names")?.addEventListener("change", refreshReportModal);
+  document.getElementById("report-show-tax")?.addEventListener("change", refreshReportModal);
+  document.getElementById("report-show-ratings")?.addEventListener("change", refreshReportModal);
+
+  document.getElementById("report-stats-toggle-btn")?.addEventListener("click", () => {
+    const btn   = document.getElementById("report-stats-toggle-btn");
+    const panel = document.getElementById("report-stats-panel");
+    const open  = !btn.classList.contains("open");
+    btn.classList.toggle("open", open);
+    panel.classList.toggle("open", open);
+  });
 }
 
 function closeMenuReport(e) {

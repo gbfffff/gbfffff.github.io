@@ -8,21 +8,24 @@
 //    • Execute as: Me
 //    • Who has access: Anyone
 // 4. Copy the web app URL into config.js → APPS_SCRIPT_URL
-// 5. Tabs "Orders", "Drivers", "History", and "Ratings" are created
-//    automatically (with headers) on first write to each -- no manual setup.
+// 5. Tabs "Orders", "Drivers", "History", "Ratings", and "Overrides" are
+//    created automatically (with headers) on first write to each -- no
+//    manual setup.
 //
 // SHEET READING (for displaying orders on the site):
 // 6. In your Google Sheet → File → Share → Publish to web
 //    • Choose "Entire Document" and format "Comma-separated values (.csv)"
 //    • Click Publish — this lets the site read orders without an API key
-// 7. Note the "gid" of the "History" and "Ratings" tabs (visible in the URL
-//    when that tab is open) → config.js needs these as HISTORY_GID/RATINGS_GID
+// 7. Note the "gid" of the "History", "Ratings", and "Overrides" tabs
+//    (visible in the URL when that tab is open) → config.js needs these as
+//    HISTORY_GID/RATINGS_GID/OVERRIDES_GID
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ORDERS_SHEET  = "Orders";
-const DRIVERS_SHEET = "Drivers";
-const HISTORY_SHEET = "History";
-const RATINGS_SHEET = "Ratings";
+const ORDERS_SHEET    = "Orders";
+const DRIVERS_SHEET   = "Drivers";
+const HISTORY_SHEET   = "History";
+const RATINGS_SHEET   = "Ratings";
+const OVERRIDES_SHEET = "Overrides";
 
 function doGet(e) {
   const ss   = SpreadsheetApp.getActiveSpreadsheet();
@@ -67,6 +70,18 @@ function doGet(e) {
         sheet.appendRow(["Timestamp", "Date", "Restaurant", "Item", "Name", "Rating"]);
       }
       sheet.appendRow([now, data.date, data.restaurant, data.item, data.name, data.rating]);
+    }
+
+    // Manual restaurant-rotation override (e.g. an unpredictable event
+    // forces a swap). Append-only, like the other tabs -- readers should
+    // take the LATEST row for a given date as the effective override, since
+    // an admin re-overriding the same week just appends another row.
+    if (data.type === "override") {
+      const sheet = getOrCreateSheet(ss, OVERRIDES_SHEET);
+      if (sheet.getLastRow() === 0) {
+        sheet.appendRow(["Timestamp", "Date", "Restaurant", "Reason"]);
+      }
+      sheet.appendRow([now, data.date, data.restaurant, data.reason || ""]);
     }
   } catch (err) {
     return ContentService

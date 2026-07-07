@@ -34,11 +34,12 @@ jobs:
           DRIVERS_GID:      ${{ secrets.DRIVERS_GID }}
           HISTORY_GID:      ${{ secrets.HISTORY_GID }}
           RATINGS_GID:      ${{ secrets.RATINGS_GID }}
+          OVERRIDES_GID:    ${{ secrets.OVERRIDES_GID }}
           TOMTOM_KEY:       ${{ secrets.TOMTOM_KEY_PROD }}
         run: |
-          printf 'window.TAKEOUT_CONFIG = {\n  APPS_SCRIPT_URL:  "%s",\n  FORM_URL:         "%s",\n  FORM_NAME_ENTRY:  "%s",\n  FORM_ORDER_ENTRY: "%s",\n  SHEET_ID:         "%s",\n  ORDERS_GID:       "%s",\n  DRIVERS_GID:      "%s",\n  HISTORY_GID:      "%s",\n  RATINGS_GID:      "%s",\n  TOMTOM_KEY:       "%s"\n};\n' \
+          printf 'window.TAKEOUT_CONFIG = {\n  APPS_SCRIPT_URL:  "%s",\n  FORM_URL:         "%s",\n  FORM_NAME_ENTRY:  "%s",\n  FORM_ORDER_ENTRY: "%s",\n  SHEET_ID:         "%s",\n  ORDERS_GID:       "%s",\n  DRIVERS_GID:      "%s",\n  HISTORY_GID:      "%s",\n  RATINGS_GID:      "%s",\n  OVERRIDES_GID:    "%s",\n  TOMTOM_KEY:       "%s"\n};\n' \
             "$APPS_SCRIPT_URL" "$FORM_URL" "$FORM_NAME_ENTRY" "$FORM_ORDER_ENTRY" \
-            "$SHEET_ID" "$ORDERS_GID" "$DRIVERS_GID" "$HISTORY_GID" "$RATINGS_GID" "$TOMTOM_KEY" > takeouts/config.js
+            "$SHEET_ID" "$ORDERS_GID" "$DRIVERS_GID" "$HISTORY_GID" "$RATINGS_GID" "$OVERRIDES_GID" "$TOMTOM_KEY" > takeouts/config.js
 
       - name: Generate takeouts-qa/config.js from QA secrets
         env:
@@ -50,11 +51,12 @@ jobs:
           ORDERS_GID:       ${{ secrets.QA_ORDERS_GID }}
           HISTORY_GID:      ${{ secrets.QA_HISTORY_GID }}
           RATINGS_GID:      ${{ secrets.QA_RATINGS_GID }}
+          OVERRIDES_GID:    ${{ secrets.QA_OVERRIDES_GID }}
           TOMTOM_KEY:       ${{ secrets.TOMTOM_KEY_QA }}
         run: |
-          printf 'window.TAKEOUT_CONFIG = {\n  APPS_SCRIPT_URL:  "%s",\n  FORM_URL:         "%s",\n  FORM_NAME_ENTRY:  "%s",\n  FORM_ORDER_ENTRY: "%s",\n  SHEET_ID:         "%s",\n  ORDERS_GID:       "%s",\n  HISTORY_GID:      "%s",\n  RATINGS_GID:      "%s",\n  TOMTOM_KEY:       "%s"\n};\n' \
+          printf 'window.TAKEOUT_CONFIG = {\n  APPS_SCRIPT_URL:  "%s",\n  FORM_URL:         "%s",\n  FORM_NAME_ENTRY:  "%s",\n  FORM_ORDER_ENTRY: "%s",\n  SHEET_ID:         "%s",\n  ORDERS_GID:       "%s",\n  HISTORY_GID:      "%s",\n  RATINGS_GID:      "%s",\n  OVERRIDES_GID:    "%s",\n  TOMTOM_KEY:       "%s"\n};\n' \
             "$APPS_SCRIPT_URL" "$FORM_URL" "$FORM_NAME_ENTRY" "$FORM_ORDER_ENTRY" \
-            "$SHEET_ID" "$ORDERS_GID" "$HISTORY_GID" "$RATINGS_GID" "$TOMTOM_KEY" > takeouts-qa/config.js
+            "$SHEET_ID" "$ORDERS_GID" "$HISTORY_GID" "$RATINGS_GID" "$OVERRIDES_GID" "$TOMTOM_KEY" > takeouts-qa/config.js
 
       - name: Generate traffic/config.js from secrets
         env:
