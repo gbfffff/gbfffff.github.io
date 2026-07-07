@@ -30,8 +30,14 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // Shown in the footer on QA/localhost only (see DEBUG_MODE above). Bump
 // APP_VERSION and add an entry here whenever a meaningful batch of changes
 // ships -- newest entry first.
-const APP_VERSION = "1.7.0";
+const APP_VERSION = "1.7.1";
 const CHANGELOG = [
+  { version: "1.7.1", date: "2026-07-07", notes: [
+    "Restaurant badge is now a centered black box with a subtle theme-colored arrow; clicking slides down the hidden Override Restaurant button",
+    "Override calendar tooltip floats above everything instead of clipping at the table edge",
+    "Report modal's Past Orders date groups start collapsed",
+    "Custom GBF monogram favicon",
+  ]},
   { version: "1.7.0", date: "2026-07-07", notes: [
     "Restaurant rotation override (PIN + reason, global via new Overrides sheet): red flag + reason tooltip on the calendar, cancels any earlier completion, and starts a clean ordering round",
     "Deadline no longer blocks the form: Submit turns orange '(Late)' past the cutoff with a confirm step instead of the Orders Closed overlay",
@@ -2152,6 +2158,36 @@ document.getElementById("tax-toggle").addEventListener("change", () => renderOrd
 document.getElementById("show-prices-toggle").addEventListener("change", () => renderOrdersTable());
 document.getElementById("group-dupes-toggle").addEventListener("change", () => renderOrdersTable());
 
+// Restaurant-badge slidedown: the Override Restaurant button stays hidden
+// until the badge (or its small arrow) is clicked.
+document.getElementById("restaurant-toggle-btn")?.addEventListener("click", () => {
+  const btn   = document.getElementById("restaurant-toggle-btn");
+  const panel = document.getElementById("restaurant-tools-panel");
+  const open  = !btn.classList.contains("open");
+  btn.classList.toggle("open", open);
+  panel?.classList.toggle("open", open);
+});
+
+// Floating override tooltip: positioned via JS and appended to <body> so
+// .friday-calendar's overflow:hidden can't clip it at the table edge.
+document.addEventListener("mouseover", e => {
+  const tip = document.getElementById("override-flag-tooltip");
+  if (!tip) return;
+  const flag = e.target.closest?.(".fcal-override-flag");
+  if (!flag) { tip.style.display = "none"; return; }
+
+  tip.textContent = flag.dataset.tip || "";
+  tip.style.display = "block";
+  const fr = flag.getBoundingClientRect();
+  const tr = tip.getBoundingClientRect();
+  let left = fr.left + fr.width / 2 - tr.width / 2;
+  left = Math.max(8, Math.min(left, window.innerWidth - tr.width - 8));
+  let top = fr.top - tr.height - 8;
+  if (top < 8) top = fr.bottom + 8;
+  tip.style.left = `${left}px`;
+  tip.style.top  = `${top}px`;
+});
+
 document.getElementById("order-complete-btn").addEventListener("click", async () => {
   const rows = _lastOrderRows;
   const btn    = document.getElementById("order-complete-btn");
@@ -2487,8 +2523,9 @@ function renderReportHistory(groups, showNames, showTax, showRatings) {
   if (titlebar) titlebar.style.display = groups.length ? "flex" : "none";
   if (!groups.length) { container.innerHTML = ""; return; }
 
-  // First render for this restaurant: everything expanded by default.
-  if (_openReportDates === null) _openReportDates = new Set(groups.map(g => g.date));
+  // First render for this restaurant: all date groups start collapsed; the
+  // set then remembers what the user opens across checkbox re-renders.
+  if (_openReportDates === null) _openReportDates = new Set();
 
   container.innerHTML = groups.map(g => {
     const subtotal = showTax ? g.subtotal * TAX_RATE : g.subtotal;

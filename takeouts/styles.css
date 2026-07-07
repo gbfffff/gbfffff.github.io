@@ -456,29 +456,26 @@
     }
     .fcal-current .fcal-date { border-right-color: #333; }
     .fcal-current .fcal-name { color: var(--accent); }
-    /* Custom hover tooltip (native title= proved unreliable): shows the
-       override target + reason instantly on hover. */
     .fcal-override-flag { position: relative; color: var(--red); cursor: help; }
-    .fcal-override-flag:hover::after {
-      content: attr(data-tip);
-      position: absolute;
-      bottom: 150%;
-      left: 50%;
-      transform: translateX(-50%);
+    /* Real floating tooltip (JS-positioned, appended to <body>) instead of a
+       CSS ::after -- .friday-calendar has overflow:hidden, which was
+       clipping the old absolutely-positioned tooltip at the container edge. */
+    #override-flag-tooltip {
+      display: none;
+      position: fixed;
       background: #000;
       color: var(--accent);
       font-size: 0.68rem;
       font-weight: 600;
       line-height: 1.4;
       letter-spacing: 0.01em;
-      text-transform: none;
       padding: 0.5rem 0.75rem;
       width: max-content;
       max-width: 200px;
       white-space: normal;
       text-align: center;
       border: 1px solid var(--accent);
-      z-index: 40;
+      z-index: 500;
       pointer-events: none;
     }
 
@@ -491,6 +488,36 @@
       padding: 0.5rem 1rem;
       border-radius: 0;
     }
+
+    /* The whole toggle IS the black restaurant box; the badge span inside
+       loses its own background so box + arrow read as one unit. */
+    .restaurant-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #000;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-family: inherit;
+      align-self: center;
+    }
+    .restaurant-toggle-btn .restaurant-badge { background: none; padding: 0; }
+    /* Small, dim, theme-colored arrow inside the black box -- intentionally
+       subtle since the slidedown is an admin affordance. */
+    .restaurant-toggle-btn .restaurant-toggle-arrow {
+      font-size: 0.7rem;
+      color: var(--accent);
+      opacity: 0.55;
+      transition: transform 0.2s ease, opacity 0.15s ease;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .restaurant-toggle-btn:hover .restaurant-toggle-arrow { opacity: 1; }
+    .restaurant-toggle-btn.open .restaurant-toggle-arrow { transform: rotate(180deg); opacity: 1; }
+    #restaurant-tools-panel { max-width: 260px; width: 100%; align-self: center; }
+    #restaurant-tools-panel.open { border-top: none; margin-top: 0.6rem; }
+    #restaurant-tools-panel .override-restaurant-btn { margin-top: 0; }
 
     .date-badge {
       color: var(--text-muted);
@@ -2044,7 +2071,9 @@
     body.dark .rotation-panel.open { border-top-color: var(--ink); }
     body.dark .rotation-row-current { border-color: var(--ink); }
     body.dark .rotation-cuisine { border-color: var(--ink); }
-    body.dark .restaurant-badge { background: var(--ink); color: var(--bg); }
+    body.dark .restaurant-toggle-btn { background: var(--ink); }
+    body.dark .restaurant-badge { background: none; color: var(--bg); }
+    body.dark .restaurant-toggle-btn .restaurant-toggle-arrow { color: var(--bg); }
     body.dark .order-countdown { background: var(--ink); color: var(--bg); border-color: var(--ink); }
     body.dark .countdown-label { border-right-color: var(--bg); }
     body.dark .countdown-label-time { border-bottom-color: rgba(0,0,0,0.5); }
