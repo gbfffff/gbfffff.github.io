@@ -83,7 +83,7 @@
         {
           "item": "Spicy Feta Dip",
           "price": 6.5,
-          "desc": "Whipped imported feta with roasted jalapeño, garlic, and fresh herbs, served with pita wedges",
+          "desc": "Whipped imported feta with roasted jalape\u00f1o, garlic, and fresh herbs, served with pita wedges",
           "category": "Dips"
         },
         {
@@ -179,7 +179,7 @@
         {
           "item": "Hortiatiki Village Salad",
           "price": 9.75,
-          "desc": "No lettuce — tomato, cucumber, onion, imported feta, kalamata olives, peppers, lemon olive oil vinaigrette, served with warm pita, served with warm pita",
+          "desc": "No lettuce \u2014 tomato, cucumber, onion, imported feta, kalamata olives, peppers, lemon olive oil vinaigrette, served with warm pita, served with warm pita",
           "extras": [
             {
               "name": "Gyro Meat",
@@ -460,13 +460,13 @@
         {
           "item": "Moussaka",
           "price": 16.5,
-          "desc": "Layered eggplant, seasoned ground beef, and béchamel sauce, baked",
+          "desc": "Layered eggplant, seasoned ground beef, and b\u00e9chamel sauce, baked",
           "category": "Platters & Entrees"
         },
         {
           "item": "Pastichio",
           "price": 16.5,
-          "desc": "Greek baked pasta with seasoned ground beef and béchamel sauce",
+          "desc": "Greek baked pasta with seasoned ground beef and b\u00e9chamel sauce",
           "category": "Platters & Entrees"
         },
         {
@@ -530,47 +530,47 @@
       "menuImages": [],
       "menu": [
         {
-          "item": "Wonton Soup 雲吞湯",
+          "item": "Wonton Soup \u96f2\u541e\u6e6f",
           "price": 3.5,
           "category": "Soup"
         },
         {
-          "item": "Hot & Sour Soup 酸辣湯",
+          "item": "Hot & Sour Soup \u9178\u8fa3\u6e6f",
           "price": 3.5,
           "category": "Soup"
         },
         {
-          "item": "Egg Drop Soup 蛋花湯",
+          "item": "Egg Drop Soup \u86cb\u82b1\u6e6f",
           "price": 3.5,
           "category": "Soup"
         },
         {
-          "item": "Pork w/ Preserved Cabbage Soup 榨菜肉絲湯",
+          "item": "Pork w/ Preserved Cabbage Soup \u69a8\u83dc\u8089\u7d72\u6e6f",
           "price": 7.5,
           "category": "Soup"
         },
         {
-          "item": "Chicken & Corn Soup 雞茸玉米湯",
+          "item": "Chicken & Corn Soup \u96de\u8338\u7389\u7c73\u6e6f",
           "price": 7.5,
           "category": "Soup"
         },
         {
-          "item": "Vegetable with Tofu Soup 素菜豆腐湯",
+          "item": "Vegetable with Tofu Soup \u7d20\u83dc\u8c46\u8150\u6e6f",
           "price": 7.5,
           "category": "Soup"
         },
         {
-          "item": "Shepherd Tofu Soup 薺菜豆腐湯",
+          "item": "Shepherd Tofu Soup \u85ba\u83dc\u8c46\u8150\u6e6f",
           "price": 8.5,
           "category": "Soup"
         },
         {
-          "item": "Pickled Fish Soup 雪菜魚湯",
+          "item": "Pickled Fish Soup \u96ea\u83dc\u9b5a\u6e6f",
           "price": 8.95,
           "category": "Soup"
         },
         {
-          "item": "Steamed or Pan Fried Dumpling (6pcs) 蒸餃或鍋貼",
+          "item": "Steamed or Pan Fried Dumpling (6pcs) \u84b8\u9903\u6216\u934b\u8cbc",
           "price": 7.5,
           "popular": true,
           "orOptions": [
@@ -580,7 +580,7 @@
           "category": "Appetizers"
         },
         {
-          "item": "Steamed or Fried Veggie Dumplings (6pcs) 素水餃或素鍋貼",
+          "item": "Steamed or Fried Veggie Dumplings (6pcs) \u7d20\u6c34\u9903\u6216\u7d20\u934b\u8cbc",
           "price": 7.95,
           "orOptions": [
             "Steamed",
@@ -589,519 +589,519 @@
           "category": "Appetizers"
         },
         {
-          "item": "Fried Wontons (6pcs) 炸雲吞",
+          "item": "Fried Wontons (6pcs) \u70b8\u96f2\u541e",
           "price": 5.95,
           "category": "Appetizers"
         },
         {
-          "item": "Crab Rangoon (4pcs) 蟹角",
+          "item": "Crab Rangoon (4pcs) \u87f9\u89d2",
           "price": 5.95,
           "category": "Appetizers"
         },
         {
-          "item": "Vegetable Spring Roll 上海素卷",
+          "item": "Vegetable Spring Roll \u4e0a\u6d77\u7d20\u5377",
           "price": 2.95,
           "category": "Appetizers"
         },
         {
-          "item": "Egg Roll (1pc) 春卷",
+          "item": "Egg Roll (1pc) \u6625\u5377",
           "price": 2.95,
           "category": "Appetizers"
         },
         {
-          "item": "Fried Calamari 酥炸鮮魷",
+          "item": "Fried Calamari \u9165\u70b8\u9bae\u9b77",
           "price": 9.95,
           "category": "Appetizers"
         },
         {
-          "item": "BBQ Spare Ribs (3pcs) 烤排骨",
+          "item": "BBQ Spare Ribs (3pcs) \u70e4\u6392\u9aa8",
           "price": 9.95,
           "category": "Appetizers"
         },
         {
-          "item": "Chicken with Scallions 蔥爆雞",
+          "item": "Chicken with Scallions \u8525\u7206\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Lemon Chicken 檸檬雞",
+          "item": "Lemon Chicken \u6ab8\u6aac\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Orange Chicken 陳皮雞",
+          "item": "Orange Chicken \u9673\u76ae\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Sesame Chicken 芝麻雞",
+          "item": "Sesame Chicken \u829d\u9ebb\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "General Tso's Chicken 左公雞",
+          "item": "General Tso's Chicken \u5de6\u516c\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Kung Pao Chicken 宮保雞",
+          "item": "Kung Pao Chicken \u5bae\u4fdd\u96de",
           "price": 15.95,
           "category": "Poultry"
         },
         {
-          "item": "Hunan Chicken 湖南雞",
+          "item": "Hunan Chicken \u6e56\u5357\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Szechuan Chicken 四川雞",
+          "item": "Szechuan Chicken \u56db\u5ddd\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Curry Chicken 咖喱雞",
+          "item": "Curry Chicken \u5496\u55b1\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Basil Chicken Thai Style 九層塔雞",
+          "item": "Basil Chicken Thai Style \u4e5d\u5c64\u5854\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Chicken with Garlic Sauce 魚香雞",
+          "item": "Chicken with Garlic Sauce \u9b5a\u9999\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Chicken with Black Bean Sauce 豉椒雞",
+          "item": "Chicken with Black Bean Sauce \u8c49\u6912\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Chicken with Broccoli 芥蘭雞",
+          "item": "Chicken with Broccoli \u82a5\u862d\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Chicken with Snow Peas 雪豆雞",
+          "item": "Chicken with Snow Peas \u96ea\u8c46\u96de",
           "price": 15.95,
           "category": "Poultry"
         },
         {
-          "item": "Chicken with String Beans 四季豆雞",
+          "item": "Chicken with String Beans \u56db\u5b63\u8c46\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Chicken with Cashew Nuts 腰果雞",
+          "item": "Chicken with Cashew Nuts \u8170\u679c\u96de",
           "price": 16.95,
           "category": "Poultry"
         },
         {
-          "item": "Sweet and Sour Chicken 甜酸雞",
+          "item": "Sweet and Sour Chicken \u751c\u9178\u96de",
           "price": 15.95,
           "category": "Poultry"
         },
         {
-          "item": "Moo Shi Chicken 木須雞",
+          "item": "Moo Shi Chicken \u6728\u9808\u96de",
           "price": 15.95,
           "category": "Poultry"
         },
         {
-          "item": "Moo Goo Gai Pan 毛菇雞",
+          "item": "Moo Goo Gai Pan \u6bdb\u83c7\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Chicken w/ Vegetable 素菜雞",
+          "item": "Chicken w/ Vegetable \u7d20\u83dc\u96de",
           "price": 14.95,
           "category": "Poultry"
         },
         {
-          "item": "Mongolian Beef 蔥爆牛",
+          "item": "Mongolian Beef \u8525\u7206\u725b",
           "price": 19.95,
           "category": "Beef"
         },
         {
-          "item": "Beef with Broccoli 芥蘭牛",
+          "item": "Beef with Broccoli \u82a5\u862d\u725b",
           "price": 17.95,
           "category": "Beef"
         },
         {
-          "item": "Beef with Snow Peas 雪豆牛",
+          "item": "Beef with Snow Peas \u96ea\u8c46\u725b",
           "price": 18.95,
           "category": "Beef"
         },
         {
-          "item": "Beef with Garlic Sauce 魚香牛",
+          "item": "Beef with Garlic Sauce \u9b5a\u9999\u725b",
           "price": 17.95,
           "category": "Beef"
         },
         {
-          "item": "Beef with Green Pepper 青椒牛",
+          "item": "Beef with Green Pepper \u9752\u6912\u725b",
           "price": 17.95,
           "category": "Beef"
         },
         {
-          "item": "Beef w/ Black Bean Sauce 豉椒牛",
+          "item": "Beef w/ Black Bean Sauce \u8c49\u6912\u725b",
           "price": 17.95,
           "category": "Beef"
         },
         {
-          "item": "Beef with String Beans 四季豆牛",
+          "item": "Beef with String Beans \u56db\u5b63\u8c46\u725b",
           "price": 17.95,
           "category": "Beef"
         },
         {
-          "item": "Beef with Vegetable 素菜牛",
+          "item": "Beef with Vegetable \u7d20\u83dc\u725b",
           "price": 17.95,
           "category": "Beef"
         },
         {
-          "item": "Hunan Beef 湖南牛",
+          "item": "Hunan Beef \u6e56\u5357\u725b",
           "price": 17.95,
           "category": "Beef"
         },
         {
-          "item": "Szechuan Beef 四川牛",
+          "item": "Szechuan Beef \u56db\u5ddd\u725b",
           "price": 17.95,
           "category": "Beef"
         },
         {
-          "item": "Moo Shi Beef 木須牛",
+          "item": "Moo Shi Beef \u6728\u9808\u725b",
           "price": 17.95,
           "category": "Beef"
         },
         {
-          "item": "General Tso's Beef 左公牛",
+          "item": "General Tso's Beef \u5de6\u516c\u725b",
           "price": 20.95,
           "category": "Beef"
         },
         {
-          "item": "Sesame Beef 芝麻牛",
+          "item": "Sesame Beef \u829d\u9ebb\u725b",
           "price": 20.95,
           "category": "Beef"
         },
         {
-          "item": "Crispy Shredded Beef 干扁牛",
+          "item": "Crispy Shredded Beef \u5e72\u6241\u725b",
           "price": 20.95,
           "category": "Beef"
         },
         {
-          "item": "Orange Beef 陳皮牛",
+          "item": "Orange Beef \u9673\u76ae\u725b",
           "price": 20.95,
           "category": "Beef"
         },
         {
-          "item": "Ma-Po Tofu with Pork 麻婆豆腐",
+          "item": "Ma-Po Tofu with Pork \u9ebb\u5a46\u8c46\u8150",
           "price": 14.95,
           "category": "Pork"
         },
         {
-          "item": "Moo Shi Pork 木須肉",
+          "item": "Moo Shi Pork \u6728\u9808\u8089",
           "price": 14.95,
           "category": "Pork"
         },
         {
-          "item": "Szechuan Pork 四川肉",
+          "item": "Szechuan Pork \u56db\u5ddd\u8089",
           "price": 14.95,
           "category": "Pork"
         },
         {
-          "item": "Roast Pork with Vegetable 素菜叉燒",
+          "item": "Roast Pork with Vegetable \u7d20\u83dc\u53c9\u71d2",
           "price": 14.95,
           "category": "Pork"
         },
         {
-          "item": "Roast Pork with Snow Peas 雪豆叉燒",
+          "item": "Roast Pork with Snow Peas \u96ea\u8c46\u53c9\u71d2",
           "price": 15.95,
           "category": "Pork"
         },
         {
-          "item": "Roast Pork with Scallions 蔥爆叉燒",
+          "item": "Roast Pork with Scallions \u8525\u7206\u53c9\u71d2",
           "price": 16.95,
           "category": "Pork"
         },
         {
-          "item": "Pork with Scallions 蔥爆肉",
+          "item": "Pork with Scallions \u8525\u7206\u8089",
           "price": 15.95,
           "category": "Pork"
         },
         {
-          "item": "Hunan Shrimp 湖南蝦",
+          "item": "Hunan Shrimp \u6e56\u5357\u8766",
           "price": 16.95,
           "category": "Seafood"
         },
         {
-          "item": "Kung Pao Jumbo Shrimp 宮保大蝦",
+          "item": "Kung Pao Jumbo Shrimp \u5bae\u4fdd\u5927\u8766",
           "price": 16.95,
           "category": "Seafood"
         },
         {
-          "item": "General Tso's Jumbo Shrimp 左公大蝦",
+          "item": "General Tso's Jumbo Shrimp \u5de6\u516c\u5927\u8766",
           "price": 17.95,
           "category": "Seafood"
         },
         {
-          "item": "Shrimp with Broccoli 芥蘭蝦",
+          "item": "Shrimp with Broccoli \u82a5\u862d\u8766",
           "price": 16.95,
           "category": "Seafood"
         },
         {
-          "item": "Shrimp with Cashew Nuts 腰果蝦",
+          "item": "Shrimp with Cashew Nuts \u8170\u679c\u8766",
           "price": 17.95,
           "category": "Seafood"
         },
         {
-          "item": "Shrimp with Black Bean Sauce 豉椒蝦",
+          "item": "Shrimp with Black Bean Sauce \u8c49\u6912\u8766",
           "price": 16.95,
           "category": "Seafood"
         },
         {
-          "item": "Shrimp with Garlic Sauce 魚香蝦",
+          "item": "Shrimp with Garlic Sauce \u9b5a\u9999\u8766",
           "price": 16.95,
           "category": "Seafood"
         },
         {
-          "item": "Shrimp with Vegetable 素菜蝦",
+          "item": "Shrimp with Vegetable \u7d20\u83dc\u8766",
           "price": 16.95,
           "category": "Seafood"
         },
         {
-          "item": "Shrimp with Lobster Sauce 蝦龍糊",
+          "item": "Shrimp with Lobster Sauce \u8766\u9f8d\u7cca",
           "price": 16.95,
           "category": "Seafood"
         },
         {
-          "item": "Sweet & Sour Shrimp 甜酸蝦",
+          "item": "Sweet & Sour Shrimp \u751c\u9178\u8766",
           "price": 16.95,
           "category": "Seafood"
         },
         {
-          "item": "Jumbo Shrimp with Spicy Salt 椒鹽蝦",
+          "item": "Jumbo Shrimp with Spicy Salt \u6912\u9e7d\u8766",
           "price": 18.95,
           "category": "Seafood"
         },
         {
-          "item": "Jumbo Shrimp Szechuan Style 干燒大蝦",
+          "item": "Jumbo Shrimp Szechuan Style \u5e72\u71d2\u5927\u8766",
           "price": 16.95,
           "category": "Seafood"
         },
         {
-          "item": "Fish Fillet with Spicy Salt 椒鹽魚片",
+          "item": "Fish Fillet with Spicy Salt \u6912\u9e7d\u9b5a\u7247",
           "price": 18.95,
           "category": "Seafood"
         },
         {
-          "item": "Triple Delight (Chicken, Beef, Shrimp) 炒三鮮",
+          "item": "Triple Delight (Chicken, Beef, Shrimp) \u7092\u4e09\u9bae",
           "price": 16.95,
           "category": "Seafood"
         },
         {
-          "item": "Three Treasure with Spicy Salt 椒鹽三寶",
+          "item": "Three Treasure with Spicy Salt \u6912\u9e7d\u4e09\u5bf6",
           "price": 19.95,
           "category": "Seafood"
         },
         {
-          "item": "Shrimp & Chicken w/ Vegetable 雞蝦炒素菜",
+          "item": "Shrimp & Chicken w/ Vegetable \u96de\u8766\u7092\u7d20\u83dc",
           "price": 16.95,
           "category": "Seafood"
         },
         {
-          "item": "Seafood Combination 海鮮大燴",
+          "item": "Seafood Combination \u6d77\u9bae\u5927\u71f4",
           "price": 18.95,
           "category": "Seafood"
         },
         {
-          "item": "Happy Family 全家福",
+          "item": "Happy Family \u5168\u5bb6\u798f",
           "price": 18.95,
           "category": "Seafood"
         },
         {
-          "item": "Tofu with Vegetables 素菜豆腐",
+          "item": "Tofu with Vegetables \u7d20\u83dc\u8c46\u8150",
           "price": 13.95,
           "category": "Vegetables"
         },
         {
-          "item": "Eggplant with Garlic Sauce 魚香茄子",
+          "item": "Eggplant with Garlic Sauce \u9b5a\u9999\u8304\u5b50",
           "price": 13.95,
           "category": "Vegetables"
         },
         {
-          "item": "Broccoli with Garlic Sauce 魚香芥蘭",
+          "item": "Broccoli with Garlic Sauce \u9b5a\u9999\u82a5\u862d",
           "price": 13.95,
           "category": "Vegetables"
         },
         {
-          "item": "Stir-Fried String Beans 干扁四季豆",
+          "item": "Stir-Fried String Beans \u5e72\u6241\u56db\u5b63\u8c46",
           "price": 13.95,
           "category": "Vegetables"
         },
         {
-          "item": "Kung Pao Tofu 宮保豆腐",
+          "item": "Kung Pao Tofu \u5bae\u4fdd\u8c46\u8150",
           "price": 13.95,
           "category": "Vegetables"
         },
         {
-          "item": "Crispy Eggplant 脆皮茄子",
+          "item": "Crispy Eggplant \u8106\u76ae\u8304\u5b50",
           "price": 13.95,
           "category": "Vegetables"
         },
         {
-          "item": "Tofu with Basil Thai Style 九層塔豆腐",
+          "item": "Tofu with Basil Thai Style \u4e5d\u5c64\u5854\u8c46\u8150",
           "price": 13.95,
           "category": "Vegetables"
         },
         {
-          "item": "Moo Shi Vegetables 素木須",
+          "item": "Moo Shi Vegetables \u7d20\u6728\u9808",
           "price": 13.95,
           "category": "Vegetables"
         },
         {
-          "item": "Sautéed Mixed Vegetables 素什錦",
+          "item": "Saut\u00e9ed Mixed Vegetables \u7d20\u4ec0\u9326",
           "price": 13.95,
           "category": "Vegetables"
         },
         {
-          "item": "Young Chou Fried Rice 揚州炒飯",
+          "item": "Young Chou Fried Rice \u63da\u5dde\u7092\u98ef",
           "price": 14.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Combination Fried Rice 什錦炒飯",
+          "item": "Combination Fried Rice \u4ec0\u9326\u7092\u98ef",
           "price": 13.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Shrimp Fried Rice 蝦炒飯",
+          "item": "Shrimp Fried Rice \u8766\u7092\u98ef",
           "price": 12.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Beef Fried Rice 牛炒飯",
+          "item": "Beef Fried Rice \u725b\u7092\u98ef",
           "price": 12.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Chicken Fried Rice 雞炒飯",
+          "item": "Chicken Fried Rice \u96de\u7092\u98ef",
           "price": 11.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Roast Pork Fried Rice 叉燒炒飯",
+          "item": "Roast Pork Fried Rice \u53c9\u71d2\u7092\u98ef",
           "price": 11.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Vegetable Fried Rice 素菜炒飯",
+          "item": "Vegetable Fried Rice \u7d20\u83dc\u7092\u98ef",
           "price": 11.5,
           "category": "Fried Rice"
         },
         {
-          "item": "Plain Fried Rice 淨炒飯",
+          "item": "Plain Fried Rice \u6de8\u7092\u98ef",
           "price": 7.0,
           "category": "Fried Rice"
         },
         {
-          "item": "Seafood Pan Fried Noodles 海鮮兩面黃",
+          "item": "Seafood Pan Fried Noodles \u6d77\u9bae\u5169\u9762\u9ec3",
           "price": 19.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Combination Pan Fried Noodles 三鮮兩面黃",
+          "item": "Combination Pan Fried Noodles \u4e09\u9bae\u5169\u9762\u9ec3",
           "price": 18.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Combination Lo Mein 什錦撈麵",
+          "item": "Combination Lo Mein \u4ec0\u9326\u6488\u9eb5",
           "price": 13.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Combination Chow Mein 什錦炒麵",
+          "item": "Combination Chow Mein \u4ec0\u9326\u7092\u9eb5",
           "price": 13.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Shrimp Lo Mein 蝦撈麵",
+          "item": "Shrimp Lo Mein \u8766\u6488\u9eb5",
           "price": 13.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Beef Lo Mein 牛撈麵",
+          "item": "Beef Lo Mein \u725b\u6488\u9eb5",
           "price": 13.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Shrimp Chow Mein 蝦炒麵",
+          "item": "Shrimp Chow Mein \u8766\u7092\u9eb5",
           "price": 12.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Beef Chow Mein 牛炒麵",
+          "item": "Beef Chow Mein \u725b\u7092\u9eb5",
           "price": 12.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Chicken Lo Mein 雞撈麵",
+          "item": "Chicken Lo Mein \u96de\u6488\u9eb5",
           "price": 11.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Roast Pork Lo Mein 叉燒撈麵",
+          "item": "Roast Pork Lo Mein \u53c9\u71d2\u6488\u9eb5",
           "price": 11.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Vegetable Lo Mein 素菜撈麵",
+          "item": "Vegetable Lo Mein \u7d20\u83dc\u6488\u9eb5",
           "price": 11.5,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Taiwanese Rice Noodles 台式米粉",
+          "item": "Taiwanese Rice Noodles \u53f0\u5f0f\u7c73\u7c89",
           "price": 15.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Singapore Rice Noodles 星洲米粉",
+          "item": "Singapore Rice Noodles \u661f\u6d32\u7c73\u7c89",
           "price": 15.95,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Plain Lo Mein 淨撈麵",
+          "item": "Plain Lo Mein \u6de8\u6488\u9eb5",
           "price": 7.0,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Chicken Chow Mein 雞炒麵",
+          "item": "Chicken Chow Mein \u96de\u7092\u9eb5",
           "price": 12.5,
           "category": "Lo Mein & Pan Fried Noodles"
         },
         {
-          "item": "Beef Chow Fun 干炒牛河",
+          "item": "Beef Chow Fun \u5e72\u7092\u725b\u6cb3",
           "price": 17.95,
           "popular": true,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Chicken Chow Fun 干炒雞河",
+          "item": "Chicken Chow Fun \u5e72\u7092\u96de\u6cb3",
           "price": 14.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Chicken Over Rice South China Style 新加坡海南雞飯",
+          "item": "Chicken Over Rice South China Style \u65b0\u52a0\u5761\u6d77\u5357\u96de\u98ef",
           "price": 16.95,
           "popular": true,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Shanghai Wong Pan Fried Noodles — Seafood 上海王家炒二面黃（海鮮）",
+          "item": "Shanghai Wong Pan Fried Noodles \u2014 Seafood \u4e0a\u6d77\u738b\u5bb6\u7092\u4e8c\u9762\u9ec3\uff08\u6d77\u9bae\uff09",
           "price": 19.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Shanghai Wong Pan Fried Noodles — Pork or Chicken 上海王家炒二面黃（肉絲/雞絲）",
+          "item": "Shanghai Wong Pan Fried Noodles \u2014 Pork or Chicken \u4e0a\u6d77\u738b\u5bb6\u7092\u4e8c\u9762\u9ec3\uff08\u8089\u7d72/\u96de\u7d72\uff09",
           "price": 16.95,
           "popular": true,
           "orOptions": [
@@ -1111,52 +1111,52 @@
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Braised Meatball in Soup 上湯獅子頭",
+          "item": "Braised Meatball in Soup \u4e0a\u6e6f\u7345\u5b50\u982d",
           "price": 19.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Braised Meatball Young Chou Style 揚州獅子頭",
+          "item": "Braised Meatball Young Chou Style \u63da\u5dde\u7345\u5b50\u982d",
           "price": 16.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Dong Po Pork 東坡肉",
+          "item": "Dong Po Pork \u6771\u5761\u8089",
           "price": 17.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Sizzling Beef w/ Black Pepper Sauce 鐵板牛柳",
+          "item": "Sizzling Beef w/ Black Pepper Sauce \u9435\u677f\u725b\u67f3",
           "price": 19.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Pork Chop w/ Black Pepper Sauce 黑胡椒排骨",
+          "item": "Pork Chop w/ Black Pepper Sauce \u9ed1\u80e1\u6912\u6392\u9aa8",
           "price": 15.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Pork Chop with Spiced Salt 椒鹽排骨",
+          "item": "Pork Chop with Spiced Salt \u6912\u9e7d\u6392\u9aa8",
           "price": 15.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Sweet and Sour Pork Chop 糖醋排骨",
+          "item": "Sweet and Sour Pork Chop \u7cd6\u918b\u6392\u9aa8",
           "price": 16.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Shredded Beef with Chili Pepper 小椒牛肉絲",
+          "item": "Shredded Beef with Chili Pepper \u5c0f\u6912\u725b\u8089\u7d72",
           "price": 18.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Shredded Beef with Bamboo Shoot and Chili Pepper 小椒筍尖牛肉絲",
+          "item": "Shredded Beef with Bamboo Shoot and Chili Pepper \u5c0f\u6912\u7b4d\u5c16\u725b\u8089\u7d72",
           "price": 18.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Shredded Pork or Chicken with Bamboo Shoot and Chili Pepper 小椒筍尖肉絲/雞絲",
+          "item": "Shredded Pork or Chicken with Bamboo Shoot and Chili Pepper \u5c0f\u6912\u7b4d\u5c16\u8089\u7d72/\u96de\u7d72",
           "price": 17.95,
           "orOptions": [
             "Pork",
@@ -1165,493 +1165,493 @@
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Shredded Chicken with Chili Pepper 辣椒雞絲",
+          "item": "Shredded Chicken with Chili Pepper \u8fa3\u6912\u96de\u7d72",
           "price": 15.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Pork with Dry Bean Curd 香干肉絲",
+          "item": "Pork with Dry Bean Curd \u9999\u5e72\u8089\u7d72",
           "price": 15.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Lamb with Scallion 蔥爆羊",
+          "item": "Lamb with Scallion \u8525\u7206\u7f8a",
           "price": 18.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Bok Choy with Black Mushroom 冬菇菜心",
+          "item": "Bok Choy with Black Mushroom \u51ac\u83c7\u83dc\u5fc3",
           "price": 15.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Sautéed Green You Cai 炒油菜",
+          "item": "Saut\u00e9ed Green You Cai \u7092\u6cb9\u83dc",
           "price": 15.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Eggplant with Basil 九層塔茄子",
+          "item": "Eggplant with Basil \u4e5d\u5c64\u5854\u8304\u5b50",
           "price": 14.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Fish Filet with Black Bean Sauce 豉椒魚片",
+          "item": "Fish Filet with Black Bean Sauce \u8c49\u6912\u9b5a\u7247",
           "price": 17.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Sautéed Fish Filet w/ Wine Sauce 糟溜魚片",
+          "item": "Saut\u00e9ed Fish Filet w/ Wine Sauce \u7cdf\u6e9c\u9b5a\u7247",
           "price": 17.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Sautéed Shrimp with White Sauce 清炒蝦仁",
+          "item": "Saut\u00e9ed Shrimp with White Sauce \u6e05\u7092\u8766\u4ec1",
           "price": 18.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Sizzling Seafood & Tofu 鐵板海鮮豆腐",
+          "item": "Sizzling Seafood & Tofu \u9435\u677f\u6d77\u9bae\u8c46\u8150",
           "price": 18.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Crabmeat with Tofu 蟹黃蟹肉豆腐",
+          "item": "Crabmeat with Tofu \u87f9\u9ec3\u87f9\u8089\u8c46\u8150",
           "price": 17.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Vegetable Delight Shanghai Style 上海素燴",
+          "item": "Vegetable Delight Shanghai Style \u4e0a\u6d77\u7d20\u71f4",
           "price": 15.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Bean Curd Home Style 家常豆腐",
+          "item": "Bean Curd Home Style \u5bb6\u5e38\u8c46\u8150",
           "price": 14.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Radish Cake Singapore Style 新加坡炒蘿蔔糕",
+          "item": "Radish Cake Singapore Style \u65b0\u52a0\u5761\u7092\u863f\u8514\u7cd5",
           "price": 15.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Salted Fish w/ Chicken and Eggplant in Hot Pot 鹹魚雞粒茄子煲",
+          "item": "Salted Fish w/ Chicken and Eggplant in Hot Pot \u9e79\u9b5a\u96de\u7c92\u8304\u5b50\u7172",
           "price": 15.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Salty Duck Shanghai Style (half) 食尚鹽水鴨半隻",
+          "item": "Salty Duck Shanghai Style (half) \u98df\u5c1a\u9e7d\u6c34\u9d28\u534a\u96bb",
           "price": 19.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Special Style Beef with Pancakes 特色牛肉大餅",
+          "item": "Special Style Beef with Pancakes \u7279\u8272\u725b\u8089\u5927\u9905",
           "price": 25.95,
           "category": "Chef's Suggestions"
         },
         {
-          "item": "Beef Noodle Soup 食尚牛肉麵",
+          "item": "Beef Noodle Soup \u98df\u5c1a\u725b\u8089\u9eb5",
           "price": 14.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Curry Beef Noodle Soup 咖喱牛肉麵",
+          "item": "Curry Beef Noodle Soup \u5496\u55b1\u725b\u8089\u9eb5",
           "price": 14.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle w/ Shredded Beef & Pepper (No Soup) 小椒牛肉絲拌麵",
+          "item": "Noodle w/ Shredded Beef & Pepper (No Soup) \u5c0f\u6912\u725b\u8089\u7d72\u62cc\u9eb5",
           "price": 14.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle Soup w/ Shredded Beef & Pepper 小椒牛肉絲麵",
+          "item": "Noodle Soup w/ Shredded Beef & Pepper \u5c0f\u6912\u725b\u8089\u7d72\u9eb5",
           "price": 14.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle Soup with Pork Chop 大排麵",
+          "item": "Noodle Soup with Pork Chop \u5927\u6392\u9eb5",
           "price": 12.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Baked Salted Spareribs w/ Noodles 椒鹽排骨麵",
+          "item": "Baked Salted Spareribs w/ Noodles \u6912\u9e7d\u6392\u9aa8\u9eb5",
           "price": 12.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle Soup with Spiced Pork 辣肉麵",
+          "item": "Noodle Soup with Spiced Pork \u8fa3\u8089\u9eb5",
           "price": 12.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle with Braised Pork 燜肉麵",
+          "item": "Noodle with Braised Pork \u71dc\u8089\u9eb5",
           "price": 12.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle Soup with Pork and Preserved Vegetable 榨菜肉絲麵",
+          "item": "Noodle Soup with Pork and Preserved Vegetable \u69a8\u83dc\u8089\u7d72\u9eb5",
           "price": 11.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle Soup w/ Pork & Preserved Cabbage 雪菜肉絲麵",
+          "item": "Noodle Soup w/ Pork & Preserved Cabbage \u96ea\u83dc\u8089\u7d72\u9eb5",
           "price": 11.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Pork with Garlic Sauce Noodle Soup 魚香肉絲湯麵",
+          "item": "Pork with Garlic Sauce Noodle Soup \u9b5a\u9999\u8089\u7d72\u6e6f\u9eb5",
           "price": 11.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodles with Soy Bean Paste 炸醬麵",
+          "item": "Noodles with Soy Bean Paste \u70b8\u91ac\u9eb5",
           "price": 11.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle Soup with Special Spicy Sauce 辣醬麵",
+          "item": "Noodle Soup with Special Spicy Sauce \u8fa3\u91ac\u9eb5",
           "price": 11.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle Soup with Bean Curd Roll 素雞麵",
+          "item": "Noodle Soup with Bean Curd Roll \u7d20\u96de\u9eb5",
           "price": 11.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodles Served with Thick Gravy 大滷麵",
+          "item": "Noodles Served with Thick Gravy \u5927\u6ef7\u9eb5",
           "price": 11.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Pork Intestine Noodle Shanghai Style 上海肥腸麵",
+          "item": "Pork Intestine Noodle Shanghai Style \u4e0a\u6d77\u80a5\u8178\u9eb5",
           "price": 13.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle with Scallion Sauce 蔥油拌麵",
+          "item": "Noodle with Scallion Sauce \u8525\u6cb9\u62cc\u9eb5",
           "price": 7.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle with Sesame Sauce 麻醬拌麵",
+          "item": "Noodle with Sesame Sauce \u9ebb\u91ac\u62cc\u9eb5",
           "price": 7.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Noodle Soup 陽春麵",
+          "item": "Noodle Soup \u967d\u6625\u9eb5",
           "price": 6.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Extra Noodle 加麵",
+          "item": "Extra Noodle \u52a0\u9eb5",
           "price": 3.0,
           "category": "Noodle Soups"
         },
         {
-          "item": "Extra Spiced Pork 加辣肉",
+          "item": "Extra Spiced Pork \u52a0\u8fa3\u8089",
           "price": 5.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Extra Special Spicy Sauce 加辣醬",
+          "item": "Extra Special Spicy Sauce \u52a0\u8fa3\u91ac",
           "price": 4.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Extra Fried Egg 加荷包蛋",
+          "item": "Extra Fried Egg \u52a0\u8377\u5305\u86cb",
           "price": 3.0,
           "category": "Noodle Soups"
         },
         {
-          "item": "Extra Bean Curd Roll 加素雞",
+          "item": "Extra Bean Curd Roll \u52a0\u7d20\u96de",
           "price": 4.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Extra Pork Chop 加大排",
+          "item": "Extra Pork Chop \u52a0\u5927\u6392",
           "price": 5.95,
           "category": "Noodle Soups"
         },
         {
-          "item": "Pork Soup Dumpling 上海小籠包",
+          "item": "Pork Soup Dumpling \u4e0a\u6d77\u5c0f\u7c60\u5305",
           "price": 10.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Crabmeat w/ Pork Soup Dumpling 蟹粉小籠包",
+          "item": "Crabmeat w/ Pork Soup Dumpling \u87f9\u7c89\u5c0f\u7c60\u5305",
           "price": 12.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Pan Fry Soup Dumpling 生煎包",
+          "item": "Pan Fry Soup Dumpling \u751f\u714e\u5305",
           "desc": "Weekends only",
           "price": 9.5,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Pot Stickers 鍋貼",
+          "item": "Pot Stickers \u934b\u8cbc",
           "price": 7.5,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Vegetarian Pot Stickers 素鍋貼",
+          "item": "Vegetarian Pot Stickers \u7d20\u934b\u8cbc",
           "price": 7.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Dumplings 水餃",
+          "item": "Dumplings \u6c34\u9903",
           "price": 7.5,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Vegetarian Dumplings 素水餃",
+          "item": "Vegetarian Dumplings \u7d20\u6c34\u9903",
           "price": 7.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Wonton (Stuffed w/ Pork & Vegetable) Soup 薺菜餛飩",
+          "item": "Wonton (Stuffed w/ Pork & Vegetable) Soup \u85ba\u83dc\u991b\u98e9",
           "price": 10.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Pork Wonton Soup Shanghai Style 上海鮮肉餛飩",
+          "item": "Pork Wonton Soup Shanghai Style \u4e0a\u6d77\u9bae\u8089\u991b\u98e9",
           "price": 6.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Wonton with Red Hot Sauce 紅油抄手",
+          "item": "Wonton with Red Hot Sauce \u7d05\u6cb9\u6284\u624b",
           "price": 7.5,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Shumai Stuffed with Glutinous Rice 糯米燒賣",
+          "item": "Shumai Stuffed with Glutinous Rice \u7cef\u7c73\u71d2\u8ce3",
           "price": 7.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Steamed Bun Stuffed with Pork 豬肉菜包",
+          "item": "Steamed Bun Stuffed with Pork \u8c6c\u8089\u83dc\u5305",
           "price": 7.5,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Vegetarian Steamed Bun 素菜包",
+          "item": "Vegetarian Steamed Bun \u7d20\u83dc\u5305",
           "price": 7.5,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Red Bean Paste Bun 豆沙包",
+          "item": "Red Bean Paste Bun \u8c46\u6c99\u5305",
           "price": 6.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Sticky Rice Roll 飯團",
+          "item": "Sticky Rice Roll \u98ef\u5718",
           "desc": "Weekends only",
           "price": 6.5,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Curry Beef Pan Fry Bun (2) 咖喱牛肉煎包",
+          "item": "Curry Beef Pan Fry Bun (2) \u5496\u55b1\u725b\u8089\u714e\u5305",
           "price": 7.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Beef Pocket 牛肉餡餅",
+          "item": "Beef Pocket \u725b\u8089\u9921\u9905",
           "price": 6.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Chive Pocket 韭菜盒子",
+          "item": "Chive Pocket \u97ed\u83dc\u76d2\u5b50",
           "price": 7.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Chive Pie 韭菜餅",
+          "item": "Chive Pie \u97ed\u83dc\u9905",
           "price": 4.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Crispy Scallion Pie 蔥油餅",
+          "item": "Crispy Scallion Pie \u8525\u6cb9\u9905",
           "price": 4.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Pancake 大餅",
+          "item": "Pancake \u5927\u9905",
           "desc": "Weekends only",
           "price": 3.5,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Turnip Pastry 蘿蔔絲餅",
+          "item": "Turnip Pastry \u863f\u8514\u7d72\u9905",
           "price": 5.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Roast Pork Pastry 叉燒酥",
+          "item": "Roast Pork Pastry \u53c9\u71d2\u9165",
           "price": 5.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Biscuit Stuffed w/ Pine-Nuts & Red Bean Paste 松仁豆沙酥餅",
+          "item": "Biscuit Stuffed w/ Pine-Nuts & Red Bean Paste \u677e\u4ec1\u8c46\u6c99\u9165\u9905",
           "price": 5.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Baked Sugar Stuffed Sesame Biscuit 蟹殼黃",
+          "item": "Baked Sugar Stuffed Sesame Biscuit \u87f9\u6bbc\u9ec3",
           "price": 4.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Pork Moon Cake Shanghai Style 鮮肉月餅",
+          "item": "Pork Moon Cake Shanghai Style \u9bae\u8089\u6708\u9905",
           "price": 6.5,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Lo Mein Shanghai Style 上海粗炒麵",
+          "item": "Lo Mein Shanghai Style \u4e0a\u6d77\u7c97\u7092\u9eb5",
           "price": 10.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Sticky Rice Cake with Shredded Pork 肉絲炒年糕",
+          "item": "Sticky Rice Cake with Shredded Pork \u8089\u7d72\u7092\u5e74\u7cd5",
           "price": 10.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Rice Noodle Soup w/ Fried Tofu 油豆腐細粉湯",
+          "item": "Rice Noodle Soup w/ Fried Tofu \u6cb9\u8c46\u8150\u7d30\u7c89\u6e6f",
           "price": 7.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Curry Beef Rice Noodle Soup 咖喱牛肉粉絲湯",
+          "item": "Curry Beef Rice Noodle Soup \u5496\u55b1\u725b\u8089\u7c89\u7d72\u6e6f",
           "price": 11.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Smoked Fish Shanghai Style 上海熏魚",
+          "item": "Smoked Fish Shanghai Style \u4e0a\u6d77\u718f\u9b5a",
           "price": 10.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Liquor-Soaked (Drunken) Chicken 醉雞",
+          "item": "Liquor-Soaked (Drunken) Chicken \u9189\u96de",
           "price": 8.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Braised Duck w/ Soy Sauce Shanghai Style 上海醬鴨",
+          "item": "Braised Duck w/ Soy Sauce Shanghai Style \u4e0a\u6d77\u91ac\u9d28",
           "price": 9.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Salty Duck Shanghai Style (Dim Sum) 食尚鹽水鴨（點心）",
+          "item": "Salty Duck Shanghai Style (Dim Sum) \u98df\u5c1a\u9e7d\u6c34\u9d28\uff08\u9ede\u5fc3\uff09",
           "price": 9.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Jelly Fish Salad 蔥油海蜇",
+          "item": "Jelly Fish Salad \u8525\u6cb9\u6d77\u8707",
           "price": 9.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Marinated Beef 五香牛肉",
+          "item": "Marinated Beef \u4e94\u9999\u725b\u8089",
           "price": 13.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Beef Tendon with Hot Sauce 麻辣牛筋",
+          "item": "Beef Tendon with Hot Sauce \u9ebb\u8fa3\u725b\u7b4b",
           "price": 12.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Spicy Pork Ears 麻辣豬耳",
+          "item": "Spicy Pork Ears \u9ebb\u8fa3\u8c6c\u8033",
           "price": 11.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Tofu with Preserved Egg 皮蛋豆腐",
+          "item": "Tofu with Preserved Egg \u76ae\u86cb\u8c46\u8150",
           "price": 7.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Cucumber Salad 涼拌黃瓜",
+          "item": "Cucumber Salad \u6dbc\u62cc\u9ec3\u74dc",
           "price": 9.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Dried Bean Curd Salad 涼拌豆干",
+          "item": "Dried Bean Curd Salad \u6dbc\u62cc\u8c46\u5e72",
           "price": 7.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Mustard Green Edamame Bean Curd Salad 雪菜百頁毛豆",
+          "item": "Mustard Green Edamame Bean Curd Salad \u96ea\u83dc\u767e\u9801\u6bdb\u8c46",
           "price": 7.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Pickled Vegetable 香脆泡菜",
+          "item": "Pickled Vegetable \u9999\u8106\u6ce1\u83dc",
           "price": 5.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Fried Gluten and Shitaki Mushroom 四鮮烤麩",
+          "item": "Fried Gluten and Shitaki Mushroom \u56db\u9bae\u70e4\u9ea9",
           "price": 8.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Soup w/ Meatball Wrapped in Dried Bean Curd 雙檔",
+          "item": "Soup w/ Meatball Wrapped in Dried Bean Curd \u96d9\u6a94",
           "price": 9.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Steamed Glutinous Rice Pudding w/ Dried Fruits & Nuts 八寶飯",
+          "item": "Steamed Glutinous Rice Pudding w/ Dried Fruits & Nuts \u516b\u5bf6\u98ef",
           "price": 8.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Taro Paste Pudding w/ Dried Fruits & Nuts 八寶芋泥",
+          "item": "Taro Paste Pudding w/ Dried Fruits & Nuts \u516b\u5bf6\u828b\u6ce5",
           "price": 8.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Sweet Rice Ball Soup 酒釀圓子",
+          "item": "Sweet Rice Ball Soup \u9152\u91c0\u5713\u5b50",
           "price": 6.25,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Sesame Rice Ball Soup 芝麻湯圓",
+          "item": "Sesame Rice Ball Soup \u829d\u9ebb\u6e6f\u5713",
           "price": 6.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Rice Ball (Stuffed w/ Pork) Soup 鮮肉湯圓",
+          "item": "Rice Ball (Stuffed w/ Pork) Soup \u9bae\u8089\u6e6f\u5713",
           "price": 7.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Pumpkin Pie 南瓜餅",
+          "item": "Pumpkin Pie \u5357\u74dc\u9905",
           "price": 5.5,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Fried Bread Stick 油條",
+          "item": "Fried Bread Stick \u6cb9\u689d",
           "desc": "Weekends only",
           "price": 3.5,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Salted Soy Beans Milk 鹹豆漿",
+          "item": "Salted Soy Beans Milk \u9e79\u8c46\u6f3f",
           "desc": "Weekends only",
           "price": 4.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Sweet Soy Beans Milk 甜豆漿",
+          "item": "Sweet Soy Beans Milk \u751c\u8c46\u6f3f",
           "desc": "Weekends only",
           "price": 3.95,
           "category": "Dim Sum & Snacks"
         },
         {
-          "item": "Salty Crispy Fish 椒鹽小龍魚",
+          "item": "Salty Crispy Fish \u6912\u9e7d\u5c0f\u9f8d\u9b5a",
           "price": 10.95,
           "category": "Dim Sum & Snacks"
         }
@@ -1864,7 +1864,7 @@
         {
           "item": "Chile Asado",
           "price": 1.0,
-          "desc": "Grilled jalapeño",
+          "desc": "Grilled jalape\u00f1o",
           "category": "Sides"
         },
         {
@@ -1947,468 +1947,2966 @@
         {
           "item": "Tod Mun Pla",
           "price": 8,
-          "desc": "Fried fish cake"
+          "desc": "Fried fish cake",
+          "category": "Appetizers"
         },
         {
           "item": "Tod Mun Goong",
           "price": 9,
-          "desc": "Fried shrimp cake"
+          "desc": "Fried shrimp cake",
+          "category": "Appetizers"
         },
         {
           "item": "Mee Grob",
           "price": 10,
-          "desc": "Crispy rice noodle tossed in a sweet sticky homemade sauce with minced pork"
+          "desc": "Crispy rice noodle tossed in a sweet sticky homemade sauce with minced pork",
+          "category": "Appetizers"
         },
         {
           "item": "Chicken Satay",
           "price": 10,
-          "desc": "Grilled chicken skewers with homemade peanut and sweet cucumber sauce"
+          "desc": "Grilled chicken skewers with homemade peanut and sweet cucumber sauce",
+          "category": "Appetizers"
         },
         {
           "item": "Fried Tofu",
           "price": 10,
-          "desc": "Served with homemade sweet chili sauce garnished with crushed peanuts"
+          "desc": "Served with homemade sweet chili sauce garnished with crushed peanuts",
+          "category": "Appetizers"
         },
         {
           "item": "Bangkok Garden Calamari",
           "price": 13,
-          "desc": "Fried calamari with crispy basil, served with homemade seafood sauce"
+          "desc": "Fried calamari with crispy basil, served with homemade seafood sauce",
+          "category": "Appetizers"
         },
         {
           "item": "Yum Pla Grob",
           "price": 15,
-          "desc": "Crispy fish salad tossed in lime juice, fish sauce, and lemongrass"
+          "desc": "Crispy fish salad tossed in lime juice, fish sauce, and lemongrass",
+          "category": "Appetizers"
         },
         {
           "item": "Goong Chae Nam Pla",
           "price": 14,
-          "desc": "Raw shrimp with homemade spicy chili garlic seafood sauce"
+          "desc": "Raw shrimp with homemade spicy chili garlic seafood sauce",
+          "category": "Appetizers"
         },
         {
           "item": "Yum Pla Dook Fu",
           "price": 15,
-          "desc": "Crispy airy fried catfish topped with green apple slices, homemade spicy garlic seafood sauce and roasted peanuts"
+          "desc": "Crispy airy fried catfish topped with green apple slices, homemade spicy garlic seafood sauce and roasted peanuts",
+          "category": "Appetizers"
         },
         {
           "item": "Vegetable Curry Puffs",
           "price": 7,
-          "desc": "Puffy pastry filled with sweet potatoes, peas, and carrots"
+          "desc": "Puffy pastry filled with sweet potatoes, peas, and carrots",
+          "category": "Appetizers"
         },
         {
           "item": "Vegetable Spring Rolls",
           "price": 6,
-          "desc": "Crispy vegetable spring rolls"
+          "desc": "Crispy vegetable spring rolls",
+          "category": "Appetizers"
         },
         {
           "item": "Roti Curry",
           "price": 8,
-          "desc": "Roti pancake with mussaman curry (contains peanuts)"
+          "desc": "Roti pancake with mussaman curry (contains peanuts)",
+          "category": "Appetizers"
         },
         {
           "item": "Tom Yum Wonton",
           "price": 9,
-          "desc": "Homemade pork and shrimp wontons in tom yum style chili oil"
+          "desc": "Homemade pork and shrimp wontons in tom yum style chili oil",
+          "category": "Appetizers"
         },
         {
           "item": "Moo Yang",
           "price": 12,
-          "desc": "Marinated grilled pork with homemade spicy fish sauce"
+          "desc": "Marinated grilled pork with homemade spicy fish sauce",
+          "category": "Appetizers"
         },
         {
           "item": "Tom Yum Wings",
           "price": 10,
-          "desc": "Breaded and fried chicken wings tossed in tom yum seasoning"
+          "desc": "Breaded and fried chicken wings tossed in tom yum seasoning",
+          "category": "Appetizers"
         },
         {
           "item": "Drunken Wings",
           "price": 10,
-          "desc": "Breaded and fried chicken wings in sweet chili basil sauce"
+          "desc": "Breaded and fried chicken wings in sweet chili basil sauce",
+          "category": "Appetizers"
         },
         {
           "item": "Chicken Zaap",
           "price": 12,
-          "desc": "Spicy fried chicken salad tossed in fish sauce and lime juice with cilantro, scallions, and green apple"
+          "desc": "Spicy fried chicken salad tossed in fish sauce and lime juice with cilantro, scallions, and green apple",
+          "category": "Appetizers"
         },
         {
           "item": "Hoy Obb",
           "price": 15,
-          "desc": "Steamed lemongrass mussels with homemade seafood sauce"
+          "desc": "Steamed lemongrass mussels with homemade seafood sauce",
+          "category": "Appetizers"
         },
         {
           "item": "Southern Roll",
           "price": 5,
-          "desc": "Ground curried chicken with peas and carrots, white onions in roti pancake with sweet cucumber sauce"
+          "desc": "Ground curried chicken with peas and carrots, white onions in roti pancake with sweet cucumber sauce",
+          "category": "Appetizers"
         },
         {
           "item": "Koi",
           "price": 13,
-          "desc": "Spicy raw beef salad"
+          "desc": "Spicy raw beef salad",
+          "category": "Appetizers"
         },
         {
           "item": "Chive Dumplings",
-          "price": 8
+          "price": 8,
+          "category": "Appetizers"
         },
         {
           "item": "Bag of Gold",
           "price": 10,
-          "desc": "Ground chicken with corn and peas in fried wonton"
+          "desc": "Ground chicken with corn and peas in fried wonton",
+          "category": "Appetizers"
         },
         {
           "item": "Vegetable Pot Stickers",
-          "price": 9
+          "price": 9,
+          "category": "Appetizers"
         },
         {
           "item": "Kanom Jeeb",
           "price": 8,
-          "desc": "Steamed pork and crab meat dumplings"
+          "desc": "Steamed pork and crab meat dumplings",
+          "category": "Appetizers"
         },
         {
           "item": "Crab Rangoon",
           "price": 7,
-          "desc": "Crispy wonton shell with cream cheese and crab meat filling"
+          "desc": "Crispy wonton shell with cream cheese and crab meat filling",
+          "category": "Appetizers"
         },
         {
           "item": "Prah Goong",
           "price": 14,
-          "desc": "Spicy shrimp salad tossed in spicy lime juice, lemongrass, red onions, green onions, and cilantro"
+          "desc": "Spicy shrimp salad tossed in spicy lime juice, lemongrass, red onions, green onions, and cilantro",
+          "category": "Appetizers"
         },
         {
           "item": "Larb",
           "price": 10,
-          "protein": true,
           "orOptions": [
             "Chicken",
             "Pork"
           ],
-          "desc": "Spicy ground chicken or pork with rice powder, scallions, red onion, cilantro, chili pepper, fish sauce, and lime juice"
+          "desc": "Spicy ground chicken or pork with rice powder, scallions, red onion, cilantro, chili pepper, fish sauce, and lime juice",
+          "category": "Appetizers"
         },
         {
           "item": "Tom Yum Soup",
           "price": 10,
-          "protein": true,
           "popular": true,
-          "desc": "Lemongrass soup with choice of protein: chicken, shrimp, vegetable, tofu (+$2)"
+          "desc": "Lemongrass soup",
+          "category": "Soups and Salad",
+          "sizes": {
+            "Chicken": 10,
+            "Vegetable": 10,
+            "Tofu": 10,
+            "Shrimp": 12
+          }
         },
         {
           "item": "Tom Kha Soup",
           "price": 10,
-          "protein": true,
-          "desc": "Coconut milk soup with choice of protein: chicken, shrimp, vegetable, tofu (+$2)"
+          "desc": "Coconut milk soup",
+          "category": "Soups and Salad",
+          "sizes": {
+            "Chicken": 10,
+            "Vegetable": 10,
+            "Tofu": 10,
+            "Shrimp": 12
+          }
         },
         {
           "item": "Seven Sea Soup",
           "price": 13,
-          "desc": "Lemongrass and basil seafood soup"
+          "desc": "Lemongrass and basil seafood soup",
+          "category": "Soups and Salad"
+        },
+        {
+          "item": "Yum Pla Mug",
+          "price": 12,
+          "desc": "Spicy squid salad",
+          "category": "Soups and Salad"
         },
         {
           "item": "Som Tum",
           "price": 9,
-          "desc": "Spicy papaya salad (contains peanuts)"
+          "desc": "Spicy papaya salad (contains peanuts)",
+          "category": "Soups and Salad"
         },
         {
           "item": "Yum Nuer",
           "price": 12,
-          "desc": "Spicy beef salad tossed in fish sauce and lime juice with cucumbers, tomatoes, red onions, scallions, and cilantro"
+          "desc": "Spicy beef salad tossed in fish sauce and lime juice with cucumbers, tomatoes, red onions, scallions, and cilantro",
+          "category": "Soups and Salad"
         },
         {
           "item": "Pad Kragow",
           "price": 15,
-          "protein": true,
-          "desc": "Thai basil stir fry with your choice of protein"
+          "desc": "Thai basil stir fry",
+          "category": "Entrees",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Kragow Kai Dow (Street Food Style)",
-          "price": 15,
-          "desc": "Thai basil stir fry with ground chicken, served over jasmine rice with a fried egg on top"
+          "price": 17,
+          "desc": "Thai basil stir fry served over jasmine rice with a fried egg on top. Choice of ground chicken or ground pork",
+          "category": "Entrees",
+          "orOptions": [
+            "Ground Chicken",
+            "Ground Pork"
+          ]
         },
         {
           "item": "Holy Ginger",
           "price": 15,
-          "protein": true,
-          "desc": "Ginger root and onion stir fry with choice of protein"
+          "desc": "Ginger root and onion stir fry",
+          "category": "Entrees",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Pad Prik King",
           "price": 17,
-          "protein": true,
-          "desc": "Curry sauce stir fry with green beans and choice of protein"
+          "desc": "Curry sauce stir fry with green beans",
+          "category": "Entrees",
+          "sizes": {
+            "Chicken": 17,
+            "Beef": 17,
+            "Pork": 17,
+            "Tofu": 17,
+            "Vegetable": 17,
+            "Shrimp": 19,
+            "Duck": 22,
+            "Crispy Chicken": 18,
+            "Crispy Pork": 18
+          }
         },
         {
           "item": "Basil Eggplant",
           "price": 17,
-          "desc": "Eggplant stir fried with basil leaves and choice of protein"
+          "desc": "Eggplant stir fried with basil leaves",
+          "category": "Entrees",
+          "sizes": {
+            "Chicken": 17,
+            "Beef": 17,
+            "Pork": 17,
+            "Tofu": 17,
+            "Vegetable": 17,
+            "Shrimp": 19,
+            "Duck": 22,
+            "Crispy Chicken": 18,
+            "Crispy Pork": 18
+          }
         },
         {
           "item": "Hot Chili and Garlic Stir Fry",
           "price": 15,
-          "protein": true,
-          "desc": "Stir fry with choice of protein"
+          "desc": "Stir fry with choice of protein",
+          "category": "Entrees",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Sweet and Sour Stir Fry",
           "price": 15,
-          "protein": true,
-          "desc": "Stir fry with choice of protein"
+          "desc": "Stir fry with choice of protein",
+          "category": "Entrees",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Mixed Vegetable Stir Fry",
           "price": 15,
-          "desc": "Stir fry with choice of protein"
+          "category": "Entrees"
         },
         {
           "item": "Koon Nai's Chicken",
           "price": 16,
-          "desc": "Breaded and fried chicken breast slices stir fried in sweet chili basil sauce"
+          "desc": "Breaded and fried chicken breast slices stir fried in sweet chili basil sauce",
+          "category": "Entrees"
         },
         {
           "item": "Chicken with Cashew Nuts",
-          "price": 14
+          "price": 14,
+          "category": "Entrees"
         },
         {
           "item": "Chicken with Broccoli",
-          "price": 14
+          "price": 14,
+          "category": "Entrees"
         },
         {
           "item": "Gang Som Cha Oom",
           "price": 16,
-          "protein": true,
-          "desc": "Curry sauce stir fry with fried eggs infused with acacia leaves and shrimp"
+          "desc": "Thai style sour curry with fried eggs infused with acacia leaves, and shrimp",
+          "category": "Entrees"
         },
         {
           "item": "Pad Sa Tor",
           "price": 16,
-          "protein": true,
-          "desc": "Stir fried stink bean with minced pork and shrimp"
+          "desc": "Stir fried stink bean with minced pork and shrimp",
+          "category": "Entrees"
         },
         {
           "item": "Red Curry",
           "price": 15,
-          "protein": true,
           "popular": true,
-          "desc": "Thai red curry with bamboo shoots, bell peppers, and basil leaves with choice of protein"
+          "desc": "Thai red curry with bamboo shoots, bell peppers, and basil leaves",
+          "category": "Curry",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Braised Beef Mussaman Curry",
           "price": 20,
-          "desc": "Braised beef shank in mussaman curry sauce (contains peanuts and dairy)"
+          "desc": "Braised beef shank in mussaman curry sauce (contains peanuts and dairy)",
+          "category": "Curry"
         },
         {
           "item": "Green Curry",
           "price": 15,
-          "protein": true,
           "popular": true,
-          "desc": "Thai green curry with Thai eggplants, bell peppers, basil leaves with choice of protein"
+          "desc": "Thai green curry with Thai eggplants, bell peppers, and basil leaves",
+          "category": "Curry",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Yellow Curry",
           "price": 15,
-          "protein": true,
-          "desc": "Thai yellow curry with carrots, potatoes, white onions with choice of protein"
+          "desc": "Thai yellow curry with carrots, potatoes, and white onions",
+          "category": "Curry",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Panang Curry",
           "price": 15,
-          "protein": true,
-          "desc": "Thai panang curry with basil leaves and choice of protein"
+          "desc": "Thai panang curry with bell peppers and basil leaves",
+          "category": "Curry",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Angel Duck",
           "price": 20,
-          "desc": "Duck breast in red curry with pineapples and cherry tomatoes"
+          "desc": "Duck breast in red curry with pineapples and cherry tomatoes",
+          "category": "Curry"
         },
         {
           "item": "Mussaman Curry",
           "price": 15,
-          "protein": true,
-          "desc": "Thai mussaman curry with potatoes and carrots with choice of protein (contains peanuts and dairy)"
+          "desc": "Thai mussaman curry with potatoes and carrots. Contains peanuts and dairy",
+          "category": "Curry",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Drunken Fried Rice",
           "price": 15,
-          "protein": true,
-          "desc": "Spicy basil fried rice with bell peppers and choice of protein"
+          "desc": "Spicy basil fried rice with bell peppers",
+          "category": "Rice",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Pineapple Fried Rice",
           "price": 15,
-          "protein": true,
-          "desc": "Fried rice with pineapples, cashew nuts, peas and carrots, raisins, green onions with choice of protein"
+          "desc": "Fried rice with pineapples, cashew nuts, peas and carrots, raisins, and green onions",
+          "category": "Rice",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Jumbo Crabmeat Fried Rice",
           "price": 20,
-          "desc": "Lump crabmeat fried rice with red and green onions"
+          "desc": "Lump crabmeat fried rice with red and green onions",
+          "category": "Rice"
         },
         {
           "item": "Train Station Fried Rice",
           "price": 15,
-          "protein": true,
-          "desc": "Fried rice with Chinese broccoli and tomatoes with choice of protein"
+          "desc": "Fried rice with Chinese broccoli and tomatoes",
+          "category": "Rice",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Bethesda Fried Rice",
           "price": 15,
-          "protein": true,
-          "desc": "Fried rice with red onion and green onions with choice of protein"
+          "desc": "Fried rice with red onion and green onions",
+          "category": "Rice",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Green Curry Fried Rice",
           "price": 15,
-          "protein": true,
-          "desc": "Fried rice in green curry paste with bell peppers, basil leaves, bamboo, and eggplant with choice of protein"
+          "desc": "Fried rice in green curry paste with bell peppers, basil leaves, bamboo, and eggplant",
+          "category": "Rice",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Tom Yum Fried Rice",
           "price": 15,
-          "protein": true,
-          "desc": "Fried rice in tom yum chili paste with basil leaves, tomatoes, and white onions with choice of protein"
+          "desc": "Fried rice in tom yum chili paste with basil leaves, tomatoes, and white onions",
+          "category": "Rice",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Khao Mok Gai",
           "price": 16,
-          "desc": "Thai style fried chicken biryani with homemade sweet and sour minty sauce"
+          "desc": "Thai style fried chicken biryani with homemade sweet and sour minty sauce",
+          "category": "Rice"
         },
         {
           "item": "Pad Thai",
           "price": 15,
-          "protein": true,
           "popular": true,
-          "desc": "Stir fried thin rice noodle with eggs and topped with chopped tofu, bean sprouts, served with lime wedge and peanuts. Choice of protein"
+          "desc": "Stir fried thin rice noodle with eggs, chopped tofu, and bean sprouts, served with a lime wedge and roasted peanuts. Contains peanuts and eggs",
+          "category": "Noodles",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Pad Se Ew",
           "price": 15,
-          "protein": true,
-          "desc": "Stir fried wide rice noodle in sweet soy sauce with Chinese broccoli with choice of protein"
+          "desc": "Stir fried wide rice noodle in sweet soy sauce with Chinese broccoli. Contains eggs",
+          "category": "Noodles",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Drunken Noodle",
           "price": 15,
-          "protein": true,
           "popular": true,
-          "desc": "Stir fried wide rice noodle with basil leaves, bell peppers, white onions and tomatoes with choice of protein"
+          "desc": "Stir fried wide rice noodle with basil leaves, bell peppers, white onions, and tomatoes",
+          "category": "Noodles",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Yacht Noodle Soup",
           "price": 18,
-          "protein": true,
-          "desc": "Braised pork noodle soup"
+          "desc": "Braised pork noodle soup",
+          "category": "Noodles"
         },
         {
           "item": "Chicken Khao Soy",
           "price": 18,
-          "desc": "Chiang Mai curry noodle with chicken, a northern Thai specialty with a rich coconut curry broth"
+          "desc": "Chiang Mai curry noodle with chicken, a northern Thai specialty with a rich coconut curry broth",
+          "category": "Noodles"
         },
         {
           "item": "Bomb Noodles",
           "price": 15,
-          "protein": true,
-          "desc": "Dry stewed beef noodle with bean sprouts"
+          "desc": "Dry stewed beef noodle with bean sprouts",
+          "category": "Noodles"
         },
         {
           "item": "Lad Na",
           "price": 15,
-          "protein": true,
-          "desc": "Wide rice noodle topped with black bean gravy and Chinese broccoli with choice of protein"
+          "desc": "Wide rice noodle topped with black bean gravy and Chinese broccoli",
+          "category": "Noodles",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Kathiew Krua Gai",
           "price": 15,
-          "desc": "Stir fried wide rice noodles with chicken and green onions"
+          "desc": "Stir fried wide rice noodles with chicken and green onions",
+          "category": "Noodles"
         },
         {
           "item": "Bangkok Beef Noodle Soup",
           "price": 18,
-          "desc": "Thai beef noodle soup with beef shank, beef balls, green beansprouts, topped with green onions and cilantro"
+          "desc": "Thai beef noodle soup with beef shank, beef balls, green beansprouts, topped with green onions and cilantro",
+          "category": "Noodles"
         },
         {
           "item": "Pad Woon Sen",
           "price": 15,
-          "protein": true,
-          "desc": "Stir fried glass noodle with eggs, tomatoes, white onions, bell peppers, carrots, bean sprouts, green onions with choice of protein"
+          "desc": "Stir fried glass noodle with eggs, tomatoes, white onions, bell peppers, carrots, bean sprouts, and green onions",
+          "category": "Noodles",
+          "sizes": {
+            "Chicken": 15,
+            "Beef": 15,
+            "Pork": 15,
+            "Tofu": 15,
+            "Vegetable": 15,
+            "Shrimp": 17,
+            "Duck": 20,
+            "Crispy Chicken": 16,
+            "Crispy Pork": 16
+          }
         },
         {
           "item": "Pla Rad Prik",
           "price": 32,
-          "desc": "Whole fried branzino topped with hot chili and garlic sauce"
+          "desc": "Whole fried branzino topped with hot chili and garlic sauce",
+          "category": "Bethesda Special"
         },
         {
           "item": "Fish In The Garden",
           "price": 32,
-          "desc": "Whole fried branzino served with a side of spicy apple salad"
+          "desc": "Whole fried branzino served with a side of spicy apple salad",
+          "category": "Bethesda Special"
         },
         {
           "item": "Lobster Tail Choo-Chee",
           "price": 28,
-          "desc": "Lobster tail in red curry base"
+          "desc": "Lobster tail in red curry base",
+          "category": "Bethesda Special"
         },
         {
           "item": "Lemon Fish",
           "price": 25,
-          "desc": "Steamed filet turbot with homemade spicy lemon garlic sauce"
+          "desc": "Steamed filet turbot with homemade spicy lemon garlic sauce",
+          "category": "Bethesda Special"
         },
         {
           "item": "Curry Clams",
           "price": 20,
-          "desc": "Clams stir fried in Thai chili paste with basil leaves"
+          "desc": "Clams stir fried in Thai chili paste with basil leaves",
+          "category": "Bethesda Special"
         },
         {
           "item": "Volcano Chicken",
           "price": 22,
-          "desc": "Flaming whole chicken with homemade sweet sauce"
+          "desc": "Flaming whole chicken with homemade sweet sauce",
+          "category": "Bethesda Special"
         },
         {
           "item": "Kana Moo Grob",
           "price": 17,
-          "desc": "Stir fried crispy pork belly with Chinese broccoli"
+          "desc": "Stir fried crispy pork belly with Chinese broccoli",
+          "category": "Bethesda Special"
         },
         {
           "item": "Moo Grob Prik King",
           "price": 17,
-          "desc": "Stir fried crispy pork belly in chili curry base with string beans"
+          "desc": "Stir fried crispy pork belly in chili curry base with string beans",
+          "category": "Bethesda Special"
         },
         {
           "item": "Steamed Jasmine Rice",
-          "price": 2
+          "price": 2,
+          "category": "Side Orders"
         },
         {
           "item": "Steamed Veggies",
-          "price": 3
+          "price": 3,
+          "category": "Side Orders"
         },
         {
           "item": "Fried Egg",
-          "price": 2
+          "price": 2,
+          "category": "Side Orders"
         },
         {
           "item": "Steamed Noodle",
-          "price": 3
+          "price": 3,
+          "category": "Side Orders"
         }
       ]
     },
     {
       "name": "Sardis",
-      "phone": "",
-      "orderUrl": "",
-      "mapUrl": "",
+      "phone": "3015953222",
+      "orderUrl": "https://sardischicken.orderexperience.net/662a790048781eb51a0a0f72/menu",
+      "mapUrl": "https://maps.app.goo.gl/29fTnvrq91i6hBFSA",
       "address": "",
-      "menuUrl": "",
-      "menuImages": [],
-      "menu": [],
+      "menuUrl": "https://sardischicken.com/menu/",
+      "menuImages": [
+        "images/Sardis-MENU-MD-MAR-2026-V3-1.png",
+        "images/Sardis-MENU-MD-MAR-2026-V3-2.png"
+      ],
+      "menu": [
+        {
+          "item": "3 Piece - Dark Meat",
+          "price": 15.0,
+          "desc": "2 legs and a thigh, charbroiled Peruvian-style. Locally sourced, farm-fresh Grade A chicken. Includes choice of 2 regular sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Charbroiled Peruvian Chicken",
+          "saucePick": {
+            "count": 2,
+            "options": [
+              "Aji Amarillo Aoli (Yellow/Medium)",
+              "Rocoto Pepper Aoli (Red/Hot)",
+              "Jalapeno/Habanero Aoli (Green/Very Hot)",
+              "Alabama White (Mild)",
+              "Mumbo (Mild)",
+              "Sardi's Q (Mild)",
+              "Honey Mustard (Mild)",
+              "Spicy Balsamic"
+            ]
+          }
+        },
+        {
+          "item": "Quarter Chicken - White Meat",
+          "price": 15.0,
+          "desc": "Breast and wing combo, charbroiled Peruvian-style. Includes choice of 2 regular sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Charbroiled Peruvian Chicken",
+          "saucePick": {
+            "count": 2,
+            "options": [
+              "Aji Amarillo Aoli (Yellow/Medium)",
+              "Rocoto Pepper Aoli (Red/Hot)",
+              "Jalapeno/Habanero Aoli (Green/Very Hot)",
+              "Alabama White (Mild)",
+              "Mumbo (Mild)",
+              "Sardi's Q (Mild)",
+              "Honey Mustard (Mild)",
+              "Spicy Balsamic"
+            ]
+          }
+        },
+        {
+          "item": "Half Chicken",
+          "price": 17.0,
+          "desc": "Half a charbroiled Peruvian chicken. Includes choice of 2 regular sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Charbroiled Peruvian Chicken",
+          "saucePick": {
+            "count": 2,
+            "options": [
+              "Aji Amarillo Aoli (Yellow/Medium)",
+              "Rocoto Pepper Aoli (Red/Hot)",
+              "Jalapeno/Habanero Aoli (Green/Very Hot)",
+              "Alabama White (Mild)",
+              "Mumbo (Mild)",
+              "Sardi's Q (Mild)",
+              "Honey Mustard (Mild)",
+              "Spicy Balsamic"
+            ]
+          }
+        },
+        {
+          "item": "Half Chicken Lunch Special",
+          "price": 18.5,
+          "desc": "Mon-Fri until 4pm only. Half chicken with a regular fountain soda. Includes choice of 2 regular sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Charbroiled Peruvian Chicken",
+          "saucePick": {
+            "count": 2,
+            "options": [
+              "Aji Amarillo Aoli (Yellow/Medium)",
+              "Rocoto Pepper Aoli (Red/Hot)",
+              "Jalapeno/Habanero Aoli (Green/Very Hot)",
+              "Alabama White (Mild)",
+              "Mumbo (Mild)",
+              "Sardi's Q (Mild)",
+              "Honey Mustard (Mild)",
+              "Spicy Balsamic"
+            ]
+          }
+        },
+        {
+          "item": "Whole Chicken Only",
+          "price": 21.0,
+          "desc": "A whole charbroiled Peruvian chicken, no sides included.",
+          "category": "Charbroiled Peruvian Chicken",
+          "saucePick": {
+            "count": 2,
+            "options": [
+              "Aji Amarillo Aoli (Yellow/Medium)",
+              "Rocoto Pepper Aoli (Red/Hot)",
+              "Jalapeno/Habanero Aoli (Green/Very Hot)",
+              "Alabama White (Mild)",
+              "Mumbo (Mild)",
+              "Sardi's Q (Mild)",
+              "Honey Mustard (Mild)",
+              "Spicy Balsamic"
+            ]
+          }
+        },
+        {
+          "item": "Whole Chicken",
+          "price": 34.0,
+          "desc": "A whole charbroiled Peruvian chicken. Feeds 3-4. Includes choice of 2 regular sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Charbroiled Peruvian Chicken",
+          "saucePick": {
+            "count": 2,
+            "options": [
+              "Aji Amarillo Aoli (Yellow/Medium)",
+              "Rocoto Pepper Aoli (Red/Hot)",
+              "Jalapeno/Habanero Aoli (Green/Very Hot)",
+              "Alabama White (Mild)",
+              "Mumbo (Mild)",
+              "Sardi's Q (Mild)",
+              "Honey Mustard (Mild)",
+              "Spicy Balsamic"
+            ]
+          }
+        },
+        {
+          "item": "Whole Chicken Special",
+          "price": 40.0,
+          "desc": "A whole chicken with 3 large sides included. Feeds 4-5.",
+          "sidesPick": {
+            "count": 3,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Charbroiled Peruvian Chicken",
+          "saucePick": {
+            "count": 2,
+            "options": [
+              "Aji Amarillo Aoli (Yellow/Medium)",
+              "Rocoto Pepper Aoli (Red/Hot)",
+              "Jalapeno/Habanero Aoli (Green/Very Hot)",
+              "Alabama White (Mild)",
+              "Mumbo (Mild)",
+              "Sardi's Q (Mild)",
+              "Honey Mustard (Mild)",
+              "Spicy Balsamic"
+            ]
+          }
+        },
+        {
+          "item": "Whole Chicken Special + 2-Liter",
+          "price": 43.0,
+          "desc": "A whole chicken with 3 large sides and a 2-liter soda. Feeds 4-5.",
+          "sidesPick": {
+            "count": 3,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Charbroiled Peruvian Chicken",
+          "saucePick": {
+            "count": 2,
+            "options": [
+              "Aji Amarillo Aoli (Yellow/Medium)",
+              "Rocoto Pepper Aoli (Red/Hot)",
+              "Jalapeno/Habanero Aoli (Green/Very Hot)",
+              "Alabama White (Mild)",
+              "Mumbo (Mild)",
+              "Sardi's Q (Mild)",
+              "Honey Mustard (Mild)",
+              "Spicy Balsamic"
+            ]
+          }
+        },
+        {
+          "item": "One Whole and a Half Chicken",
+          "price": 52.0,
+          "desc": "One whole chicken plus a half chicken, with 4 large sides included. Feeds 5-6.",
+          "sidesPick": {
+            "count": 4,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Charbroiled Peruvian Chicken",
+          "saucePick": {
+            "count": 2,
+            "options": [
+              "Aji Amarillo Aoli (Yellow/Medium)",
+              "Rocoto Pepper Aoli (Red/Hot)",
+              "Jalapeno/Habanero Aoli (Green/Very Hot)",
+              "Alabama White (Mild)",
+              "Mumbo (Mild)",
+              "Sardi's Q (Mild)",
+              "Honey Mustard (Mild)",
+              "Spicy Balsamic"
+            ]
+          }
+        },
+        {
+          "item": "One Whole and a Half Chicken + 2-Liter",
+          "price": 55.0,
+          "desc": "One whole chicken plus a half chicken, with 4 large sides and a 2-liter soda. Feeds 5-6.",
+          "sidesPick": {
+            "count": 4,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Charbroiled Peruvian Chicken",
+          "saucePick": {
+            "count": 2,
+            "options": [
+              "Aji Amarillo Aoli (Yellow/Medium)",
+              "Rocoto Pepper Aoli (Red/Hot)",
+              "Jalapeno/Habanero Aoli (Green/Very Hot)",
+              "Alabama White (Mild)",
+              "Mumbo (Mild)",
+              "Sardi's Q (Mild)",
+              "Honey Mustard (Mild)",
+              "Spicy Balsamic"
+            ]
+          }
+        },
+        {
+          "item": "Family Special",
+          "price": 65.0,
+          "desc": "2 whole chickens with 6 large sides and a 2-liter soda included. Feeds 6-7.",
+          "sidesPick": {
+            "count": 6,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Charbroiled Peruvian Chicken",
+          "saucePick": {
+            "count": 2,
+            "options": [
+              "Aji Amarillo Aoli (Yellow/Medium)",
+              "Rocoto Pepper Aoli (Red/Hot)",
+              "Jalapeno/Habanero Aoli (Green/Very Hot)",
+              "Alabama White (Mild)",
+              "Mumbo (Mild)",
+              "Sardi's Q (Mild)",
+              "Honey Mustard (Mild)",
+              "Spicy Balsamic"
+            ]
+          }
+        },
+        {
+          "item": "Sardi's Wings",
+          "price": 12.0,
+          "desc": "6 wings, freshly fried to order, with your choice of BBQ, Buffalo, Old Bay, or Naked. Served with blue cheese or ranch.",
+          "category": "Grilled Meat + Seafood"
+        },
+        {
+          "item": "Chuletas de Cerdo",
+          "price": 17.0,
+          "desc": "3 fresh center cut pork chops, marinated and chargrilled. Includes choice of 2 sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Grilled Meat + Seafood"
+        },
+        {
+          "item": "Steak Anticuchos Skewers",
+          "price": 21.0,
+          "desc": "Marinated steak skewers, chargrilled to perfection. Includes choice of 2 sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Grilled Meat + Seafood"
+        },
+        {
+          "item": "Gulf Shrimp Skewers",
+          "price": 20.0,
+          "desc": "Marinated Gulf shrimp skewers, chargrilled to perfection. Includes choice of 2 sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Grilled Meat + Seafood"
+        },
+        {
+          "item": "Phil's Lamb Chops",
+          "price": 27.0,
+          "desc": "4 New Zealand lamb chops, marinated and chargrilled. Includes choice of 2 sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Grilled Meat + Seafood"
+        },
+        {
+          "item": "Ultimate 3 Meat Combo",
+          "price": 26.0,
+          "desc": "Choose any 3: chicken skewer, beef skewer, shrimp skewer, 1/4 chicken, center cut pork chop, carne asada, or lamb chop. Includes choice of 2 sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Grilled Meat + Seafood"
+        },
+        {
+          "item": "Bang Bang Chicken",
+          "price": 15.5,
+          "desc": "Skewered chicken chunks slathered in sweet and tangy bang bang sauce, cooked until tender and caramelized. Includes choice of 2 sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Grilled Meat + Seafood"
+        },
+        {
+          "item": "World Famous Souvlaki",
+          "price": 18.0,
+          "desc": "Medallions of chicken tenderloin, peppers, and onions on skewers with pita bread and tzatziki sauce. Includes choice of 2 sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Grilled Meat + Seafood"
+        },
+        {
+          "item": "Sardi's Salmon",
+          "price": 23.0,
+          "desc": "Marinated and broiled salmon topped with homemade beurre blanc. Includes choice of 2 sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Grilled Meat + Seafood"
+        },
+        {
+          "item": "Peruvian Seasoned Whitefish",
+          "price": 21.0,
+          "desc": "Fried or broiled, served with a salsa remoulade. Includes choice of 2 sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Grilled Meat + Seafood"
+        },
+        {
+          "item": "Pollo o Lomo Saltado",
+          "sizes": {
+            "Chicken": 18.0,
+            "Steak": 23.0
+          },
+          "desc": "Sauteed chicken or steak, onions, and tomatoes served over french fries and rice.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Carne Asada",
+          "price": 25.0,
+          "desc": "8oz USDA choice skirt steak, chargrilled to perfection, topped with peppers and onions. Includes choice of 2 sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Churrasco de Pollo",
+          "price": 18.0,
+          "desc": "Chicken breast marinated in cilantro, peppers, garlic, and onion, chargrilled, served with fresh pico de gallo. Includes choice of 2 sides.",
+          "sidesPick": {
+            "count": 2,
+            "options": [
+              "White Rice",
+              "Arroz Chaufa (Peruvian Fried Rice)",
+              "French Fries",
+              "Black Beans",
+              "White Rice & Beans",
+              "Chaufa & Beans",
+              "Green Beans",
+              "Sweet Corn",
+              "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+              "House Salad",
+              "Mashed Potatoes",
+              "Coleslaw",
+              "Garlic Broccoli",
+              "Roasted Vegetables",
+              "Fried Yuca",
+              "Fried Plantains",
+              "Brussels Sprouts & Carrots"
+            ]
+          },
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Ceviche",
+          "sizes": {
+            "Fish Only": 19.5,
+            "+ Seafood": 21.5
+          },
+          "desc": "Fresh fish marinated in lime juice, mixed with our special spices. Served with sweet potato and Peruvian corn. *Consuming raw or undercooked seafood increases the risk of foodborne illness.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Quesadilla",
+          "sizes": {
+            "Chicken": 13.0,
+            "Steak": 16.5
+          },
+          "desc": "Flour tortilla loaded with chicken or steak and jack cheddar cheese. Served with fresh pico de gallo and sour cream.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Chicharron de Pollo",
+          "price": 14.0,
+          "desc": "1/2 boneless chicken, marinated and fried.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Sweet Chili Chicken",
+          "price": 15.5,
+          "desc": "Chicken thighs marinated in a sweet and spicy sauce. Delicious, bold, and unique.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Chicken Tenders",
+          "price": 13.0,
+          "desc": "3 tenders marinated and fried to a golden brown.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Power Bowl",
+          "sizes": {
+            "Chicken": 16.0,
+            "Steak": 19.0
+          },
+          "desc": "Grilled chicken or steak strips served over white rice, black beans, sweet corn, and fresh pico de gallo.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Empanadas",
+          "price": 11.0,
+          "desc": "3 homemade empanadas filled with your choice of ropa vieja, chicken, or steak.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Pupusa - Queso",
+          "price": 3.5,
+          "desc": "Grilled stuffed masa cake filled with cheese, served with curtido (spicy slaw). Priced each.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Pupusa - Frijol",
+          "price": 3.5,
+          "desc": "Grilled stuffed masa cake filled with bean and cheese, served with curtido (spicy slaw). Priced each.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Pupusa - Jalapeno",
+          "price": 3.5,
+          "desc": "Grilled stuffed masa cake filled with jalapeno and cheese, served with curtido (spicy slaw). Priced each.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Pupusa - Revueltas",
+          "price": 3.5,
+          "desc": "Grilled stuffed masa cake filled with pork, beans, and cheese, served with curtido (spicy slaw). Priced each.",
+          "category": "Latin Specialties"
+        },
+        {
+          "item": "Grilled or Crispy Chicken Sandwich",
+          "price": 11.0,
+          "desc": "Chargrilled or fried chicken breast with lettuce, tomato, and chipotle mayo on a buttery brioche bun.",
+          "category": "Sandwiches"
+        },
+        {
+          "item": "Sardi's Cheesesteak",
+          "sizes": {
+            "Chicken": 17.0,
+            "Steak": 17.0
+          },
+          "desc": "New and improved! Thin-sliced ribeye piled high with 50% more meat, melted Cooper sharp cheese, grilled onions, and mayo on seeded bread. Bigger, better, beefier! Lettuce, tomatoes, and hot peppers added upon request.",
+          "category": "Sandwiches"
+        },
+        {
+          "item": "Gyro de Sardi's",
+          "price": 11.5,
+          "desc": "Marinated lamb or chicken, lettuce, tomato, red onion, feta cheese, and tzatziki sauce wrapped in pita bread.",
+          "category": "Sandwiches"
+        },
+        {
+          "item": "Crispy Fish Sandwich",
+          "price": 11.0,
+          "desc": "Seasoned fried whitefish with lettuce, tomato, and salsa remoulade on a buttery brioche bun.",
+          "category": "Sandwiches"
+        },
+        {
+          "item": "Sardi's Chicken and Rice Soup",
+          "price": 7.0,
+          "desc": "Homemade chicken and rice soup with simple seasonings, juicy chicken, flavorful rice, and tender vegetables.",
+          "category": "Salads + Soups"
+        },
+        {
+          "item": "De Casa Salad",
+          "sizes": {
+            "Plain": 8.5,
+            "+ Chicken": 14.5,
+            "+ Salmon": 20.0
+          },
+          "desc": "Mixed greens tossed with carrots, tomatoes, onions, cucumbers, and chickpeas.",
+          "category": "Salads + Soups"
+        },
+        {
+          "item": "El Greco Salad",
+          "sizes": {
+            "Plain": 11.0,
+            "+ Chicken": 16.5,
+            "+ Salmon": 21.0
+          },
+          "desc": "Fresh greens with tomato wedges, Greek olives, feta cheese, onions, cucumbers, and oregano.",
+          "category": "Salads + Soups"
+        },
+        {
+          "item": "Empanada (Extra)",
+          "price": 3.1,
+          "desc": "One extra empanada.",
+          "category": "Extras"
+        },
+        {
+          "item": "Tortillas (4)",
+          "price": 2.4,
+          "desc": "4 tortillas.",
+          "category": "Extras"
+        },
+        {
+          "item": "Dressing",
+          "price": 1.0,
+          "desc": "Extra dressing.",
+          "category": "Extras"
+        },
+        {
+          "item": "Sauce",
+          "price": 1.0,
+          "desc": "Extra sauce.",
+          "category": "Extras"
+        },
+        {
+          "item": "Tres Leches",
+          "price": 6.0,
+          "category": "Desserts"
+        },
+        {
+          "item": "Flan",
+          "price": 6.0,
+          "category": "Desserts"
+        },
+        {
+          "item": "Rice Pudding",
+          "price": 6.0,
+          "category": "Desserts"
+        },
+        {
+          "item": "Carrot Cake",
+          "price": 6.0,
+          "category": "Desserts"
+        },
+        {
+          "item": "Tiramisu Cake",
+          "price": 6.0,
+          "category": "Desserts"
+        },
+        {
+          "item": "Red Velvet Cake",
+          "price": 6.0,
+          "category": "Desserts"
+        },
+        {
+          "item": "Chocolate Mousse Cake",
+          "price": 5.0,
+          "category": "Desserts"
+        },
+        {
+          "item": "Strawberry Shortcake Parfait",
+          "price": 5.0,
+          "category": "Desserts"
+        },
+        {
+          "item": "Southern Banana Pudding Parfait",
+          "price": 5.0,
+          "category": "Desserts"
+        },
+        {
+          "item": "Alfajores (2)",
+          "price": 5.0,
+          "desc": "2 alfajores.",
+          "category": "Desserts"
+        },
+        {
+          "item": "Alfajores (10 Mini)",
+          "price": 7.0,
+          "desc": "10 mini alfajores.",
+          "category": "Desserts"
+        },
+        {
+          "item": "Fountain Soda",
+          "price": 3.0,
+          "category": "Drinks"
+        },
+        {
+          "item": "20oz Bottle Soda",
+          "price": 3.5,
+          "category": "Drinks"
+        },
+        {
+          "item": "Inca Kola Bottle",
+          "price": 3.0,
+          "category": "Drinks"
+        },
+        {
+          "item": "Juice Bottle",
+          "price": 3.0,
+          "category": "Drinks"
+        },
+        {
+          "item": "Chicha Limena Bottle",
+          "price": 3.0,
+          "category": "Drinks"
+        },
+        {
+          "item": "Bottled Water",
+          "price": 3.0,
+          "category": "Drinks"
+        },
+        {
+          "item": "2 Liter Soda",
+          "price": 4.5,
+          "category": "Drinks"
+        },
+        {
+          "item": "White Rice",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Arroz Chaufa (Peruvian Fried Rice)",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "French Fries",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Black Beans",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "White Rice & Beans",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Chaufa & Beans",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Green Beans",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Sweet Corn",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Mixed Vegetables (Corn, peas, green beans, and carrots)",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "House Salad",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Mashed Potatoes",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Coleslaw",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Garlic Broccoli",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Roasted Vegetables",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Fried Yuca",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Fried Plantains",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        },
+        {
+          "item": "Brussels Sprouts & Carrots",
+          "sizes": {
+            "Regular": 5.25,
+            "Large": 6.5
+          },
+          "category": "Sides"
+        }
+      ],
       "cuisine": "Peruvian"
     },
     {
       "name": "Mi La Cay",
-      "phone": "",
-      "orderUrl": "",
-      "mapUrl": "",
-      "address": "",
-      "menuUrl": "",
-      "menuImages": [],
-      "menu": [],
-      "cuisine": "Vietnamese"
+      "cuisine": "Vietnamese",
+      "phone": "(301) 929-2822",
+      "orderUrl": "http://milacaywheaton.com/",
+      "mapUrl": "https://maps.app.goo.gl/6gneoaNweJiqBDM67",
+      "address": "2407-09 University Blvd., W, Wheaton, MD 20902",
+      "menuUrl": "http://milacaywheaton.com/assets/imgs/menu.pdf",
+      "menuImages": [
+        "images/Mi-La-Cay-Menu-Page-1.png"
+      ],
+      "menu": [
+        {
+          "item": "Ch\u1ea3 Gi\u00f2 - Spring Roll (2)",
+          "price": 5.95,
+          "desc": "Fried wrapped rolls with minced chicken, taro, carrots, bean thread noodles and spices, served with fish sauce",
+          "category": "Appetizers"
+        },
+        {
+          "item": "G\u1ecfi Cu\u1ed1n - Summer Roll (2)",
+          "price": 5.95,
+          "desc": "Steamed shrimp, lean sliced pork, lettuce, and vermicelli noodles wrapped in rice paper, served with peanut sauce",
+          "category": "Appetizers"
+        },
+        {
+          "item": "G\u1ecfi Cu\u1ed1n Chay - Vegetarian Summer Roll (2)",
+          "price": 5.25,
+          "desc": "Tofu, lettuce, pickled carrots, and vermicelli noodles wrapped in rice paper, served with peanut sauce",
+          "category": "Appetizers"
+        },
+        {
+          "item": "B\u00f2 N\u01b0\u1edbng L\u00e1 Nho - Beef Wrapped in Grape Leaves (3)",
+          "price": 11.95,
+          "desc": "Marinated ground beef wrapped in grape leaves, topped with crushed peanuts and fried onions. Served with fish sauce",
+          "category": "Appetizers"
+        },
+        {
+          "item": "Chim C\u00fat - Roasted Quail (2)",
+          "price": 12.95,
+          "desc": "Crispy roasted quail, served with lettuce, pickled carrots, cabbage, and salt & pepper in lime juice",
+          "category": "Appetizers"
+        },
+        {
+          "item": "T\u00f4m N\u01b0\u1edbng - Grilled Shrimp (Appetizer)",
+          "price": 11.95,
+          "desc": "Marinated jumbo shrimp, topped with oiled scallions and crushed peanuts, served with fish sauce",
+          "category": "Appetizers"
+        },
+        {
+          "item": "G\u1ecfi \u0110u \u0110\u1ee7 Th\u00e1i - Spicy Papaya Salad",
+          "price": 13.95,
+          "desc": "Shredded papaya, tomato, basil, and grilled shrimp served with the spicy sauce & crushed peanuts",
+          "category": "Appetizers"
+        },
+        {
+          "item": "G\u1ecfi G\u00e0 - Chicken Salad / G\u1ecfi T\u00f4m - Shrimp Salad",
+          "desc": "Choice of tender chicken breast or steamed shrimp mixed with shredded cabbage, red onion, tossed with fish sauce & crushed peanuts",
+          "category": "Appetizers",
+          "sizes": {
+            "Chicken Salad": 11.95,
+            "Shrimp Salad": 12.95
+          }
+        },
+        {
+          "item": "D\u1ea7u Ch\u1ea3o Qu\u1ea3y - Fried Breadstick (1)",
+          "price": 3.95,
+          "category": "Appetizers"
+        },
+        {
+          "item": "B\u00f2 N\u01b0\u1edbng S\u1ea3 - Grilled Lemongrass Beef",
+          "price": 14.95,
+          "desc": "Marinated sliced beef with lemongrass. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
+          "category": "Grilled Rice Plates",
+          "extras": [
+            {
+              "name": "Egg",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Rice",
+              "price": 2.95
+            },
+            {
+              "name": "Tomato Rice",
+              "price": 4.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 6.95
+            }
+          ]
+        },
+        {
+          "item": "Th\u1ecbt Heo N\u01b0\u1edbng - Grilled Pork",
+          "price": 14.95,
+          "desc": "Marinated sliced pork. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
+          "category": "Grilled Rice Plates",
+          "extras": [
+            {
+              "name": "Egg",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Rice",
+              "price": 2.95
+            },
+            {
+              "name": "Tomato Rice",
+              "price": 4.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 6.95
+            }
+          ]
+        },
+        {
+          "item": "G\u00e0 N\u01b0\u1edbng Chanh - Grilled Lemon Chicken",
+          "price": 14.95,
+          "desc": "Marinated boneless chicken in lemon sauce. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
+          "category": "Grilled Rice Plates",
+          "extras": [
+            {
+              "name": "Egg",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Rice",
+              "price": 2.95
+            },
+            {
+              "name": "Tomato Rice",
+              "price": 4.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 6.95
+            }
+          ]
+        },
+        {
+          "item": "G\u00e0 N\u01b0\u1edbng S\u1ea3 \u1edat - Grilled Lemongrass Chicken",
+          "price": 14.95,
+          "desc": "Marinated boneless chicken in spicy garlic lemongrass sauce. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
+          "category": "Grilled Rice Plates",
+          "extras": [
+            {
+              "name": "Egg",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Rice",
+              "price": 2.95
+            },
+            {
+              "name": "Tomato Rice",
+              "price": 4.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 6.95
+            }
+          ]
+        },
+        {
+          "item": "T\u00f4m N\u01b0\u1edbng - Grilled Shrimp (Rice Plate)",
+          "price": 15.95,
+          "desc": "Marinated large shrimp in garlic sauce. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
+          "category": "Grilled Rice Plates",
+          "extras": [
+            {
+              "name": "Egg",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Rice",
+              "price": 2.95
+            },
+            {
+              "name": "Tomato Rice",
+              "price": 4.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 6.95
+            }
+          ]
+        },
+        {
+          "item": "B\u00f2 L\u00e1 Nho - Beef Wrapped in Grape Leaves (Rice Plate)",
+          "price": 15.95,
+          "desc": "Marinated ground beef wrapped in grape leaves. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
+          "category": "Grilled Rice Plates",
+          "extras": [
+            {
+              "name": "Egg",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Rice",
+              "price": 2.95
+            },
+            {
+              "name": "Tomato Rice",
+              "price": 4.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 6.95
+            }
+          ]
+        },
+        {
+          "item": "C\u01a1m Ba M\u00f3n - Combo Rice Platter",
+          "price": 16.95,
+          "desc": "Choice of any 3 grilled meats, served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
+          "category": "Grilled Rice Plates",
+          "sidesPick": {
+            "count": 3,
+            "options": [
+              "Grilled Lemongrass Beef",
+              "Grilled Pork",
+              "Grilled Lemon Chicken",
+              "Grilled Lemongrass Chicken",
+              "Grilled Shrimp",
+              "Beef Wrapped in Grape Leaves"
+            ]
+          }
+        },
+        {
+          "item": "C\u01a1m \u0110\u1ecf G\u00e0 X\u1ed1i M\u1ee1 - Crispy Maryland Chicken",
+          "price": 15.95,
+          "desc": "Crispy fried chicken served with tomato rice & ginger sauce",
+          "category": "Rice Dishes"
+        },
+        {
+          "item": "C\u01a1m \u0110\u1ecf Chim C\u00fat - Roast Quail (1)",
+          "price": 14.95,
+          "desc": "Crispy roasted quail served with tomato rice & fish sauce",
+          "category": "Rice Dishes"
+        },
+        {
+          "item": "C\u01a1m T\u1ea5m S\u01b0\u1eddn Tr\u1ee9ng - Grilled Pork Chop & Fried Egg",
+          "price": 14.95,
+          "desc": "Served with broken rice and fish sauce",
+          "category": "Rice Dishes"
+        },
+        {
+          "item": "C\u01a1m T\u1ea5m B\u00ec S\u01b0\u1eddn Ch\u1ea3 - Combination Broken Rice Platter",
+          "price": 16.95,
+          "desc": "Grilled pork chop, meat loaf, and shredded pork served with broken rice and fish sauce",
+          "category": "Rice Dishes"
+        },
+        {
+          "item": "C\u01a1m T\u1ea5m S\u01b0\u1eddn N\u01b0\u1edbng 2 Mi\u1ebfng - 2 Grilled Pork Chops",
+          "price": 17.95,
+          "desc": "Served with broken rice and fish sauce",
+          "category": "Rice Dishes"
+        },
+        {
+          "item": "M\u00ec X\u00e0o D\u00f2n ho\u1eb7c X\u00e0o M\u1ec1m, \u0110\u1ed3 Bi\u1ec3n - Crispy/Soft Egg Noodles with Seafood",
+          "price": 18.95,
+          "desc": "Crispy or soft egg noodles w/ shrimp, squid, fish balls, mussels, crab meat, mixed vegetables topped w/ fried onion. Can be made vegetarian.",
+          "category": "Stir Fried Noodles"
+        },
+        {
+          "item": "M\u00ec X\u00e0o D\u00f2n ho\u1eb7c X\u00e0o M\u1ec1m Th\u1eadp C\u1ea9m - Crispy/Soft Egg Noodles Meat Combo",
+          "price": 17.95,
+          "desc": "Crispy or soft egg noodles with beef, pork, chicken, mixed vegetables, topped w/ fried onion. Can be made vegetarian.",
+          "category": "Stir Fried Noodles"
+        },
+        {
+          "item": "H\u1ee7 Ti\u1ebfu B\u00f2 \u00c1p Ch\u1ea3o - Stir Fried Flat Rice Noodles (With/Without Gravy)",
+          "price": 17.95,
+          "desc": "Stir fried flat rice noodles with beef, mixed vegetables, carrot and mushroom, topped w/ fried onion. Can be made vegetarian.",
+          "category": "Stir Fried Noodles"
+        },
+        {
+          "item": "H\u1ee7 Ti\u1ebfu X\u00e0o Ch\u1ee3 L\u1edbn - Stir Fried Rice Noodles Combination",
+          "price": 17.95,
+          "desc": "Stir fried rice noodles with chicken, shrimp, fish balls, bean sprout and onions, topped w/ fried onion. Can be made vegetarian.",
+          "category": "Stir Fried Noodles"
+        },
+        {
+          "item": "H\u1ee7 Ti\u1ebfu X\u00e0o Th\u00e1i - Pad Thai Noodles",
+          "price": 17.95,
+          "desc": "Stir fried rice noodles with shrimp, chicken, fish balls, bean sprouts, and onions, topped with peanuts. Can be made vegetarian.",
+          "category": "Stir Fried Noodles"
+        },
+        {
+          "item": "B\u00e1nh L\u1ecdt X\u00e0o Th\u1eadp C\u1ea9m - Stir Fried Pin Rice Noodles Combination",
+          "price": 17.95,
+          "desc": "Assorted pin rice noodles with shrimp, chicken, fish balls, bean sprouts and onions, topped w/ fried onion. Can be made vegetarian.",
+          "category": "Stir Fried Noodles"
+        },
+        {
+          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu La Cay - La Cay Noodle Soup",
+          "price": 14.95,
+          "desc": "Sliced pork, fried shrimp cracker, minced pork, squid, shrimp, fish balls, sliced pork heart & liver, topped with fried minced garlic & scallions in pork broth. Broth in or on the side.",
+          "category": "Noodle Soup",
+          "orOptions": [
+            "Egg Noodles",
+            "Rice Noodles"
+          ],
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Substitute Clear (Glass) Noodles",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Clear (Glass) Noodles",
+              "price": 3.49
+            }
+          ]
+        },
+        {
+          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu La Cay Th\u1eadp C\u1ea9m - La Cay Noodle Combination Soup",
+          "price": 14.95,
+          "desc": "Sliced B.B.Q. pork, minced pork, fried shrimp cracker, squid, shrimp, fish balls, sliced pork heart & liver, topped with fried minced garlic & scallions in pork broth. Broth in or on the side.",
+          "category": "Noodle Soup",
+          "orOptions": [
+            "Egg Noodles",
+            "Rice Noodles"
+          ],
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Substitute Clear (Glass) Noodles",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Clear (Glass) Noodles",
+              "price": 3.49
+            }
+          ]
+        },
+        {
+          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu Nam Vang - Phnom Penh Noodle Soup",
+          "price": 14.95,
+          "desc": "Sliced pork, minced pork, shrimp, squid, fish balls, sliced pork heart & liver, topped with fried minced garlic in pork broth. Broth in or on the side.",
+          "category": "Noodle Soup",
+          "orOptions": [
+            "Egg Noodles",
+            "Rice Noodles"
+          ],
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Substitute Clear (Glass) Noodles",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Clear (Glass) Noodles",
+              "price": 3.49
+            }
+          ]
+        },
+        {
+          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu G\u00e0 X\u1ed1i M\u1ee1 - Crispy Maryland Chicken Noodle Soup",
+          "price": 15.95,
+          "desc": "Fried chicken thigh served with minced pork, fried shallots, fried minced garlic, and scallions in chicken broth",
+          "category": "Noodle Soup",
+          "orOptions": [
+            "Egg Noodles",
+            "Rice Noodles"
+          ],
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Substitute Clear (Glass) Noodles",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Clear (Glass) Noodles",
+              "price": 3.49
+            }
+          ]
+        },
+        {
+          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu Chim C\u00fat - Roasted Quail Noodle Soup",
+          "price": 15.95,
+          "desc": "Roasted quail served with minced pork, fried shallots, fried minced garlic, and scallions in chicken broth. Broth in or on the side.",
+          "category": "Noodle Soup",
+          "orOptions": [
+            "Egg Noodles",
+            "Rice Noodles"
+          ],
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Substitute Clear (Glass) Noodles",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Clear (Glass) Noodles",
+              "price": 3.49
+            }
+          ]
+        },
+        {
+          "item": "H\u1ee7 Ti\u1ebfu Dai M\u1ef9 Tho - Clear Glass Noodle Soup",
+          "price": 15.95,
+          "desc": "Sliced B.B.Q pork, minced pork, squid, shrimp, fish balls topped with scallions and fried minced garlic in pork broth. Gluten free.",
+          "category": "Noodle Soup",
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Substitute Clear (Glass) Noodles",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Clear (Glass) Noodles",
+              "price": 3.49
+            }
+          ]
+        },
+        {
+          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu V\u1ecbt Ti\u1ec1m - Roast Duck Noodle Soup",
+          "price": 15.95,
+          "desc": "Roasted duck served with chinese vegetables in 5-spice broth",
+          "category": "Noodle Soup",
+          "orOptions": [
+            "Egg Noodles",
+            "Rice Noodles"
+          ],
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Substitute Clear (Glass) Noodles",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Clear (Glass) Noodles",
+              "price": 3.49
+            }
+          ]
+        },
+        {
+          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu B\u00f2 Kho - Beef Stew Noodle Soup",
+          "price": 15.95,
+          "desc": "Beef stew served with egg noodle, cubed beef briskets, carrots, and onions",
+          "category": "Noodle Soup",
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Substitute Clear (Glass) Noodles",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Clear (Glass) Noodles",
+              "price": 3.49
+            }
+          ]
+        },
+        {
+          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu B\u00f2 Sat\u00e9 - Noodle with Sate Beef Soup",
+          "price": 15.95,
+          "desc": "Sliced eye-round steak and sliced tomatoes with spicy sate soup, topped with peanuts and scallions",
+          "category": "Noodle Soup",
+          "orOptions": [
+            "Egg Noodles",
+            "Rice Noodles"
+          ],
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Substitute Clear (Glass) Noodles",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Clear (Glass) Noodles",
+              "price": 3.49
+            }
+          ]
+        },
+        {
+          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu \u0110\u1ed3 Bi\u1ec3n - Seafood Noodle Soup",
+          "price": 15.95,
+          "desc": "Shrimp, squid, mussels, fish balls, and crab meat in pork broth",
+          "category": "Noodle Soup",
+          "orOptions": [
+            "Egg Noodles",
+            "Rice Noodles"
+          ],
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Substitute Clear (Glass) Noodles",
+              "price": 1.95
+            },
+            {
+              "name": "Extra Clear (Glass) Noodles",
+              "price": 3.49
+            }
+          ]
+        },
+        {
+          "item": "Ph\u1edf T\u00e1i N\u1ea1m G\u1ea7u G\u00e2n S\u00e1ch",
+          "desc": "Sliced eye-round steak, well-done flank, brisket, soft tendon and bible tripe. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
+          "category": "Pho - Beef Noodle Soup",
+          "sizes": {
+            "Small": 14.75,
+            "Large": 15.75
+          },
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 5.5
+            },
+            {
+              "name": "Pickled Onion",
+              "price": 2.0
+            },
+            {
+              "name": "House Special P10 Sauce",
+              "price": 1.0
+            }
+          ]
+        },
+        {
+          "item": "Ph\u1edf Ch\u00edn N\u1ea1m G\u1ea7u G\u00e2n S\u00e1ch",
+          "desc": "Sliced well-done brisket and flank, soft tendon, and bible tripe. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
+          "category": "Pho - Beef Noodle Soup",
+          "sizes": {
+            "Small": 14.75,
+            "Large": 15.75
+          },
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 5.5
+            },
+            {
+              "name": "Pickled Onion",
+              "price": 2.0
+            },
+            {
+              "name": "House Special P10 Sauce",
+              "price": 1.0
+            }
+          ]
+        },
+        {
+          "item": "Ph\u1edf T\u00e1i N\u1ea1m",
+          "desc": "Sliced eye-round steak and well-done flank. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
+          "category": "Pho - Beef Noodle Soup",
+          "sizes": {
+            "Small": 14.75,
+            "Large": 15.75
+          },
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 5.5
+            },
+            {
+              "name": "Pickled Onion",
+              "price": 2.0
+            },
+            {
+              "name": "House Special P10 Sauce",
+              "price": 1.0
+            }
+          ]
+        },
+        {
+          "item": "Ph\u1edf T\u00e1i Ch\u00edn",
+          "desc": "Sliced eye-round steak and well-done brisket. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
+          "category": "Pho - Beef Noodle Soup",
+          "sizes": {
+            "Small": 14.75,
+            "Large": 15.75
+          },
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 5.5
+            },
+            {
+              "name": "Pickled Onion",
+              "price": 2.0
+            },
+            {
+              "name": "House Special P10 Sauce",
+              "price": 1.0
+            }
+          ]
+        },
+        {
+          "item": "Ph\u1edf T\u00e1i",
+          "desc": "Sliced eye-round steak. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
+          "category": "Pho - Beef Noodle Soup",
+          "sizes": {
+            "Small": 14.75,
+            "Large": 15.75
+          },
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 5.5
+            },
+            {
+              "name": "Pickled Onion",
+              "price": 2.0
+            },
+            {
+              "name": "House Special P10 Sauce",
+              "price": 1.0
+            }
+          ]
+        },
+        {
+          "item": "Ph\u1edf B\u00f2 Vi\u00ean",
+          "desc": "Beef balls. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
+          "category": "Pho - Beef Noodle Soup",
+          "sizes": {
+            "Small": 14.75,
+            "Large": 15.75
+          },
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 5.5
+            },
+            {
+              "name": "Pickled Onion",
+              "price": 2.0
+            },
+            {
+              "name": "House Special P10 Sauce",
+              "price": 1.0
+            }
+          ]
+        },
+        {
+          "item": "Ph\u1edf Rau",
+          "desc": "Broccoli, napa, carrots, and mushrooms. Choice of beef or vegetarian broth. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
+          "category": "Pho - Beef Noodle Soup",
+          "sizes": {
+            "Small": 14.75,
+            "Large": 15.75
+          },
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 5.5
+            },
+            {
+              "name": "Pickled Onion",
+              "price": 2.0
+            },
+            {
+              "name": "House Special P10 Sauce",
+              "price": 1.0
+            }
+          ],
+          "orOptions": [
+            "Beef Broth",
+            "Vegetarian Broth"
+          ]
+        },
+        {
+          "item": "Ph\u1edf \u0110\u1eb7c Bi\u1ec7t - Ph\u1edf Special",
+          "desc": "Sliced eye-round steak, well-done flank, brisket, soft tendon, bible tripe, and beef balls. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
+          "category": "Pho - Beef Noodle Soup",
+          "sizes": {
+            "Small": 15.25,
+            "Large": 16.25
+          },
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 5.5
+            },
+            {
+              "name": "Pickled Onion",
+              "price": 2.0
+            },
+            {
+              "name": "House Special P10 Sauce",
+              "price": 1.0
+            }
+          ]
+        },
+        {
+          "item": "Ph\u1edf G\u00e0",
+          "desc": "Sliced chicken breast. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
+          "category": "Pho - Beef Noodle Soup",
+          "sizes": {
+            "Small": 14.75,
+            "Large": 15.75
+          },
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 5.5
+            },
+            {
+              "name": "Pickled Onion",
+              "price": 2.0
+            },
+            {
+              "name": "House Special P10 Sauce",
+              "price": 1.0
+            }
+          ]
+        },
+        {
+          "item": "Ph\u1edf La Cay",
+          "desc": "Sliced eye round steak and well-done brisket in spicy beef broth. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
+          "category": "Pho - Beef Noodle Soup",
+          "sizes": {
+            "Small": 15.25,
+            "Large": 16.25
+          },
+          "extras": [
+            {
+              "name": "Extra Egg Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Rice Noodles",
+              "price": 2.95
+            },
+            {
+              "name": "Extra Meat",
+              "price": 5.5
+            },
+            {
+              "name": "Pickled Onion",
+              "price": 2.0
+            },
+            {
+              "name": "House Special P10 Sauce",
+              "price": 1.0
+            }
+          ]
+        },
+        {
+          "item": "B\u00fan B\u00f2 Hu\u1ebf - Lemongrass Beef Noodles Soup",
+          "price": 16.95,
+          "desc": "Vermicelli noodles served with sliced beef, Vietnamese ham, pork hock, pork blood, spicy lemongrass beef soup. Spicy. Gluten free.",
+          "category": "Bun - Vermicelli"
+        },
+        {
+          "item": "B\u00fan G\u00e0 Cari - Curry Chicken with Vermicelli Noodle Soup",
+          "price": 16.95,
+          "desc": "Vermicelli noodles served in spicy curry soup with chunks of chicken and sweet potatoes. Spicy. Gluten free.",
+          "category": "Bun - Vermicelli"
+        },
+        {
+          "item": "B\u00fan B\u00f2 N\u01b0\u1edbng S\u1ea3 - Vermicelli Noodles with Grilled Lemongrass Beef",
+          "price": 14.95,
+          "desc": "Grilled lemongrass beef. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
+          "category": "Bun - Vermicelli"
+        },
+        {
+          "item": "B\u00fan Th\u1ecbt Heo N\u01b0\u1edbng - Vermicelli Noodles with Grilled Pork",
+          "price": 14.95,
+          "desc": "Grilled pork. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
+          "category": "Bun - Vermicelli"
+        },
+        {
+          "item": "B\u00fan G\u00e0 N\u01b0\u1edbng Chanh - Vermicelli Noodles with Grilled Lemon Chicken",
+          "price": 14.95,
+          "desc": "Grilled lemon chicken. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
+          "category": "Bun - Vermicelli"
+        },
+        {
+          "item": "B\u00fan T\u00f4m N\u01b0\u1edbng - Vermicelli Noodles with Grilled Shrimp",
+          "price": 15.95,
+          "desc": "Grilled shrimp. Gluten free. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
+          "category": "Bun - Vermicelli"
+        },
+        {
+          "item": "B\u00fan Ch\u1ea3 Gi\u00f2 - Vermicelli Noodles with Fried Spring Rolls",
+          "price": 14.95,
+          "desc": "Fried spring rolls. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
+          "category": "Bun - Vermicelli"
+        },
+        {
+          "item": "B\u00fan Ba M\u00f3n - Combo Vermicelli Noodles",
+          "price": 16.25,
+          "desc": "Choice of any 3 items. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
+          "category": "Bun - Vermicelli",
+          "sidesPick": {
+            "count": 3,
+            "options": [
+              "Grilled Lemongrass Beef",
+              "Grilled Pork",
+              "Grilled Lemon Chicken",
+              "Grilled Shrimp",
+              "Fried Spring Rolls"
+            ]
+          }
+        },
+        {
+          "item": "B\u00e1nh H\u1ecfi Th\u1ecbt N\u01b0\u1edbng - Grilled Pork with Fine Vermicelli",
+          "price": 15.95,
+          "desc": "Lettuce, pickled carrots, cucumber, basil, topped with fried garlic, served with fish sauce",
+          "category": "Bun - Vermicelli",
+          "extras": [
+            {
+              "name": "Rice Paper (5 sheets)",
+              "price": 1.95
+            }
+          ]
+        },
+        {
+          "item": "B\u00e1nh X\u00e8o - Vietnamese Pancake",
+          "price": 17.95,
+          "desc": "Vietnamese pancake stuffed with shrimp, sliced pork, and bean sprouts. Served with fish sauce.",
+          "category": "Bun - Vermicelli"
+        },
+        {
+          "item": "B\u00e1nh M\u00ec - Vietnamese Sub",
+          "price": 9.95,
+          "desc": "Vietnamese sub sandwich. Choice of filling.",
+          "category": "Banh Mi",
+          "orOptions": [
+            "Th\u1ecbt Ngu\u1ed9i - Cold Cut",
+            "Th\u1ecbt Heo N\u01b0\u1edbng - Grilled Pork",
+            "Th\u1ecbt B\u00f2 N\u01b0\u1edbng - Grilled Beef",
+            "Th\u1ecbt G\u00e0 N\u01b0\u1edbng - Grilled Chicken",
+            "B\u00e1nh M\u00ec \u0110\u1eadu H\u1ee7 - Tofu (Spicy Lemongrass)",
+            "B\u00e1nh M\u00ec \u0110\u1eadu H\u1ee7 - Tofu (Mild)"
+          ]
+        },
+        {
+          "item": "Soda",
+          "price": 1.95,
+          "desc": "Choice of Coke, Diet Coke, Sprite, Sunkist, or Pepsi",
+          "category": "Beverages & Dessert",
+          "orOptions": [
+            "Coke",
+            "Diet Coke",
+            "Sprite",
+            "Sunkist",
+            "Pepsi"
+          ]
+        },
+        {
+          "item": "Bottled Soda",
+          "price": 3.95,
+          "desc": "Choice of Root Beer, Fanta, or Coke",
+          "category": "Beverages & Dessert",
+          "orOptions": [
+            "Root Beer",
+            "Fanta",
+            "Coke"
+          ]
+        },
+        {
+          "item": "Soybean Drink - S\u1eefa \u0110\u1eadu N\u00e0nh",
+          "price": 3.95,
+          "category": "Beverages & Dessert"
+        },
+        {
+          "item": "Jasmine Iced Tea or Hot Tea - Tr\u00e0 \u0110\u00e1",
+          "price": 2.49,
+          "desc": "Non-sweetened",
+          "category": "Beverages & Dessert"
+        },
+        {
+          "item": "Young Coconut Juice - N\u01b0\u1edbc D\u1eeba T\u01b0\u01a1i",
+          "price": 4.95,
+          "category": "Beverages & Dessert"
+        },
+        {
+          "item": "French Coffee with Condensed Milk - Cafe",
+          "price": 5.79,
+          "desc": "Hot or iced",
+          "category": "Beverages & Dessert",
+          "orOptions": [
+            "Hot",
+            "Iced"
+          ]
+        },
+        {
+          "item": "Homemade Lemonade",
+          "category": "Beverages & Dessert",
+          "sizes": {
+            "Lemonade": 4.49,
+            "with Club Soda": 4.95
+          }
+        },
+        {
+          "item": "Thai Iced Tea - Tr\u00e0 S\u1eefa \u0110\u00e1 Th\u00e1i",
+          "price": 5.49,
+          "category": "Beverages & Dessert"
+        },
+        {
+          "item": "Smoothie with Tapioca Pearls - Sinh T\u1ed1 Tr\u00e2n Ch\u00e2u",
+          "desc": "Fresh fruit smoothie with tapioca pearls",
+          "category": "Beverages & Dessert",
+          "sizes": {
+            "Papaya": 6.95,
+            "Strawberry": 6.95,
+            "Red Bean": 6.95,
+            "Thai Tea": 6.95,
+            "Durian": 7.25,
+            "Mango": 7.25,
+            "Avocado": 7.25,
+            "Taro": 7.25
+          }
+        },
+        {
+          "item": "Tri-Colored Bean Dessert - Ch\u00e8 Ba M\u00e0u",
+          "price": 6.49,
+          "category": "Beverages & Dessert"
+        }
+      ]
     },
     {
-      "name": "偉記",
+      "name": "\u5049\u8a18",
       "phone": "",
       "orderUrl": "",
       "mapUrl": "",
@@ -2481,7 +4979,7 @@
       "cuisine": "Vietnamese"
     },
     {
-      "name": "羊城",
+      "name": "\u7f8a\u57ce",
       "phone": "",
       "orderUrl": "",
       "mapUrl": "",

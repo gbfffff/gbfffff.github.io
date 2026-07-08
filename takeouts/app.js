@@ -253,11 +253,14 @@ async function loadRestaurant() {
 
     // A manual override (unpredictable event forcing a restaurant swap) is
     // keyed by date and visible to everyone -- it wins over the normal
-    // rotation-index pick for the active Friday.
-    const overrideName = getOverrideRestaurant(currentFriday);
-    if (overrideName) {
-      const match = findRestaurantByName(overrideName);
-      if (match) restaurant = match;
+    // rotation-index pick for the active Friday. An explicit ?week= preview
+    // wins over even that, since it's a deliberate "show me week N" ask.
+    if (weekParam === null) {
+      const overrideName = getOverrideRestaurant(currentFriday);
+      if (overrideName) {
+        const match = findRestaurantByName(overrideName);
+        if (match) restaurant = match;
+      }
     }
 
     buildFridayCalendar(config);
@@ -283,6 +286,19 @@ async function loadRestaurant() {
     buildTrafficMap("");
     buildOrderInfoStrip(null);
   }
+  resizeRestaurantToggleBtn();
+}
+
+// The black box behind the restaurant name (which hides the Override
+// Restaurant slidedown) is always 2.5x as wide as its content, no matter how
+// long or short the restaurant's name is -- reset to auto first so a shorter
+// new name doesn't inherit the previous name's stretched width.
+function resizeRestaurantToggleBtn() {
+  const btn = document.getElementById("restaurant-toggle-btn");
+  if (!btn) return;
+  btn.style.width = "auto";
+  const natural = btn.getBoundingClientRect().width;
+  btn.style.width = `${natural * 2.5}px`;
 }
 
 function slugify(s) {
@@ -317,12 +333,16 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     : "";
 
   function mpiHtml(item) {
-    const price       = item.price ? `<span class="mpi-price">$${Number(item.price).toFixed(2)}</span>` : "";
+    const price       = item.price ? `<span class="mpi-price">$${Number(item.price).toFixed(2)}</span>`
+      : (item.sizes ? `<span class="mpi-price">$${Math.min(...Object.values(item.sizes).map(Number)).toFixed(2)}+</span>` : "");
     const orHint      = item.orOptions?.length ? `<span class="mpi-protein-hint">choose 1: ${esc(item.orOptions.join(" or "))}</span>` : "";
+    const sidesHint   = item.sidesPick ? `<span class="mpi-protein-hint">+ ${item.sidesPick.count} sides</span>` : "";
+    const sauceHint   = item.saucePick ? `<span class="mpi-protein-hint">+ ${item.saucePick.count} sauces</span>` : "";
+    const sizeHint    = item.sizes ? `<span class="mpi-protein-hint">choose ${Object.keys(item.sizes).join("/")}</span>` : "";
     const proteinHint = (!item.orOptions?.length && item.protein) ? `<span class="mpi-protein-hint">+ protein</span>` : "";
     const desc        = item.desc ? `<span class="mpi-desc">${esc(item.desc)}</span>` : "";
     return `<div class="mpi" data-name="${escAttr(item.item)}">
-      <span class="mpi-left"><span class="mpi-name">${esc(item.item)}${orHint || proteinHint}</span>${desc}</span>
+      <span class="mpi-left"><span class="mpi-name">${esc(item.item)}${orHint || sidesHint}${sauceHint}${!orHint && !sidesHint ? sizeHint || proteinHint : ""}</span>${desc}</span>
       ${price}
     </div>`;
   }
@@ -339,15 +359,19 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     </div>`;
   }
 
+  function sectionLabelHtml(text) {
+    return `<div class="mpi-section-label">${esc(text)}</div>`;
+  }
+
   const favsSection = favs.length
     ? `<div class="mpi-popular-block" id="mpi-sec-favs">
-        <div class="mpi-section-label">GBF Favs</div>
+        ${sectionLabelHtml("GBF Favs")}
         <div class="mpi-grid">${favs.map(mpiHtml).join("")}</div>
        </div>`
     : "";
   const dislikesSection = dislikes.length
     ? `<div class="mpi-dislike-block" id="mpi-sec-dislikes">
-        <div class="mpi-section-label">GBF Dislikes</div>
+        ${sectionLabelHtml("GBF Dislikes")}
         <div class="mpi-grid">${dislikes.map(dislikeMpiHtml).join("")}</div>
        </div>`
     : "";
@@ -374,7 +398,7 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
       const id = `mpi-sec-${slugify(cat)}`;
       shortcutSections.push({ label: cat, id });
       return `<div class="mpi-cat-block" id="${id}">
-        <div class="mpi-section-label">${esc(cat)}</div>
+        ${sectionLabelHtml(cat)}
         <div class="mpi-grid">${catMap.get(cat).map(mpiHtml).join("")}</div>
         ${backToTopHtml}
        </div>`;
@@ -481,6 +505,27 @@ function buildMenu(items) {
       <div style="display:flex;gap:0.5rem">
         <button type="button" id="or-options-add-btn" class="protein-btn protein-btn-add" disabled>Add to Order</button>
       </div>
+    </div>
+    <div id="sides-pick-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--bg);border:2px solid #000;border-radius:6px;font-size:0.85rem">
+      <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose <strong id="sides-pick-count"></strong> sides for <strong id="sides-pick-item"></strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
+      <div id="sides-pick-list" style="display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.6rem;max-height:220px;overflow-y:auto"></div>
+      <div style="display:flex;gap:0.5rem">
+        <button type="button" id="sides-pick-add-btn" class="protein-btn protein-btn-add" disabled>Add to Order</button>
+      </div>
+    </div>
+    <div id="size-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--bg);border:2px solid #000;border-radius:6px;font-size:0.85rem">
+      <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose an option for <strong id="size-prompt-item"></strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
+      <div id="size-prompt-list" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.6rem"></div>
+      <div style="display:flex;gap:0.5rem">
+        <button type="button" id="size-prompt-add-btn" class="protein-btn protein-btn-add" disabled>Add to Order</button>
+      </div>
+    </div>
+    <div id="sauce-pick-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--bg);border:2px solid #000;border-radius:6px;font-size:0.85rem">
+      <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose <strong id="sauce-pick-count"></strong> sauces for <strong id="sauce-pick-item"></strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
+      <div id="sauce-pick-list" style="display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.6rem;max-height:220px;overflow-y:auto"></div>
+      <div style="display:flex;gap:0.5rem">
+        <button type="button" id="sauce-pick-add-btn" class="protein-btn protein-btn-add" disabled>Add to Order</button>
+      </div>
     </div>`;
 
   const input    = document.getElementById("menu-search");
@@ -498,7 +543,8 @@ function buildMenu(items) {
     dropdown.innerHTML = matches.map(m => {
       const takers  = takenItems[m.item.toLowerCase()] || [];
       const taken   = selectedItems.includes(m.item);
-      const price   = m.price ? `<span class="dd-price">$${Number(m.price).toFixed(2)}</span>` : "";
+      const price   = m.price ? `<span class="dd-price">$${Number(m.price).toFixed(2)}</span>`
+        : (m.sizes ? `<span class="dd-price">$${Math.min(...Object.values(m.sizes).map(Number)).toFixed(2)}+</span>` : "");
       const takenLbl = takers.length ? `<span class="dd-taken">${takers.join(", ")}</span>` : "";
       const proteinLbl  = m.protein ? `<span class="dd-protein">+ protein</span>` : "";
       const popularStar = m.popular ? `<span class="dd-popular">★</span>` : "";
@@ -553,6 +599,18 @@ function buildMenu(items) {
 
 function addItem(name) {
   const meta = allMenuItems.find(m => m.item === name);
+  if (meta && meta.sizes) {
+    showSizePrompt(name, meta);
+    return;
+  }
+  if (meta && meta.sidesPick) {
+    showSidesPickPrompt(name, meta);
+    return;
+  }
+  if (meta && meta.saucePick) {
+    showSaucePickPrompt(name, meta);
+    return;
+  }
   if (meta && meta.orOptions && meta.orOptions.length) {
     showOrOptionsPrompt(name, meta);
     return;
@@ -733,6 +791,167 @@ function showOrOptionsPrompt(baseName, meta) {
     const chosen = boxes.find(b => b.checked);
     if (!chosen) return;
     const finalName = `${baseName} (${chosen.dataset.option})`;
+    prompt.style.display = "none";
+    if (!selectedItems.includes(finalName)) {
+      selectedItems.push(finalName);
+      renderPills();
+      checkDuplicates();
+    }
+    cleanup();
+  }
+  function cleanup() {
+    listEl.removeEventListener("change", onChange);
+    addBtn.removeEventListener("click", commit);
+  }
+  listEl.addEventListener("change", onChange);
+  addBtn.addEventListener("click", commit);
+}
+
+// For combo entrees that include "at least N regular sides" -- the picks are
+// free (included in the base price), so the compact menu display just says
+// "+ N sides" instead of listing every option inline.
+function showSidesPickPrompt(baseName, meta) {
+  const prompt = document.getElementById("sides-pick-prompt");
+  const label  = document.getElementById("sides-pick-item");
+  const count  = document.getElementById("sides-pick-count");
+  const listEl = document.getElementById("sides-pick-list");
+  const addBtn = document.getElementById("sides-pick-add-btn");
+  if (!prompt) return;
+
+  const n = meta.sidesPick.count || 2;
+  label.textContent = baseName;
+  count.textContent = n;
+  listEl.innerHTML = meta.sidesPick.options.map(opt =>
+    `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+      <input type="checkbox" class="sides-pick-checkbox" data-option="${escAttr(opt)}" style="accent-color:var(--gold);width:15px;height:15px">
+      ${esc(opt)}
+    </label>`
+  ).join("");
+  addBtn.disabled = true;
+  prompt.style.display = "block";
+
+  const boxes = [...listEl.querySelectorAll(".sides-pick-checkbox")];
+
+  function onChange(e) {
+    const box = e.target.closest(".sides-pick-checkbox");
+    if (!box) return;
+    const checked = boxes.filter(b => b.checked);
+    if (checked.length > n) box.checked = false;
+    addBtn.disabled = boxes.filter(b => b.checked).length !== n;
+  }
+
+  function commit() {
+    const chosen = boxes.filter(b => b.checked).map(b => b.dataset.option);
+    if (chosen.length !== n) return;
+    const finalName = `${baseName} (${chosen.join(", ")})`;
+    prompt.style.display = "none";
+    cleanup();
+    if (meta.saucePick) {
+      showSaucePickPrompt(finalName, meta);
+      return;
+    }
+    if (!selectedItems.includes(finalName)) {
+      selectedItems.push(finalName);
+      renderPills();
+      checkDuplicates();
+    }
+  }
+  function cleanup() {
+    listEl.removeEventListener("change", onChange);
+    addBtn.removeEventListener("click", commit);
+  }
+  listEl.addEventListener("change", onChange);
+  addBtn.addEventListener("click", commit);
+}
+
+// Sauce choices are included free with chicken orders but are tracked as
+// their own order lines (rather than folded into the dish name) so the
+// Worksheet's "Group Duplicates" view can tally them across everyone's
+// orders, e.g. "6x Sauce: Aji Amarillo Aoli".
+function showSaucePickPrompt(finalDishName, meta) {
+  const prompt = document.getElementById("sauce-pick-prompt");
+  const label  = document.getElementById("sauce-pick-item");
+  const count  = document.getElementById("sauce-pick-count");
+  const listEl = document.getElementById("sauce-pick-list");
+  const addBtn = document.getElementById("sauce-pick-add-btn");
+  if (!prompt) {
+    if (!selectedItems.includes(finalDishName)) {
+      selectedItems.push(finalDishName);
+      renderPills();
+      checkDuplicates();
+    }
+    return;
+  }
+
+  const n = meta.saucePick.count || 2;
+  label.textContent = finalDishName;
+  count.textContent = n;
+  listEl.innerHTML = meta.saucePick.options.map(opt =>
+    `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+      <input type="checkbox" class="sauce-pick-checkbox" data-option="${escAttr(opt)}" style="accent-color:var(--gold);width:15px;height:15px">
+      ${esc(opt)}
+    </label>`
+  ).join("");
+  addBtn.disabled = true;
+  prompt.style.display = "block";
+
+  const boxes = [...listEl.querySelectorAll(".sauce-pick-checkbox")];
+
+  function onChange(e) {
+    const box = e.target.closest(".sauce-pick-checkbox");
+    if (!box) return;
+    const checked = boxes.filter(b => b.checked);
+    if (checked.length > n) box.checked = false;
+    addBtn.disabled = boxes.filter(b => b.checked).length !== n;
+  }
+
+  function commit() {
+    const chosen = boxes.filter(b => b.checked).map(b => b.dataset.option);
+    if (chosen.length !== n) return;
+    prompt.style.display = "none";
+    if (!selectedItems.includes(finalDishName)) selectedItems.push(finalDishName);
+    chosen.forEach(sauce => selectedItems.push(`Sauce: ${sauce}`));
+    renderPills();
+    checkDuplicates();
+    cleanup();
+  }
+  function cleanup() {
+    listEl.removeEventListener("change", onChange);
+    addBtn.removeEventListener("click", commit);
+  }
+  listEl.addEventListener("change", onChange);
+  addBtn.addEventListener("click", commit);
+}
+
+// For standalone Sides A La Carte items: one canonical item, priced
+// automatically from the Regular/Large size chosen (no duplicate menu rows).
+function showSizePrompt(baseName, meta) {
+  const prompt = document.getElementById("size-prompt");
+  const label  = document.getElementById("size-prompt-item");
+  const listEl = document.getElementById("size-prompt-list");
+  const addBtn = document.getElementById("size-prompt-add-btn");
+  if (!prompt) return;
+
+  label.textContent = baseName;
+  listEl.innerHTML = Object.entries(meta.sizes).map(([size, price]) =>
+    `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+      <input type="radio" name="size-prompt-radio" class="size-prompt-radio" data-size="${escAttr(size)}" style="accent-color:var(--gold);width:15px;height:15px">
+      ${esc(size)} <span style="color:var(--text-dim);font-size:0.8rem">$${Number(price).toFixed(2)}</span>
+    </label>`
+  ).join("");
+  addBtn.disabled = true;
+  prompt.style.display = "block";
+
+  const boxes = [...listEl.querySelectorAll(".size-prompt-radio")];
+
+  function onChange() {
+    addBtn.disabled = !boxes.some(b => b.checked);
+  }
+
+  function commit() {
+    const chosen = boxes.find(b => b.checked);
+    if (!chosen) return;
+    const finalName = `${baseName} (${chosen.dataset.size})`;
     prompt.style.display = "none";
     if (!selectedItems.includes(finalName)) {
       selectedItems.push(finalName);
@@ -1276,7 +1495,7 @@ function getPendingRatings(name) {
     const restaurant = (r[2] || "").trim();
     const item       = (r[3] || "").trim();
     const names      = (r[5] || "").split(",").map(n => n.trim().toLowerCase());
-    if (!date || !item || !names.includes(lname)) return;
+    if (!date || !item || item.startsWith("Sauce: ") || !names.includes(lname)) return;
     if (isRated(date, restaurant, item, name)) return;
     const key = `${date}|${restaurant}`;
     // Same item can appear in multiple History rows for the same date+
@@ -1479,6 +1698,25 @@ function findMenuItem(name, menu) {
   return m || null;
 }
 
+// Resolves the price for one order-line item. meta.sizes is a generic
+// {optionName: price} map -- Regular/Large for Sides A La Carte, but also
+// Chicken/Steak, Fish/+Seafood, etc. for entrees priced by protein choice
+// ("Pollo o Lomo Saltado (Steak)" -> meta.sizes.Steak). Falls through to the
+// flat price for everything else, including non-price-affecting parenthetical
+// suffixes like an orOptions choice or a "(SideA, SideB)" sidesPick tag.
+function resolveItemPrice(itemText, menu) {
+  const m = itemText.match(/^(.*)\s\((.+)\)$/);
+  if (m) {
+    const meta = findMenuItem(m[1].trim(), menu);
+    if (meta?.sizes && Object.prototype.hasOwnProperty.call(meta.sizes, m[2])) {
+      return Number(meta.sizes[m[2]]) || 0;
+    }
+  }
+  const baseName = itemText.replace(/\s*\(.*\)\s*$/, "").trim();
+  const meta = findMenuItem(baseName, menu) || findMenuItem(itemText, menu);
+  return Number(meta?.price) || 0;
+}
+
 function smartSplit(orderText) {
   const clean = orderText.replace(/ \| Notes:.*$/, "");
   const parts = [];
@@ -1501,9 +1739,9 @@ function calcOrderTotal(orderText) {
     const plusIdx = part.indexOf(" + ");
     const baseName = plusIdx >= 0 ? part.slice(0, plusIdx).trim() : part.trim();
     const suffix   = plusIdx >= 0 ? part.slice(plusIdx + 3).trim() : "";
-    const meta = findMenuItem(baseName);
+    const meta = findMenuItem(baseName.replace(/\s*\(.*\)\s*$/, "").trim()) || findMenuItem(baseName);
     if (!meta) return;
-    total += Number(meta.price) || 0;
+    total += resolveItemPrice(baseName);
     if (suffix.startsWith("Combo") && meta.comboPrice) {
       total += Number(meta.comboPrice);
     } else if (suffix && meta.extras?.length) {
@@ -1593,6 +1831,7 @@ async function loadOrders() {
       }
       if (cur.trim()) parts.push(cur.trim());
       parts.filter(Boolean).forEach(item => {
+        if (item.startsWith("Sauce: ")) return; // free sauce picks aren't order collisions
         // Strip "+ extras/combo suffix" to get base menu item name
         const base = item.replace(/\s*\+.*$/, "").trim();
         const key  = base.toLowerCase();
@@ -1663,8 +1902,9 @@ function renderOrdersTable(dupCount) {
       const itemHtml = items.map(item => {
         const isDup    = (itemCounts[item.toLowerCase()] || 0) > 1;
         const baseName = item.replace(/\s*\+.*$/, "").trim();
-        const meta     = findMenuItem(baseName);
-        const price    = (showPrices && meta?.price) ? `<span class="td-item-price">$${Number(meta.price).toFixed(2)}</span>` : "";
+        const meta     = findMenuItem(baseName.replace(/\s*\(.*\)\s*$/, "").trim()) || findMenuItem(baseName);
+        const itemPrice = resolveItemPrice(baseName);
+        const price    = (showPrices && itemPrice) ? `<span class="td-item-price">$${itemPrice.toFixed(2)}</span>` : "";
         const label    = isDup
           ? `<span class="dup-item" title="Ordered by multiple people">${esc(item)}</span>`
           : esc(item);
@@ -1730,9 +1970,9 @@ function renderOrdersTable(dupCount) {
       const sorted = [...groups.values()].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
       const groupRows = sorted.map(g => {
         const baseName  = g.label.replace(/\s*\+.*$/, "").trim();
-        const meta      = findMenuItem(baseName);
-        const priceHtml = (showPrices && meta?.price)
-          ? `<span class="grouped-item-price">$${(meta.price * g.count).toFixed(2)}</span>`
+        const groupItemPrice = resolveItemPrice(baseName);
+        const priceHtml = (showPrices && groupItemPrice)
+          ? `<span class="grouped-item-price">$${(groupItemPrice * g.count).toFixed(2)}</span>`
           : "";
         const namesHtml = `<span class="grouped-item-names">${esc(g.names.join(", "))}</span>`;
         const notesHtml = g.notes ? `<span class="grouped-item-note">Note: ${esc(g.notes)}</span>` : "";
@@ -2010,7 +2250,8 @@ function startCountdown() {
 // ── Theme & dark mode ──────────────────────────────────────────────────
 (function() {
   const SWATCH_COLORS = {
-    yellow: "#fcf811", green: "#39ff14", pink: "#fc16ac", lightpink: "#ffd1e8", cyan: "#04f2d6", white: "#ffffff", offwhite: "#fafcc4", grey: "#b8c4c6"
+    yellow: "#fcf811", green: "#39ff14", pink: "#fc16ac", lightpink: "#ffd1e8", cyan: "#04f2d6", white: "#ffffff", offwhite: "#fafcc4", grey: "#b8c4c6",
+    newspaper: "#e8e4d2", wrinkled: "#f0ead6"
   };
   const switcher   = document.getElementById("theme-switcher");
   const darkBtn    = document.getElementById("dark-toggle");
@@ -2499,8 +2740,8 @@ function computeDateBreakdown() {
 
   return [...byDate.entries()].map(([date, entries]) => {
     const items = [...entries.values()].map(e => {
-      const meta  = findMenuItem(e.item, _reportMenu);
-      const price = meta?.price ? Number(meta.price) : null;
+      const resolvedPrice = resolveItemPrice(e.item, _reportMenu);
+      const price = resolvedPrice || null;
       const ratingRow = e.person ? _allRatingRows.find(r =>
         (r[1] || "").trim() === date &&
         (r[2] || "").trim().toLowerCase() === name &&
@@ -2703,3 +2944,432 @@ function scheduleConfetti() {
   }, delay);
 }
 scheduleConfetti();
+
+// Stripe divider runs its (fast, constant-speed) scroll animation in short
+// random bursts, then pauses for a random gap before the next burst --
+// toggling play-state (rather than jumping background-position from JS)
+// keeps the stripes always evenly spaced while moving.
+function scheduleStripeToggle() {
+  const el = document.querySelector(".stripe-divider");
+  if (!el) return;
+  const idle = 10000 + Math.random() * 10000; // ~10-20s paused
+  setTimeout(() => {
+    el.classList.add("stripe-running");
+    const runFor = 5000 + Math.random() * 5000; // ~5-10s of quick movement
+    setTimeout(() => {
+      el.classList.remove("stripe-running");
+      scheduleStripeToggle();
+    }, runFor);
+  }, idle);
+}
+scheduleStripeToggle();
+
+// ── Drop Game (Plinko) ──────────────────────────────────────────────────
+// A Galton board: drag the ball along the top and release it anywhere to
+// drop it through a grid of pegs into a slot at the bottom. One slot is
+// marked as the winner each round. The board resizes with the panel (drag
+// handle, like the menu panel) -- taller boards fit more peg rows, which is
+// the knob that actually controls pace: more rows means more collisions to
+// fall through, so the ball takes longer to reach bottom.
+(function() {
+  const toggleBtn = document.getElementById("plinko-toggle-btn");
+  const panel     = document.getElementById("plinko-panel");
+  const board     = document.getElementById("plinko-board");
+  const canvas    = document.getElementById("plinko-canvas");
+  if (!toggleBtn || !panel || !board || !canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const DPR = window.devicePixelRatio || 1;
+
+  const BALL_R    = 9;
+  const PEG_R     = 4;
+  const COL_SPACE = 34;   // target horizontal spacing between peg columns
+  const ROW_SPACE = 30;   // vertical spacing between peg rows
+  const TOP_MARGIN = 40;  // gap above first peg row (the ball's drag lane)
+  const SLOT_H    = 70;   // height reserved for the slot area at the bottom
+  const GRAVITY   = 0.32;
+  const RESTITUTION = 0.62;
+  const MIN_COLORED = 0, MAX_COLORED = 6, MAX_BALLS = 12;
+  const PALETTE = ["#e63946","#f3722c","#f8961e","#f9c74f","#90be6d","#43aa8b",
+                   "#4d908e","#577590","#277da1","#9d4edd","#f72585","#ff6b6b"];
+
+  function shuffled(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  let cssW = 0, cssH = 0;
+  let pegs = [];
+  let slotCount = 0, slotW = 0, pegsBottomY = 0, floorY = 0;
+  let winningSlot = 0;
+  let paletteOrder = shuffled(PALETTE);
+  let coloredSlots = null;  // how many slots get a distinct color; null = not yet chosen
+  let coloredSlotIndices = new Set(); // which slot indices (scattered, not left-to-right) are colored
+
+  function pickColoredIndices(n) {
+    const all = Array.from({ length: slotCount }, (_, i) => i);
+    return new Set(shuffled(all).slice(0, n));
+  }
+  let ballCount = 1;        // how many balls drop per release
+  let balls = [];           // in-flight/settled balls: { x, y, vx, vy, moving }
+  let dragBall = { x: 0, y: 0 }; // the draggable staging marker shown when idle
+  let dragging = false;
+  let stuckBeyondRecovery = false;
+  let rafId = null;
+  let initialized = false;
+
+  function layout() {
+    cssW = board.clientWidth;
+    cssH = board.clientHeight;
+    if (cssW <= 0 || cssH <= 0) return;
+
+    canvas.width  = Math.round(cssW * DPR);
+    canvas.height = Math.round(cssH * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    floorY = cssH;
+    const pegAreaH = Math.max(ROW_SPACE * 3, cssH - TOP_MARGIN - SLOT_H);
+    const rows = Math.max(4, Math.round(pegAreaH / ROW_SPACE));
+    pegsBottomY = TOP_MARGIN + rows * ROW_SPACE;
+
+    const cols = Math.max(4, Math.floor(cssW / COL_SPACE) - 1);
+    const colSpace = cssW / (cols + 1);
+    const usableW = cols * colSpace;
+    const xOffset = (cssW - usableW) / 2;
+
+    pegs = [];
+    for (let r = 0; r < rows; r++) {
+      const y = TOP_MARGIN + r * ROW_SPACE;
+      const rowOffset = (r % 2 === 0) ? 0 : colSpace / 2;
+      const rowCols = (r % 2 === 0) ? cols + 1 : cols;
+      for (let c = 0; c < rowCols; c++) {
+        const x = xOffset + rowOffset + c * colSpace;
+        // Keep pegs clear of the side walls by more than a ball's width --
+        // a peg sitting right next to a wall can pinch a ball between the
+        // two, trapping it in a stuck jitter instead of letting it fall.
+        const wallClearance = BALL_R + PEG_R + 2;
+        if (x > wallClearance && x < cssW - wallClearance) pegs.push({ x, y });
+      }
+    }
+
+    slotCount = cols + 1;
+    slotW = cssW / slotCount;
+    // The top tip of each slot divider is itself a small bumper peg -- a
+    // ball landing right on a boundary can still bounce to either side,
+    // instead of being forced into whichever slot half it's nominally over.
+    for (let i = 0; i <= slotCount; i++) pegs.push({ x: i * slotW, y: pegsBottomY });
+    winningSlot = Math.floor(Math.random() * slotCount);
+    if (coloredSlots === null) coloredSlots = 2 + Math.floor(Math.random() * 3); // 2-4
+    coloredSlots = Math.min(coloredSlots, MAX_COLORED, slotCount);
+    coloredSlotIndices = pickColoredIndices(coloredSlots);
+
+    updateControlLabels();
+    resetBalls();
+    draw();
+  }
+
+  function setColoredSlots(n) {
+    if (!slotCount) return;
+    coloredSlots = Math.max(MIN_COLORED, Math.min(MAX_COLORED, slotCount, n));
+    coloredSlotIndices = pickColoredIndices(coloredSlots);
+    updateControlLabels();
+    draw();
+  }
+
+  function setBallCount(n) {
+    ballCount = Math.max(1, Math.min(MAX_BALLS, n));
+    updateControlLabels();
+  }
+
+  function updateControlLabels() {
+    const colorsLabel = document.getElementById("plinko-colored-count");
+    if (colorsLabel) colorsLabel.textContent = coloredSlots;
+    const colorsSlider = document.getElementById("plinko-colors-slider");
+    if (colorsSlider) {
+      colorsSlider.max = Math.min(MAX_COLORED, slotCount);
+      colorsSlider.value = coloredSlots;
+    }
+    const ballsLabel = document.getElementById("plinko-ball-count");
+    if (ballsLabel) ballsLabel.textContent = ballCount;
+    const ballsSlider = document.getElementById("plinko-balls-slider");
+    if (ballsSlider) ballsSlider.value = ballCount;
+  }
+
+  function resetBalls() {
+    balls = [];
+    dragBall = { x: cssW / 2, y: TOP_MARGIN / 2 };
+  }
+
+  function slotColor(i, alpha) {
+    if (i === winningSlot) return `rgba(255,196,0,${alpha})`;
+    if (!coloredSlotIndices.has(i)) return `rgba(120,120,120,${alpha * 0.35})`;
+    const hex = paletteOrder[i % paletteOrder.length];
+    const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    const bodyStyle = getComputedStyle(document.body);
+    const inkColor  = bodyStyle.getPropertyValue("--ink").trim() || "#000";
+    const accentColor = bodyStyle.getPropertyValue("--accent").trim() || "#fcf811";
+
+    // slot columns
+    for (let i = 0; i < slotCount; i++) {
+      ctx.fillStyle = slotColor(i, 0.9);
+      ctx.fillRect(i * slotW, pegsBottomY, slotW, floorY - pegsBottomY);
+    }
+    // slot dividers
+    ctx.strokeStyle = inkColor;
+    ctx.globalAlpha = 0.6;
+    ctx.lineWidth = 2;
+    for (let i = 0; i <= slotCount; i++) {
+      const x = i * slotW;
+      ctx.beginPath();
+      ctx.moveTo(x, pegsBottomY);
+      ctx.lineTo(x, floorY);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // pegs -- filled in ink (black in light mode, bright accent in dark
+    // mode) with an accent-colored outline so they never blend into the
+    // board background regardless of theme (some themes use the same
+    // color for --accent and --bg, which would otherwise wash things out).
+    ctx.fillStyle = inkColor;
+    ctx.strokeStyle = accentColor;
+    ctx.lineWidth = 1.5;
+    pegs.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, PEG_R, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+
+    // drag lane hint + staging marker, only while nothing is in flight
+    if (!balls.length) {
+      ctx.strokeStyle = "rgba(128,128,128,0.5)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath();
+      ctx.moveTo(0, dragBall.y);
+      ctx.lineTo(cssW, dragBall.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.beginPath();
+      ctx.fillStyle = inkColor;
+      ctx.arc(dragBall.x, dragBall.y, BALL_R, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = accentColor;
+      ctx.stroke();
+    }
+
+    // in-flight / settled balls -- same ink-fill/accent-stroke pairing as
+    // the staging marker, guaranteed to contrast against the board bg even
+    // in themes where --accent and --bg are the same color.
+    balls.forEach(b => {
+      ctx.beginPath();
+      ctx.fillStyle = inkColor;
+      ctx.arc(b.x, b.y, BALL_R, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = accentColor;
+      ctx.stroke();
+    });
+  }
+
+  function stepBall(b) {
+    if (!b.moving) return;
+
+    b.vy += GRAVITY;
+    b.x  += b.vx;
+    b.y  += b.vy;
+
+    // walls
+    if (b.x - BALL_R < 0) { b.x = BALL_R; b.vx = -b.vx * 0.7; }
+    if (b.x + BALL_R > cssW) { b.x = cssW - BALL_R; b.vx = -b.vx * 0.7; }
+
+    // Safety net against getting wedged (e.g. wall + peg, or peg + peg) --
+    // if a ball hasn't made real downward progress for a while, give it a
+    // small random shove instead of leaving it jittering in place forever.
+    // If several shoves in a row still don't free it, give up and signal
+    // the whole game to restart rather than stay stuck indefinitely.
+    if (b._stallY === undefined) { b._stallY = b.y; b._stallFrames = 0; b._nudges = 0; }
+    if (Math.abs(b.y - b._stallY) < 0.5) {
+      b._stallFrames++;
+      if (b._stallFrames > 45) {
+        b._nudges++;
+        if (b._nudges > 6) { stuckBeyondRecovery = true; return; }
+        b.vx += (Math.random() - 0.5) * 3;
+        b.vy += 0.8;
+        b._stallFrames = 0;
+      }
+    } else {
+      b._stallY = b.y;
+      b._stallFrames = 0;
+      b._nudges = 0;
+    }
+
+    // pegs
+    for (const p of pegs) {
+      const dx = b.x - p.x, dy = b.y - p.y;
+      const dist = Math.hypot(dx, dy);
+      const minDist = BALL_R + PEG_R;
+      if (dist > 0 && dist < minDist) {
+        const nx = dx / dist, ny = dy / dist;
+        const overlap = minDist - dist;
+        b.x += nx * overlap;
+        b.y += ny * overlap;
+        const dot = b.vx * nx + b.vy * ny;
+        b.vx = (b.vx - 2 * dot * nx) * RESTITUTION + (Math.random() - 0.5) * 0.6;
+        b.vy = (b.vy - 2 * dot * ny) * RESTITUTION;
+      }
+    }
+
+    // A bit below the divider tips (giving the tip-bumper collision above
+    // first crack at redirecting a borderline ball), the dividers become
+    // solid walls -- whichever slot the ball ends up in, it's locked to for
+    // the rest of the drop.
+    if (b.y > pegsBottomY + PEG_R * 3) {
+      const idx = Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
+      const left  = idx * slotW + BALL_R + 1;
+      const right = (idx + 1) * slotW - BALL_R - 1;
+      if (b.x < left)  { b.x = left;  b.vx = 0; }
+      if (b.x > right) { b.x = right; b.vx = 0; }
+    }
+
+    // settle into a slot
+    if (b.y + BALL_R >= floorY) {
+      b.y = floorY - BALL_R;
+      b.vx = 0; b.vy = 0;
+      b.moving = false;
+    }
+  }
+
+  // Balls bounce off each other too, not just pegs/walls -- also what keeps
+  // several balls that land in the same slot from perfectly overlapping
+  // and hiding one another; they shove apart until they visibly fit.
+  function resolveBallCollisions() {
+    for (let i = 0; i < balls.length; i++) {
+      for (let j = i + 1; j < balls.length; j++) {
+        const a = balls[i], b = balls[j];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist = Math.hypot(dx, dy);
+        const minDist = BALL_R * 2;
+        if (dist > 0 && dist < minDist) {
+          const nx = dx / dist, ny = dy / dist;
+          const overlap = (minDist - dist) / 2;
+          a.x -= nx * overlap; a.y -= ny * overlap;
+          b.x += nx * overlap; b.y += ny * overlap;
+          const avn = a.vx * nx + a.vy * ny;
+          const bvn = b.vx * nx + b.vy * ny;
+          a.vx += (bvn - avn) * nx; a.vy += (bvn - avn) * ny;
+          b.vx += (avn - bvn) * nx; b.vy += (avn - bvn) * ny;
+        }
+      }
+    }
+  }
+
+  function step() {
+    balls.forEach(stepBall);
+    resolveBallCollisions();
+    draw();
+    if (stuckBeyondRecovery) {
+      stuckBeyondRecovery = false;
+      cancelAnimationFrame(rafId);
+      layout(); // full reset: fresh pegs, fresh winning slot, empty board
+      return;
+    }
+    if (balls.some(b => b.moving)) {
+      rafId = requestAnimationFrame(step);
+    } else {
+      setTimeout(() => {
+        // A resize that arrived mid-drop (e.g. a mobile browser's address
+        // bar showing/hiding, which fires ResizeObserver too) is applied
+        // now instead of yanking the board out from under an active drop.
+        if (pendingRelayout) { pendingRelayout = false; layout(); }
+        else { resetBalls(); draw(); }
+      }, 1600);
+    }
+  }
+
+  function startPhysics() {
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(step);
+  }
+
+  function pointerPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    return { x: cx, y: cy };
+  }
+
+  canvas.addEventListener("pointerdown", e => {
+    if (balls.length) return;
+    const p = pointerPos(e);
+    if (Math.hypot(p.x - dragBall.x, p.y - dragBall.y) > BALL_R * 3) return;
+    e.preventDefault();
+    dragging = true;
+    canvas.classList.add("dragging");
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    const p = pointerPos(e);
+    dragBall.x = Math.max(BALL_R, Math.min(cssW - BALL_R, p.x));
+    draw();
+  });
+  function releaseDrag() {
+    if (!dragging) return;
+    dragging = false;
+    canvas.classList.remove("dragging");
+    balls = [];
+    for (let i = 0; i < ballCount; i++) {
+      // Every ball drops near the release point -- not stacked on the exact
+      // same pixel, but not scattered across the whole board either.
+      const x = i === 0 ? dragBall.x : dragBall.x + (Math.random() - 0.5) * 60;
+      balls.push({
+        x: Math.max(BALL_R, Math.min(cssW - BALL_R, x)),
+        y: dragBall.y,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: 0,
+        moving: true,
+      });
+    }
+    startPhysics();
+  }
+  canvas.addEventListener("pointerup", releaseDrag);
+  canvas.addEventListener("pointercancel", releaseDrag);
+
+  let pendingRelayout = false;
+  const ro = new ResizeObserver(() => {
+    if (balls.some(b => b.moving)) { pendingRelayout = true; return; }
+    layout();
+  });
+
+  document.getElementById("plinko-colors-slider")?.addEventListener("input", e => {
+    paletteOrder = shuffled(PALETTE);
+    setColoredSlots(Number(e.target.value));
+  });
+  document.getElementById("plinko-balls-slider")?.addEventListener("input", e => setBallCount(Number(e.target.value)));
+
+  const card = document.getElementById("plinko-card");
+  toggleBtn.addEventListener("click", () => {
+    const open = !toggleBtn.classList.contains("open");
+    toggleBtn.classList.toggle("open", open);
+    panel.classList.toggle("open", open);
+    card?.classList.toggle("plinko-card-open", open);
+    if (open && !initialized) {
+      initialized = true;
+      requestAnimationFrame(() => { layout(); ro.observe(board); });
+    }
+  });
+})();

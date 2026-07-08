@@ -26,6 +26,8 @@
     [data-theme="white"]     { --accent: #ffffff; --bg: #ffffff; }
     [data-theme="offwhite"]  { --accent: #fafcc4; --bg: #fafcc4; }
     [data-theme="grey"]      { --accent: #b8c4c6; --bg: #b8c4c6; }
+    [data-theme="newspaper"] { --accent: #e8e4d2; --bg: #e8e4d2; }
+    [data-theme="wrinkled"]  { --accent: #f0ead6; --bg: #f0ead6; }
     body.dark[data-theme="yellow"],
     body.dark[data-theme="green"],
     body.dark[data-theme="pink"],
@@ -33,9 +35,33 @@
     body.dark[data-theme="cyan"],
     body.dark[data-theme="white"],
     body.dark[data-theme="offwhite"],
-    body.dark[data-theme="grey"]    { --bg: #000; }
+    body.dark[data-theme="grey"],
+    body.dark[data-theme="newspaper"],
+    body.dark[data-theme="wrinkled"] { --bg: #3a3a3a; }
+
+    /* Textured background swatches -- grain/paper is a background-image
+       layered over the flat --bg color, so it survives dark-mode's --bg
+       override too (image sits independently of the color variable). */
+    body[data-theme="newspaper"] {
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+        repeating-radial-gradient(circle at 0 0, rgba(0,0,0,0.05) 0, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 4px);
+      background-repeat: repeat, repeat;
+    }
+    body[data-theme="wrinkled"] {
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse 60% 40% at 15% 20%, rgba(0,0,0,0.06), transparent 60%),
+        radial-gradient(ellipse 50% 35% at 85% 15%, rgba(0,0,0,0.05), transparent 60%),
+        radial-gradient(ellipse 70% 45% at 30% 85%, rgba(0,0,0,0.06), transparent 60%),
+        radial-gradient(ellipse 55% 40% at 80% 75%, rgba(0,0,0,0.05), transparent 60%);
+      background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+    }
     body.dark {
-      --bg:          #000000;
+      --bg:          #3a3a3a;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.45 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
       --ink:         var(--accent);
       --surface:     #111111;
       --surface-2:   #1a1a1a;
@@ -494,6 +520,7 @@
     .restaurant-toggle-btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 0.6rem;
       background: #000;
       border: none;
@@ -1308,10 +1335,18 @@
         #000 0px, #000 14px,
         var(--accent) 14px, var(--accent) 28px
       );
+      animation: stripe-scroll 0.37s linear infinite;
+      animation-play-state: paused;
+    }
+    .stripe-divider.stripe-running { animation-play-state: running; }
+    @keyframes stripe-scroll {
+      from { background-position-x: 0; }
+      to   { background-position-x: 28px; }
     }
 
     /* ── Traffic card ── */
     #traffic-card .card-body { padding: 0; }
+    #plinko-card .card-body { padding: 0; }
     .traffic-frame {
       padding: 14px;
       display: flex;
@@ -1796,13 +1831,13 @@
     /* ── Menu panel ── */
     .menu-panel {
       display: block;
-      max-height: 520px;
-      overflow-y: auto;
+      height: 520px;
+      min-height: 160px;
+      overflow: auto;
+      resize: vertical;
       scrollbar-width: thin;
       scrollbar-color: var(--border-2) transparent;
     }
-
-    @media (max-width: 600px) { .mpi-grid { grid-template-columns: 1fr; } }
 
     .menu-panel::-webkit-scrollbar { width: 4px; }
     .menu-panel::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
@@ -1828,6 +1863,12 @@
     .mpi-grid .mpi:nth-child(even) { border-right: none; }
     .mpi-grid .mpi:last-child { border-bottom: none; }
     .mpi-grid .mpi:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+
+    @media (max-width: 900px) {
+      .mpi-grid { grid-template-columns: 1fr; }
+      .mpi-grid .mpi { border-right: none; }
+      .mpi-grid .mpi:nth-last-child(2):nth-child(odd) { border-bottom: 1px solid #000; }
+    }
     .mpi:hover { background: #000; color: var(--accent); }
     .mpi:hover .mpi-name, .mpi:hover .mpi-price, .mpi:hover .mpi-desc,
     .mpi:hover .mpi-protein-hint { color: var(--accent) !important; opacity: 1; }
@@ -1867,7 +1908,16 @@
       color: var(--accent);
       -webkit-text-stroke: 1.5px #000;
       paint-order: stroke fill;
-      text-shadow: 3px 3px 0 #000;
+      text-shadow:
+        3px 3px 0 #000,
+        4.5px 3px 0 #000,
+        3px 4.5px 0 #000,
+        4.5px 4.5px 0 #000,
+        1.5px 3px 0 #000,
+        3px 1.5px 0 #000,
+        1.5px 1.5px 0 #000,
+        4.5px 1.5px 0 #000,
+        1.5px 4.5px 0 #000;
       padding: 0.85rem 1.25rem;
       background: transparent;
     }
@@ -1889,11 +1939,10 @@
       border: 2px solid #000;
       border-radius: 999px !important;
       color: #000;
-      font-size: 0.76rem;
+      font-size: 0.95rem;
       font-weight: 700;
-      font-style: italic;
-      font-family: "Courier New", Courier, monospace;
-      letter-spacing: 0.05em;
+      font-family: "EB Garamond", Garamond, Georgia, serif;
+      letter-spacing: 0.02em;
       padding: 0.4rem 1.15rem;
       margin: 0 0.6rem 0.6rem 0;
       cursor: pointer;
@@ -2065,6 +2114,12 @@
     body.dark .fcal-current .fcal-date { border-right-color: #999; }
     body.dark .fcal-current .fcal-name { color: var(--bg); }
     body.dark .rotation-toggle-btn { background: var(--bg); color: var(--ink); border-color: var(--ink); }
+    body.dark #plinko-card.plinko-card-open { border-bottom-color: var(--ink); }
+    body.dark .plinko-controls { border-color: var(--ink); }
+    body.dark .plinko-controls-label { color: var(--ink); }
+    body.dark .plinko-step-btn { background: var(--bg); color: var(--ink); border-color: var(--ink); }
+    body.dark .plinko-step-btn:hover { background: var(--ink); color: var(--bg); }
+    body.dark .plinko-slot-count { color: var(--ink); }
     body.dark .rotation-row { border-bottom-color: var(--ink); }
     body.dark .rotation-row:hover { background: var(--ink); color: var(--bg); }
     body.dark .rotation-row:hover .rotation-cuisine { border-color: var(--bg); }
@@ -2159,6 +2214,9 @@
     body.dark .stripe-divider {
       background-image: repeating-linear-gradient(90deg, var(--ink) 0px, var(--ink) 14px, var(--bg) 14px, var(--bg) 28px);
     }
+    body.dark .footer-stripe {
+      background-image: repeating-linear-gradient(90deg, var(--ink) 0px, var(--ink) 14px, var(--bg) 14px, var(--bg) 28px);
+    }
     body.dark .traffic-gauge-track { border-color: var(--ink); }
     body.dark .traffic-gauge-needle { background: var(--ink); }
     body.dark .traffic-map { border-color: var(--ink); }
@@ -2176,7 +2234,19 @@
     body.dark .mpi-name { color: var(--ink); }
     body.dark .mpi-desc { color: #aaa800; }
     body.dark .mpi-price { color: var(--ink); }
-    body.dark .mpi-section-label { color: var(--ink); text-shadow: 3px 3px 0 rgba(255,255,255,0.3); }
+    body.dark .mpi-section-label {
+      color: var(--ink);
+      text-shadow:
+        3px 3px 0 #000,
+        4.5px 3px 0 #000,
+        3px 4.5px 0 #000,
+        4.5px 4.5px 0 #000,
+        1.5px 3px 0 #000,
+        3px 1.5px 0 #000,
+        1.5px 1.5px 0 #000,
+        4.5px 1.5px 0 #000,
+        1.5px 4.5px 0 #000;
+    }
     body.dark .mpi-popular-block,
     body.dark .mpi-cat-block,
     body.dark .mpi-dislike-block { border-color: var(--ink); }
@@ -2301,6 +2371,7 @@
     .theme-options {
       display: flex;
       flex-direction: row;
+      flex-wrap: wrap;
       gap: 0.4rem;
       overflow: hidden;
       max-width: 0;
@@ -2308,7 +2379,7 @@
       transition: max-width 0.25s ease, opacity 0.2s ease;
     }
     .theme-switcher.open .theme-options {
-      max-width: 20rem;
+      max-width: 30rem;
       opacity: 1;
     }
     .theme-swatch {
@@ -2373,6 +2444,109 @@
       font-size: 0.72rem;
       color: var(--text-dim);
     }
+
+    .footer-stripe {
+      height: 7.5rem;
+      margin: 8rem 0 1rem;
+      background-image: repeating-linear-gradient(
+        90deg,
+        #000 0px, #000 14px,
+        var(--accent) 14px, var(--accent) 28px
+      );
+    }
+
+    /* ── Drop Game (Plinko) ── */
+    #plinko-card { border-bottom: none; }
+    #plinko-card.plinko-card-open { border-bottom: 2px solid #000; }
+    .plinko-toggle-btn {
+      justify-content: center;
+      border-top: none;
+      width: 100%;
+      padding: 0.25rem 0.85rem;
+    }
+    .plinko-toggle-btn .rotation-toggle-arrow { font-size: 1.4em; }
+    .plinko-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem 1.25rem;
+      padding: 0.6rem 0.85rem;
+      border-bottom: 2px solid #000;
+    }
+    .plinko-control-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .plinko-controls-label {
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .plinko-step-btn {
+      width: 1.6rem;
+      height: 1.6rem;
+      border: 2px solid #000;
+      background: var(--bg);
+      color: #000;
+      font-weight: 900;
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .plinko-step-btn:hover { background: #000; color: var(--accent); }
+    .plinko-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 7rem;
+      height: 4px;
+      background: #000;
+      cursor: pointer;
+    }
+    .plinko-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 1.1rem;
+      height: 1.1rem;
+      background: var(--accent);
+      border: 2px solid #000;
+      cursor: pointer;
+    }
+    .plinko-slider::-moz-range-thumb {
+      width: 1.1rem;
+      height: 1.1rem;
+      background: var(--accent);
+      border: 2px solid #000;
+      cursor: pointer;
+    }
+    .plinko-slider::-moz-range-track { background: #000; height: 4px; }
+    .plinko-slot-count {
+      min-width: 1.5rem;
+      text-align: center;
+      font-weight: 900;
+      font-size: 0.85rem;
+    }
+    .plinko-board {
+      display: block;
+      height: 540px;
+      min-height: 290px;
+      max-height: 3000px;
+      overflow: hidden;
+      resize: vertical;
+      background: var(--bg);
+    }
+    #plinko-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+    #plinko-canvas.dragging { cursor: grabbing; }
 
     footer button {
       background: none; border: none;
