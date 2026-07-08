@@ -30,8 +30,15 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // Shown in the footer on QA/localhost only (see DEBUG_MODE above). Bump
 // APP_VERSION and add an entry here whenever a meaningful batch of changes
 // ships -- newest entry first.
-const APP_VERSION = "1.7.1";
+const APP_VERSION = "1.8.0";
 const CHANGELOG = [
+  { version: "1.8.0", date: "2026-07-08", notes: [
+    "Drop Game: resizable Plinko board above the footer -- drag-and-release ball physics, ball-ball collisions, multi-ball drops, colored winning-slot sliders, bounceable divider tips",
+    "Full menus for Ah'Haan, Sardis, and Mi La Cay, including priced protein/size pickers and pick-N-sides combos",
+    "Two new themes (Newspaper, Wrinkled Paper); dark mode background is now a subtle grain instead of flat black",
+    "Category shortcut buttons switched to EB Garamond; header stripe divider scrolls in randomized bursts; added a static footer stripe",
+    "Menu panel and Drop Game board are vertically resizable; menu grid drops to one column earlier to avoid a squeezed two-column layout",
+  ]},
   { version: "1.7.1", date: "2026-07-07", notes: [
     "Restaurant badge is now a centered black box with a subtle theme-colored arrow; clicking slides down the hidden Override Restaurant button",
     "Override calendar tooltip floats above everything instead of clipping at the table edge",
