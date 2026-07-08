@@ -3863,49 +3863,49 @@
       ],
       "menu": [
         {
-          "item": "Ch\u1ea3 Gi\u00f2 - Spring Roll (2)",
+          "item": "AP1 Ch\u1ea3 Gi\u00f2 - Spring Roll (2)",
           "price": 5.95,
           "desc": "Fried wrapped rolls with minced chicken, taro, carrots, bean thread noodles and spices, served with fish sauce",
           "category": "Appetizers"
         },
         {
-          "item": "G\u1ecfi Cu\u1ed1n - Summer Roll (2)",
+          "item": "AP2 G\u1ecfi Cu\u1ed1n - Summer Roll (2)",
           "price": 5.95,
           "desc": "Steamed shrimp, lean sliced pork, lettuce, and vermicelli noodles wrapped in rice paper, served with peanut sauce",
           "category": "Appetizers"
         },
         {
-          "item": "G\u1ecfi Cu\u1ed1n Chay - Vegetarian Summer Roll (2)",
+          "item": "AP3 G\u1ecfi Cu\u1ed1n Chay - Vegetarian Summer Roll (2)",
           "price": 5.25,
           "desc": "Tofu, lettuce, pickled carrots, and vermicelli noodles wrapped in rice paper, served with peanut sauce",
           "category": "Appetizers"
         },
         {
-          "item": "B\u00f2 N\u01b0\u1edbng L\u00e1 Nho - Beef Wrapped in Grape Leaves (3)",
+          "item": "AP4 B\u00f2 N\u01b0\u1edbng L\u00e1 Nho - Beef Wrapped in Grape Leaves (3)",
           "price": 11.95,
           "desc": "Marinated ground beef wrapped in grape leaves, topped with crushed peanuts and fried onions. Served with fish sauce",
           "category": "Appetizers"
         },
         {
-          "item": "Chim C\u00fat - Roasted Quail (2)",
+          "item": "AP5 Chim C\u00fat - Roasted Quail (2)",
           "price": 12.95,
           "desc": "Crispy roasted quail, served with lettuce, pickled carrots, cabbage, and salt & pepper in lime juice",
           "category": "Appetizers"
         },
         {
-          "item": "T\u00f4m N\u01b0\u1edbng - Grilled Shrimp (Appetizer)",
+          "item": "AP6 T\u00f4m N\u01b0\u1edbng - Grilled Shrimp (Appetizer)",
           "price": 11.95,
           "desc": "Marinated jumbo shrimp, topped with oiled scallions and crushed peanuts, served with fish sauce",
           "category": "Appetizers"
         },
         {
-          "item": "G\u1ecfi \u0110u \u0110\u1ee7 Th\u00e1i - Spicy Papaya Salad",
+          "item": "AP7 G\u1ecfi \u0110u \u0110\u1ee7 Th\u00e1i - Spicy Papaya Salad",
           "price": 13.95,
           "desc": "Shredded papaya, tomato, basil, and grilled shrimp served with the spicy sauce & crushed peanuts",
           "category": "Appetizers"
         },
         {
-          "item": "G\u1ecfi G\u00e0 - Chicken Salad / G\u1ecfi T\u00f4m - Shrimp Salad",
+          "item": "AP8 G\u1ecfi G\u00e0 - Chicken Salad / G\u1ecfi T\u00f4m - Shrimp Salad",
           "desc": "Choice of tender chicken breast or steamed shrimp mixed with shredded cabbage, red onion, tossed with fish sauce & crushed peanuts",
           "category": "Appetizers",
           "sizes": {
@@ -3914,12 +3914,12 @@
           }
         },
         {
-          "item": "D\u1ea7u Ch\u1ea3o Qu\u1ea3y - Fried Breadstick (1)",
+          "item": "AP9 D\u1ea7u Ch\u1ea3o Qu\u1ea3y - Fried Breadstick (1)",
           "price": 3.95,
           "category": "Appetizers"
         },
         {
-          "item": "B\u00f2 N\u01b0\u1edbng S\u1ea3 - Grilled Lemongrass Beef",
+          "item": "GR1 B\u00f2 N\u01b0\u1edbng S\u1ea3 - Grilled Lemongrass Beef",
           "price": 14.95,
           "desc": "Marinated sliced beef with lemongrass. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
           "category": "Grilled Rice Plates",
@@ -3943,7 +3943,7 @@
           ]
         },
         {
-          "item": "Th\u1ecbt Heo N\u01b0\u1edbng - Grilled Pork",
+          "item": "GR2 Th\u1ecbt Heo N\u01b0\u1edbng - Grilled Pork",
           "price": 14.95,
           "desc": "Marinated sliced pork. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
           "category": "Grilled Rice Plates",
@@ -3967,7 +3967,7 @@
           ]
         },
         {
-          "item": "G\u00e0 N\u01b0\u1edbng Chanh - Grilled Lemon Chicken",
+          "item": "GR3 G\u00e0 N\u01b0\u1edbng Chanh - Grilled Lemon Chicken",
           "price": 14.95,
           "desc": "Marinated boneless chicken in lemon sauce. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
           "category": "Grilled Rice Plates",
@@ -3991,7 +3991,7 @@
           ]
         },
         {
-          "item": "G\u00e0 N\u01b0\u1edbng S\u1ea3 \u1edat - Grilled Lemongrass Chicken",
+          "item": "GR4 G\u00e0 N\u01b0\u1edbng S\u1ea3 \u1edat - Grilled Lemongrass Chicken",
           "price": 14.95,
           "desc": "Marinated boneless chicken in spicy garlic lemongrass sauce. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
           "category": "Grilled Rice Plates",
@@ -4015,7 +4015,7 @@
           ]
         },
         {
-          "item": "T\u00f4m N\u01b0\u1edbng - Grilled Shrimp (Rice Plate)",
+          "item": "GR5 T\u00f4m N\u01b0\u1edbng - Grilled Shrimp (Rice Plate)",
           "price": 15.95,
           "desc": "Marinated large shrimp in garlic sauce. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
           "category": "Grilled Rice Plates",
@@ -4039,7 +4039,7 @@
           ]
         },
         {
-          "item": "B\u00f2 L\u00e1 Nho - Beef Wrapped in Grape Leaves (Rice Plate)",
+          "item": "GR6 B\u00f2 L\u00e1 Nho - Beef Wrapped in Grape Leaves (Rice Plate)",
           "price": 15.95,
           "desc": "Marinated ground beef wrapped in grape leaves. Served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
           "category": "Grilled Rice Plates",
@@ -4063,7 +4063,7 @@
           ]
         },
         {
-          "item": "C\u01a1m Ba M\u00f3n - Combo Rice Platter",
+          "item": "GR7 C\u01a1m Ba M\u00f3n - Combo Rice Platter",
           "price": 16.95,
           "desc": "Choice of any 3 grilled meats, served with white rice, lettuce, cucumber, pickled carrots, pickled cabbage, and fish sauce.",
           "category": "Grilled Rice Plates",
@@ -4080,73 +4080,73 @@
           }
         },
         {
-          "item": "C\u01a1m \u0110\u1ecf G\u00e0 X\u1ed1i M\u1ee1 - Crispy Maryland Chicken",
+          "item": "R1 C\u01a1m \u0110\u1ecf G\u00e0 X\u1ed1i M\u1ee1 - Crispy Maryland Chicken",
           "price": 15.95,
           "desc": "Crispy fried chicken served with tomato rice & ginger sauce",
           "category": "Rice Dishes"
         },
         {
-          "item": "C\u01a1m \u0110\u1ecf Chim C\u00fat - Roast Quail (1)",
+          "item": "R2 C\u01a1m \u0110\u1ecf Chim C\u00fat - Roast Quail (1)",
           "price": 14.95,
           "desc": "Crispy roasted quail served with tomato rice & fish sauce",
           "category": "Rice Dishes"
         },
         {
-          "item": "C\u01a1m T\u1ea5m S\u01b0\u1eddn Tr\u1ee9ng - Grilled Pork Chop & Fried Egg",
+          "item": "R3 C\u01a1m T\u1ea5m S\u01b0\u1eddn Tr\u1ee9ng - Grilled Pork Chop & Fried Egg",
           "price": 14.95,
           "desc": "Served with broken rice and fish sauce",
           "category": "Rice Dishes"
         },
         {
-          "item": "C\u01a1m T\u1ea5m B\u00ec S\u01b0\u1eddn Ch\u1ea3 - Combination Broken Rice Platter",
+          "item": "R4 C\u01a1m T\u1ea5m B\u00ec S\u01b0\u1eddn Ch\u1ea3 - Combination Broken Rice Platter",
           "price": 16.95,
           "desc": "Grilled pork chop, meat loaf, and shredded pork served with broken rice and fish sauce",
           "category": "Rice Dishes"
         },
         {
-          "item": "C\u01a1m T\u1ea5m S\u01b0\u1eddn N\u01b0\u1edbng 2 Mi\u1ebfng - 2 Grilled Pork Chops",
+          "item": "R5 C\u01a1m T\u1ea5m S\u01b0\u1eddn N\u01b0\u1edbng 2 Mi\u1ebfng - 2 Grilled Pork Chops",
           "price": 17.95,
           "desc": "Served with broken rice and fish sauce",
           "category": "Rice Dishes"
         },
         {
-          "item": "M\u00ec X\u00e0o D\u00f2n ho\u1eb7c X\u00e0o M\u1ec1m, \u0110\u1ed3 Bi\u1ec3n - Crispy/Soft Egg Noodles with Seafood",
+          "item": "MX1 M\u00ec X\u00e0o D\u00f2n ho\u1eb7c X\u00e0o M\u1ec1m, \u0110\u1ed3 Bi\u1ec3n - Crispy/Soft Egg Noodles with Seafood",
           "price": 18.95,
           "desc": "Crispy or soft egg noodles w/ shrimp, squid, fish balls, mussels, crab meat, mixed vegetables topped w/ fried onion. Can be made vegetarian.",
           "category": "Stir Fried Noodles"
         },
         {
-          "item": "M\u00ec X\u00e0o D\u00f2n ho\u1eb7c X\u00e0o M\u1ec1m Th\u1eadp C\u1ea9m - Crispy/Soft Egg Noodles Meat Combo",
+          "item": "MX2 M\u00ec X\u00e0o D\u00f2n ho\u1eb7c X\u00e0o M\u1ec1m Th\u1eadp C\u1ea9m - Crispy/Soft Egg Noodles Meat Combo",
           "price": 17.95,
           "desc": "Crispy or soft egg noodles with beef, pork, chicken, mixed vegetables, topped w/ fried onion. Can be made vegetarian.",
           "category": "Stir Fried Noodles"
         },
         {
-          "item": "H\u1ee7 Ti\u1ebfu B\u00f2 \u00c1p Ch\u1ea3o - Stir Fried Flat Rice Noodles (With/Without Gravy)",
+          "item": "MX3 H\u1ee7 Ti\u1ebfu B\u00f2 \u00c1p Ch\u1ea3o - Stir Fried Flat Rice Noodles (With/Without Gravy)",
           "price": 17.95,
           "desc": "Stir fried flat rice noodles with beef, mixed vegetables, carrot and mushroom, topped w/ fried onion. Can be made vegetarian.",
           "category": "Stir Fried Noodles"
         },
         {
-          "item": "H\u1ee7 Ti\u1ebfu X\u00e0o Ch\u1ee3 L\u1edbn - Stir Fried Rice Noodles Combination",
+          "item": "MX4 H\u1ee7 Ti\u1ebfu X\u00e0o Ch\u1ee3 L\u1edbn - Stir Fried Rice Noodles Combination",
           "price": 17.95,
           "desc": "Stir fried rice noodles with chicken, shrimp, fish balls, bean sprout and onions, topped w/ fried onion. Can be made vegetarian.",
           "category": "Stir Fried Noodles"
         },
         {
-          "item": "H\u1ee7 Ti\u1ebfu X\u00e0o Th\u00e1i - Pad Thai Noodles",
+          "item": "MX5 H\u1ee7 Ti\u1ebfu X\u00e0o Th\u00e1i - Pad Thai Noodles",
           "price": 17.95,
           "desc": "Stir fried rice noodles with shrimp, chicken, fish balls, bean sprouts, and onions, topped with peanuts. Can be made vegetarian.",
           "category": "Stir Fried Noodles"
         },
         {
-          "item": "B\u00e1nh L\u1ecdt X\u00e0o Th\u1eadp C\u1ea9m - Stir Fried Pin Rice Noodles Combination",
+          "item": "MX6 B\u00e1nh L\u1ecdt X\u00e0o Th\u1eadp C\u1ea9m - Stir Fried Pin Rice Noodles Combination",
           "price": 17.95,
           "desc": "Assorted pin rice noodles with shrimp, chicken, fish balls, bean sprouts and onions, topped w/ fried onion. Can be made vegetarian.",
           "category": "Stir Fried Noodles"
         },
         {
-          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu La Cay - La Cay Noodle Soup",
+          "item": "M1 M\u00ec/H\u1ee7 Ti\u1ebfu La Cay - La Cay Noodle Soup",
           "price": 14.95,
           "desc": "Sliced pork, fried shrimp cracker, minced pork, squid, shrimp, fish balls, sliced pork heart & liver, topped with fried minced garlic & scallions in pork broth. Broth in or on the side.",
           "category": "Noodle Soup",
@@ -4174,7 +4174,7 @@
           ]
         },
         {
-          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu La Cay Th\u1eadp C\u1ea9m - La Cay Noodle Combination Soup",
+          "item": "M2 M\u00ec/H\u1ee7 Ti\u1ebfu La Cay Th\u1eadp C\u1ea9m - La Cay Noodle Combination Soup",
           "price": 14.95,
           "desc": "Sliced B.B.Q. pork, minced pork, fried shrimp cracker, squid, shrimp, fish balls, sliced pork heart & liver, topped with fried minced garlic & scallions in pork broth. Broth in or on the side.",
           "category": "Noodle Soup",
@@ -4202,7 +4202,7 @@
           ]
         },
         {
-          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu Nam Vang - Phnom Penh Noodle Soup",
+          "item": "M3 M\u00ec/H\u1ee7 Ti\u1ebfu Nam Vang - Phnom Penh Noodle Soup",
           "price": 14.95,
           "desc": "Sliced pork, minced pork, shrimp, squid, fish balls, sliced pork heart & liver, topped with fried minced garlic in pork broth. Broth in or on the side.",
           "category": "Noodle Soup",
@@ -4230,7 +4230,7 @@
           ]
         },
         {
-          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu G\u00e0 X\u1ed1i M\u1ee1 - Crispy Maryland Chicken Noodle Soup",
+          "item": "M4 M\u00ec/H\u1ee7 Ti\u1ebfu G\u00e0 X\u1ed1i M\u1ee1 - Crispy Maryland Chicken Noodle Soup",
           "price": 15.95,
           "desc": "Fried chicken thigh served with minced pork, fried shallots, fried minced garlic, and scallions in chicken broth",
           "category": "Noodle Soup",
@@ -4258,7 +4258,7 @@
           ]
         },
         {
-          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu Chim C\u00fat - Roasted Quail Noodle Soup",
+          "item": "M5 M\u00ec/H\u1ee7 Ti\u1ebfu Chim C\u00fat - Roasted Quail Noodle Soup",
           "price": 15.95,
           "desc": "Roasted quail served with minced pork, fried shallots, fried minced garlic, and scallions in chicken broth. Broth in or on the side.",
           "category": "Noodle Soup",
@@ -4286,7 +4286,7 @@
           ]
         },
         {
-          "item": "H\u1ee7 Ti\u1ebfu Dai M\u1ef9 Tho - Clear Glass Noodle Soup",
+          "item": "M6 H\u1ee7 Ti\u1ebfu Dai M\u1ef9 Tho - Clear Glass Noodle Soup",
           "price": 15.95,
           "desc": "Sliced B.B.Q pork, minced pork, squid, shrimp, fish balls topped with scallions and fried minced garlic in pork broth. Gluten free.",
           "category": "Noodle Soup",
@@ -4310,7 +4310,7 @@
           ]
         },
         {
-          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu V\u1ecbt Ti\u1ec1m - Roast Duck Noodle Soup",
+          "item": "M7 M\u00ec/H\u1ee7 Ti\u1ebfu V\u1ecbt Ti\u1ec1m - Roast Duck Noodle Soup",
           "price": 15.95,
           "desc": "Roasted duck served with chinese vegetables in 5-spice broth",
           "category": "Noodle Soup",
@@ -4338,7 +4338,7 @@
           ]
         },
         {
-          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu B\u00f2 Kho - Beef Stew Noodle Soup",
+          "item": "M8 M\u00ec/H\u1ee7 Ti\u1ebfu B\u00f2 Kho - Beef Stew Noodle Soup",
           "price": 15.95,
           "desc": "Beef stew served with egg noodle, cubed beef briskets, carrots, and onions",
           "category": "Noodle Soup",
@@ -4362,7 +4362,7 @@
           ]
         },
         {
-          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu B\u00f2 Sat\u00e9 - Noodle with Sate Beef Soup",
+          "item": "M9 M\u00ec/H\u1ee7 Ti\u1ebfu B\u00f2 Sat\u00e9 - Noodle with Sate Beef Soup",
           "price": 15.95,
           "desc": "Sliced eye-round steak and sliced tomatoes with spicy sate soup, topped with peanuts and scallions",
           "category": "Noodle Soup",
@@ -4390,7 +4390,7 @@
           ]
         },
         {
-          "item": "M\u00ec/H\u1ee7 Ti\u1ebfu \u0110\u1ed3 Bi\u1ec3n - Seafood Noodle Soup",
+          "item": "M10 M\u00ec/H\u1ee7 Ti\u1ebfu \u0110\u1ed3 Bi\u1ec3n - Seafood Noodle Soup",
           "price": 15.95,
           "desc": "Shrimp, squid, mussels, fish balls, and crab meat in pork broth",
           "category": "Noodle Soup",
@@ -4418,7 +4418,7 @@
           ]
         },
         {
-          "item": "Ph\u1edf T\u00e1i N\u1ea1m G\u1ea7u G\u00e2n S\u00e1ch",
+          "item": "P1 Ph\u1edf T\u00e1i N\u1ea1m G\u1ea7u G\u00e2n S\u00e1ch",
           "desc": "Sliced eye-round steak, well-done flank, brisket, soft tendon and bible tripe. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
           "category": "Pho - Beef Noodle Soup",
           "sizes": {
@@ -4449,7 +4449,7 @@
           ]
         },
         {
-          "item": "Ph\u1edf Ch\u00edn N\u1ea1m G\u1ea7u G\u00e2n S\u00e1ch",
+          "item": "P2 Ph\u1edf Ch\u00edn N\u1ea1m G\u1ea7u G\u00e2n S\u00e1ch",
           "desc": "Sliced well-done brisket and flank, soft tendon, and bible tripe. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
           "category": "Pho - Beef Noodle Soup",
           "sizes": {
@@ -4480,7 +4480,7 @@
           ]
         },
         {
-          "item": "Ph\u1edf T\u00e1i N\u1ea1m",
+          "item": "P3 Ph\u1edf T\u00e1i N\u1ea1m",
           "desc": "Sliced eye-round steak and well-done flank. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
           "category": "Pho - Beef Noodle Soup",
           "sizes": {
@@ -4511,7 +4511,7 @@
           ]
         },
         {
-          "item": "Ph\u1edf T\u00e1i Ch\u00edn",
+          "item": "P4 Ph\u1edf T\u00e1i Ch\u00edn",
           "desc": "Sliced eye-round steak and well-done brisket. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
           "category": "Pho - Beef Noodle Soup",
           "sizes": {
@@ -4542,7 +4542,7 @@
           ]
         },
         {
-          "item": "Ph\u1edf T\u00e1i",
+          "item": "P5 Ph\u1edf T\u00e1i",
           "desc": "Sliced eye-round steak. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
           "category": "Pho - Beef Noodle Soup",
           "sizes": {
@@ -4573,7 +4573,7 @@
           ]
         },
         {
-          "item": "Ph\u1edf B\u00f2 Vi\u00ean",
+          "item": "P6 Ph\u1edf B\u00f2 Vi\u00ean",
           "desc": "Beef balls. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
           "category": "Pho - Beef Noodle Soup",
           "sizes": {
@@ -4604,7 +4604,7 @@
           ]
         },
         {
-          "item": "Ph\u1edf Rau",
+          "item": "P7 Ph\u1edf Rau",
           "desc": "Broccoli, napa, carrots, and mushrooms. Choice of beef or vegetarian broth. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
           "category": "Pho - Beef Noodle Soup",
           "sizes": {
@@ -4639,7 +4639,7 @@
           ]
         },
         {
-          "item": "Ph\u1edf \u0110\u1eb7c Bi\u1ec7t - Ph\u1edf Special",
+          "item": "P8 Ph\u1edf \u0110\u1eb7c Bi\u1ec7t - Ph\u1edf Special",
           "desc": "Sliced eye-round steak, well-done flank, brisket, soft tendon, bible tripe, and beef balls. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
           "category": "Pho - Beef Noodle Soup",
           "sizes": {
@@ -4670,7 +4670,7 @@
           ]
         },
         {
-          "item": "Ph\u1edf G\u00e0",
+          "item": "P9 Ph\u1edf G\u00e0",
           "desc": "Sliced chicken breast. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
           "category": "Pho - Beef Noodle Soup",
           "sizes": {
@@ -4701,7 +4701,7 @@
           ]
         },
         {
-          "item": "Ph\u1edf La Cay",
+          "item": "P10 Ph\u1edf La Cay",
           "desc": "Sliced eye round steak and well-done brisket in spicy beef broth. Served with bean sprouts, jalape\u00f1o, fresh basil leaves & lime.",
           "category": "Pho - Beef Noodle Soup",
           "sizes": {
@@ -4732,49 +4732,49 @@
           ]
         },
         {
-          "item": "B\u00fan B\u00f2 Hu\u1ebf - Lemongrass Beef Noodles Soup",
+          "item": "BB B\u00fan B\u00f2 Hu\u1ebf - Lemongrass Beef Noodles Soup",
           "price": 16.95,
           "desc": "Vermicelli noodles served with sliced beef, Vietnamese ham, pork hock, pork blood, spicy lemongrass beef soup. Spicy. Gluten free.",
           "category": "Bun - Vermicelli"
         },
         {
-          "item": "B\u00fan G\u00e0 Cari - Curry Chicken with Vermicelli Noodle Soup",
+          "item": "BC B\u00fan G\u00e0 Cari - Curry Chicken with Vermicelli Noodle Soup",
           "price": 16.95,
           "desc": "Vermicelli noodles served in spicy curry soup with chunks of chicken and sweet potatoes. Spicy. Gluten free.",
           "category": "Bun - Vermicelli"
         },
         {
-          "item": "B\u00fan B\u00f2 N\u01b0\u1edbng S\u1ea3 - Vermicelli Noodles with Grilled Lemongrass Beef",
+          "item": "B1 B\u00fan B\u00f2 N\u01b0\u1edbng S\u1ea3 - Vermicelli Noodles with Grilled Lemongrass Beef",
           "price": 14.95,
           "desc": "Grilled lemongrass beef. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
           "category": "Bun - Vermicelli"
         },
         {
-          "item": "B\u00fan Th\u1ecbt Heo N\u01b0\u1edbng - Vermicelli Noodles with Grilled Pork",
+          "item": "B2 B\u00fan Th\u1ecbt Heo N\u01b0\u1edbng - Vermicelli Noodles with Grilled Pork",
           "price": 14.95,
           "desc": "Grilled pork. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
           "category": "Bun - Vermicelli"
         },
         {
-          "item": "B\u00fan G\u00e0 N\u01b0\u1edbng Chanh - Vermicelli Noodles with Grilled Lemon Chicken",
+          "item": "B3 B\u00fan G\u00e0 N\u01b0\u1edbng Chanh - Vermicelli Noodles with Grilled Lemon Chicken",
           "price": 14.95,
           "desc": "Grilled lemon chicken. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
           "category": "Bun - Vermicelli"
         },
         {
-          "item": "B\u00fan T\u00f4m N\u01b0\u1edbng - Vermicelli Noodles with Grilled Shrimp",
+          "item": "B4 B\u00fan T\u00f4m N\u01b0\u1edbng - Vermicelli Noodles with Grilled Shrimp",
           "price": 15.95,
           "desc": "Grilled shrimp. Gluten free. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
           "category": "Bun - Vermicelli"
         },
         {
-          "item": "B\u00fan Ch\u1ea3 Gi\u00f2 - Vermicelli Noodles with Fried Spring Rolls",
+          "item": "B5 B\u00fan Ch\u1ea3 Gi\u00f2 - Vermicelli Noodles with Fried Spring Rolls",
           "price": 14.95,
           "desc": "Fried spring rolls. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
           "category": "Bun - Vermicelli"
         },
         {
-          "item": "B\u00fan Ba M\u00f3n - Combo Vermicelli Noodles",
+          "item": "B6 B\u00fan Ba M\u00f3n - Combo Vermicelli Noodles",
           "price": 16.25,
           "desc": "Choice of any 3 items. Served over vermicelli, bean sprouts, lettuce, pickled carrots, cucumber, topped with crushed peanuts, and served with fish sauce. Can be served without crushed peanuts upon request.",
           "category": "Bun - Vermicelli",
@@ -4790,7 +4790,7 @@
           }
         },
         {
-          "item": "B\u00e1nh H\u1ecfi Th\u1ecbt N\u01b0\u1edbng - Grilled Pork with Fine Vermicelli",
+          "item": "BH1 B\u00e1nh H\u1ecfi Th\u1ecbt N\u01b0\u1edbng - Grilled Pork with Fine Vermicelli",
           "price": 15.95,
           "desc": "Lettuce, pickled carrots, cucumber, basil, topped with fried garlic, served with fish sauce",
           "category": "Bun - Vermicelli",
@@ -4802,7 +4802,7 @@
           ]
         },
         {
-          "item": "B\u00e1nh X\u00e8o - Vietnamese Pancake",
+          "item": "BH3 B\u00e1nh X\u00e8o - Vietnamese Pancake",
           "price": 17.95,
           "desc": "Vietnamese pancake stuffed with shrimp, sliced pork, and bean sprouts. Served with fish sauce.",
           "category": "Bun - Vermicelli"
@@ -4822,7 +4822,7 @@
           ]
         },
         {
-          "item": "Soda",
+          "item": "BV1 Soda",
           "price": 1.95,
           "desc": "Choice of Coke, Diet Coke, Sprite, Sunkist, or Pepsi",
           "category": "Beverages & Dessert",
@@ -4846,23 +4846,23 @@
           ]
         },
         {
-          "item": "Soybean Drink - S\u1eefa \u0110\u1eadu N\u00e0nh",
+          "item": "BV2 Soybean Drink - S\u1eefa \u0110\u1eadu N\u00e0nh",
           "price": 3.95,
           "category": "Beverages & Dessert"
         },
         {
-          "item": "Jasmine Iced Tea or Hot Tea - Tr\u00e0 \u0110\u00e1",
+          "item": "BV3 Jasmine Iced Tea or Hot Tea - Tr\u00e0 \u0110\u00e1",
           "price": 2.49,
           "desc": "Non-sweetened",
           "category": "Beverages & Dessert"
         },
         {
-          "item": "Young Coconut Juice - N\u01b0\u1edbc D\u1eeba T\u01b0\u01a1i",
+          "item": "BV4 Young Coconut Juice - N\u01b0\u1edbc D\u1eeba T\u01b0\u01a1i",
           "price": 4.95,
           "category": "Beverages & Dessert"
         },
         {
-          "item": "French Coffee with Condensed Milk - Cafe",
+          "item": "BV5 French Coffee with Condensed Milk - Cafe",
           "price": 5.79,
           "desc": "Hot or iced",
           "category": "Beverages & Dessert",
@@ -4872,7 +4872,7 @@
           ]
         },
         {
-          "item": "Homemade Lemonade",
+          "item": "BV6 Homemade Lemonade",
           "category": "Beverages & Dessert",
           "sizes": {
             "Lemonade": 4.49,
@@ -4880,12 +4880,12 @@
           }
         },
         {
-          "item": "Thai Iced Tea - Tr\u00e0 S\u1eefa \u0110\u00e1 Th\u00e1i",
+          "item": "BV7 Thai Iced Tea - Tr\u00e0 S\u1eefa \u0110\u00e1 Th\u00e1i",
           "price": 5.49,
           "category": "Beverages & Dessert"
         },
         {
-          "item": "Smoothie with Tapioca Pearls - Sinh T\u1ed1 Tr\u00e2n Ch\u00e2u",
+          "item": "BV8 Smoothie with Tapioca Pearls - Sinh T\u1ed1 Tr\u00e2n Ch\u00e2u",
           "desc": "Fresh fruit smoothie with tapioca pearls",
           "category": "Beverages & Dessert",
           "sizes": {
@@ -4900,7 +4900,7 @@
           }
         },
         {
-          "item": "Tri-Colored Bean Dessert - Ch\u00e8 Ba M\u00e0u",
+          "item": "BV9 Tri-Colored Bean Dessert - Ch\u00e8 Ba M\u00e0u",
           "price": 6.49,
           "category": "Beverages & Dessert"
         }

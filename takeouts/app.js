@@ -541,7 +541,7 @@ function buildMenu(items) {
 
   function renderDropdown(q) {
     const matches = q
-      ? allMenuItems.filter(m => m.item.toLowerCase().includes(q.toLowerCase()))
+      ? allMenuItems.filter(m => foldDiacritics(m.item).toLowerCase().includes(foldDiacritics(q).toLowerCase()))
       : allMenuItems;
 
     if (!matches.length) { dropdown.style.display = "none"; return; }
@@ -1702,6 +1702,13 @@ function findMenuItem(name, menu) {
   if (m) return m;
   // Order name starts with the menu item name
   m = menu.find(i => lower.startsWith(i.item.toLowerCase()));
+  if (m) return m;
+  // Diacritic-folded match -- covers hand-typed History/Ratings rows (e.g.
+  // backfilled past orders) where accents/tone marks were retyped slightly
+  // differently, or in a different Unicode normalization form, than the
+  // menu's own text.
+  const folded = foldDiacritics(lower);
+  m = menu.find(i => foldDiacritics(i.item.toLowerCase()) === folded);
   return m || null;
 }
 
@@ -2079,6 +2086,18 @@ function parseCSV(text) {
     cells.push(cur);
     return cells;
   });
+}
+
+// Strips accents/tone marks (Vietnamese, etc.) so menu search matches
+// "Bun" against "Bún" -- NFD splits a letter from its combining diacritics,
+// but "đ" is a distinct base letter (not a combining composition), so it
+// needs its own explicit fold.
+function foldDiacritics(s) {
+  return String(s)
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
 }
 
 function esc(s) {
