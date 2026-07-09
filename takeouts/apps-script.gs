@@ -63,13 +63,16 @@ function doGet(e) {
     }
 
     // Submitted from the "Rate Your Order" table, shown once the week's
-    // History has been logged. One row per person+item rating.
+    // History has been logged. One row per rating -- deliberately no name
+    // column, so ratings stay anonymous even to someone reading the raw
+    // sheet. Who still needs to rate what is worked out client-side from
+    // the History sheet's names instead.
     if (data.type === "rating") {
       const sheet = getOrCreateSheet(ss, RATINGS_SHEET);
       if (sheet.getLastRow() === 0) {
-        sheet.appendRow(["Timestamp", "Date", "Restaurant", "Item", "Name", "Rating"]);
+        sheet.appendRow(["Timestamp", "Date", "Restaurant", "Item", "Rating"]);
       }
-      sheet.appendRow([now, data.date, data.restaurant, data.item, data.name, data.rating]);
+      sheet.appendRow([now, data.date, data.restaurant, data.item, data.rating]);
     }
 
     // Manual restaurant-rotation override (e.g. an unpredictable event

@@ -46,16 +46,18 @@
   <button class="theme-dark-btn" id="dark-toggle" title="Toggle dark mode">☾</button>
   <div class="theme-swatch-current" id="theme-current" title="Change color"></div>
   <div class="theme-options" id="theme-options">
-    <div class="theme-swatch" data-theme="yellow" style="background:#fcf811" title="Acid Yellow"></div>
-    <div class="theme-swatch" data-theme="green"  style="background:#39ff14" title="Acid Green"></div>
-    <div class="theme-swatch" data-theme="pink"   style="background:#fc16ac" title="Acid Pink"></div>
-    <div class="theme-swatch" data-theme="lightpink" style="background:#ffd1e8" title="Light Pink"></div>
-    <div class="theme-swatch" data-theme="cyan"   style="background:#04f2d6" title="Cyan"></div>
-    <div class="theme-swatch" data-theme="white"    style="background:#ffffff" title="White"></div>
-    <div class="theme-swatch" data-theme="offwhite" style="background:#fafcc4" title="Off White"></div>
-    <div class="theme-swatch" data-theme="grey"     style="background:#b8c4c6" title="Grey"></div>
-    <div class="theme-swatch" data-theme="newspaper" style="background:#e8e4d2" title="Newspaper"></div>
-    <div class="theme-swatch" data-theme="wrinkled"  style="background:#f0ead6" title="Wrinkled Paper"></div>
+    <div class="theme-swatch" data-theme="white"      style="background:#ffffff" title="White"></div>
+    <div class="theme-swatch" data-theme="offwhite"   style="background:#fafcc4" title="Off White"></div>
+    <div class="theme-swatch" data-theme="wrinkled"   style="background:#f0ead6" title="Wrinkled Paper"></div>
+    <div class="theme-swatch" data-theme="newspaper"  style="background:#e8e4d2" title="Newspaper"></div>
+    <div class="theme-swatch" data-theme="lightpink"  style="background:#ffd1e8" title="Light Pink"></div>
+    <div class="theme-swatch" data-theme="yellow"     style="background:#fcf811" title="Acid Yellow"></div>
+    <div class="theme-swatch" data-theme="juicyyellow" style="background:#ffd500" title="Juicy Yellow"></div>
+    <div class="theme-swatch" data-theme="grey"       style="background:#b8c4c6" title="Grey"></div>
+    <div class="theme-swatch" data-theme="green"      style="background:#39ff14" title="Acid Green"></div>
+    <div class="theme-swatch" data-theme="emerald"    style="background:#10b981" title="Emerald Green"></div>
+    <div class="theme-swatch" data-theme="cyan"       style="background:#0abab5" title="Tiffany Blue"></div>
+    <div class="theme-swatch" data-theme="pink"       style="background:#fc16ac" title="Acid Pink"></div>
   </div>
 </div>
 <div class="container">
@@ -95,6 +97,7 @@
     </div>
     <div class="menu-panel-shortcuts" id="menu-panel-shortcuts"></div>
     <div class="menu-panel" id="menu-panel"></div>
+    <div class="resize-grip" id="menu-panel-grip" title="Drag to resize"></div>
   </div>
 
   <!-- ORDER FORM -->
@@ -265,10 +268,19 @@
             <input type="range" id="plinko-balls-slider" class="plinko-slider" min="1" max="12" value="1">
             <span id="plinko-ball-count" class="plinko-slot-count"></span>
           </div>
+          <button type="button" id="plinko-restart-btn" class="plinko-restart-btn" title="Restart board">&#8635;</button>
+          <label class="plinko-restaurant-toggle">
+            <input type="checkbox" id="plinko-restaurant-mode">
+            Restaurant Picker
+          </label>
+          <span class="plinko-clock" id="plinko-clock" title="Time since opening Drop Game">0:00</span>
         </div>
         <div class="plinko-board" id="plinko-board">
           <canvas id="plinko-canvas"></canvas>
+          <div class="plinko-comment" id="plinko-comment"></div>
         </div>
+        <div class="resize-grip" id="plinko-board-grip" title="Drag to resize"></div>
+        <div id="plinko-restaurant-legend" class="rotation-panel"></div>
       </div>
     </div>
   </div>
@@ -287,6 +299,7 @@
 
 </div>
 <script src="config.js?v=1.8.0"></script>
+<script src="plinko-comments.js?v=1.8.0"></script>
 <script src="app.js?v=1.8.0"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -358,12 +371,28 @@
         <div class="report-modal-options">
           <label class="toggle-label"><input type="checkbox" id="report-show-names" class="toggle-checkbox" checked> Names</label>
           <label class="toggle-label"><input type="checkbox" id="report-show-tax" class="toggle-checkbox"> +6% Tax</label>
-          <label class="toggle-label"><input type="checkbox" id="report-show-ratings" class="toggle-checkbox" checked> Ratings</label>
         </div>
       </div>
       <div id="report-modal-history" class="report-modal-history"></div>
 
       <div id="report-modal-total" class="report-modal-total" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div class="report-modal" id="item-detail-modal" onclick="closeItemDetail(event)">
+  <div class="report-modal-box" id="item-detail-box" onclick="event.stopPropagation()">
+    <div class="report-modal-header">
+      <h2 id="item-detail-title">Item</h2>
+      <button type="button" class="report-modal-close" onclick="closeItemDetail()">&times;</button>
+    </div>
+    <div class="report-modal-body">
+      <div class="item-detail-stats" id="item-detail-stats"></div>
+      <div class="item-detail-chart-wrap" id="item-detail-chart-wrap">
+        <svg id="item-detail-chart" class="item-detail-chart"></svg>
+        <div class="item-detail-tooltip" id="item-detail-tooltip"></div>
+      </div>
+      <div id="item-detail-empty" class="placeholder" style="display:none">No ratings logged yet for this item.</div>
     </div>
   </div>
 </div>

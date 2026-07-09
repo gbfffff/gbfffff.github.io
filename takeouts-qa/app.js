@@ -312,13 +312,14 @@ function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
-function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, dislikeMap) {
+function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, dislikeMap, controversialMap) {
   const card      = document.getElementById("menu-panel-card");
   const panel     = document.getElementById("menu-panel");
   const title     = document.getElementById("menu-panel-title");
   const shortcuts = document.getElementById("menu-panel-shortcuts");
   favSet     = favSet     || new Set();
   dislikeMap = dislikeMap || new Map();
+  controversialMap = controversialMap || new Map();
 
   if (!items.length) { card.style.display = "none"; return; }
 
@@ -354,11 +355,12 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     </div>`;
   }
 
-  const favs     = items.filter(i => favSet.has(i.item.toLowerCase()));
-  const dislikes = items.filter(i => dislikeMap.has(i.item.toLowerCase()));
+  const favs          = items.filter(i => favSet.has(i.item.toLowerCase()));
+  const dislikes      = items.filter(i => dislikeMap.has(i.item.toLowerCase()));
+  const controversial = items.filter(i => controversialMap.has(i.item.toLowerCase()));
 
-  function dislikeMpiHtml(item) {
-    const avg = dislikeMap.get(item.item.toLowerCase());
+  function avgRatingMpiHtml(item, avgMap) {
+    const avg = avgMap.get(item.item.toLowerCase());
     const price = item.price ? `<span class="mpi-price">$${Number(item.price).toFixed(2)}</span>` : "";
     return `<div class="mpi" data-name="${escAttr(item.item)}">
       <span class="mpi-left"><span class="mpi-name">${esc(item.item)}</span><span class="mpi-desc">Avg rating: ${avg.toFixed(1)}/10</span></span>
@@ -378,8 +380,14 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     : "";
   const dislikesSection = dislikes.length
     ? `<div class="mpi-dislike-block" id="mpi-sec-dislikes">
-        ${sectionLabelHtml("GBF Dislikes")}
-        <div class="mpi-grid">${dislikes.map(dislikeMpiHtml).join("")}</div>
+        ${sectionLabelHtml("GBF Hates")}
+        <div class="mpi-grid">${dislikes.map(i => avgRatingMpiHtml(i, dislikeMap)).join("")}</div>
+       </div>`
+    : "";
+  const controversialSection = controversial.length
+    ? `<div class="mpi-controversial-block" id="mpi-sec-controversial">
+        ${sectionLabelHtml("GBF Controversies")}
+        <div class="mpi-grid">${controversial.map(i => avgRatingMpiHtml(i, controversialMap)).join("")}</div>
        </div>`
     : "";
 
@@ -388,7 +396,8 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
   let bodyHtml = "";
   const shortcutSections = [];
   if (favs.length) shortcutSections.push({ label: "Favs", id: "mpi-sec-favs" });
-  if (dislikes.length) shortcutSections.push({ label: "Dislikes", id: "mpi-sec-dislikes" });
+  if (dislikes.length) shortcutSections.push({ label: "Hates", id: "mpi-sec-dislikes" });
+  if (controversial.length) shortcutSections.push({ label: "Controversies", id: "mpi-sec-controversial" });
   if (hasCats) {
     const catOrder = [];
     const catMap   = new Map();
@@ -397,7 +406,7 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
       if (!catMap.has(cat)) { catMap.set(cat, []); catOrder.push(cat); }
       catMap.get(cat).push(it);
     });
-    const totalSections  = (favs.length ? 1 : 0) + (dislikes.length ? 1 : 0) + catOrder.length;
+    const totalSections  = (favs.length ? 1 : 0) + (dislikes.length ? 1 : 0) + (controversial.length ? 1 : 0) + catOrder.length;
     const backToTopHtml  = totalSections > 1
       ? `<button type="button" class="mpi-back-to-top">&#9650; Back to Categories</button>`
       : "";
@@ -414,7 +423,7 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     bodyHtml = `<div class="mpi-grid">${items.map(mpiHtml).join("")}</div>`;
   }
 
-  panel.innerHTML = imgHtml + favsSection + dislikesSection + bodyHtml;
+  panel.innerHTML = imgHtml + favsSection + dislikesSection + controversialSection + bodyHtml;
 
   shortcuts.innerHTML = shortcutSections.length > 1
     ? shortcutSections.map((s, i) =>
@@ -1234,7 +1243,7 @@ function isWeekEffectivelyComplete() {
   return weekComplete && !(DEBUG_MODE && _debugForceReopen) && !_pinForceReopen;
 }
 let _historyRows   = [];  // all-time, all restaurants -- Timestamp, Date, Restaurant, Item, Qty, Names
-let _allRatingRows = [];  // all-time, all restaurants -- Timestamp, Date, Restaurant, Item, Name, Rating
+let _allRatingRows = [];  // all-time, all restaurants -- Timestamp, Date, Restaurant, Item, Rating (no Name column, kept anonymous)
 const _ratingTouched = new Set(); // item keys the user has actually moved the slider on
 
 // ── Mock/demo data (MOCK_MODE only) ─────────────────────────────────────
@@ -1395,7 +1404,7 @@ async function loadRatings() {
   if (!RATINGS_GID) { _allRatingRows = []; renderRatingCard(); return; }
   try {
     const csv  = await fetchCSV(RATINGS_GID);
-    const rows = parseCSV(csv).slice(1); // Timestamp, Date, Restaurant, Item, Name, Rating
+    const rows = parseCSV(csv).slice(1); // Timestamp, Date, Restaurant, Item, Rating (no Name column, kept anonymous)
     _allRatingRows = rows.concat(_optimisticRatings);
   } catch {
     _allRatingRows = [..._optimisticRatings];
@@ -1437,7 +1446,11 @@ function computeItemStats(restaurantName) {
   _allRatingRows.forEach(r => {
     if ((r[2] || "").trim().toLowerCase() !== name) return;
     const item   = (r[3] || "").trim();
-    const rating = Number(r[5]);
+    // Rating is always the LAST column -- tolerates the pre-redeploy
+    // period where the live Apps Script might still be writing the old
+    // 6-column schema (Timestamp, Date, Restaurant, Item, Name, Rating)
+    // instead of the current 5-column one, without needing to know which.
+    const rating = Number(r[r.length - 1]);
     if (!item || isNaN(rating)) return;
     const e = entryFor(item);
     e.ratingSum   += rating;
@@ -1445,6 +1458,29 @@ function computeItemStats(restaurantName) {
   });
 
   return stats;
+}
+
+// One point per date this item has any ratings, averaged if more than one
+// person rated it that same day -- sorted chronologically for the trend
+// line. Ratings have no name column, so this is as granular as it gets.
+function computeItemRatingTrend(restaurant, item) {
+  const name = (restaurant || "").trim().toLowerCase();
+  const itemLower = (item || "").trim().toLowerCase();
+  const byDate = new Map(); // date -> { sum, count }
+  _allRatingRows.forEach(r => {
+    if ((r[2] || "").trim().toLowerCase() !== name) return;
+    if ((r[3] || "").trim().toLowerCase() !== itemLower) return;
+    const date = (r[1] || "").trim();
+    const rating = Number(r[r.length - 1]); // last column, tolerant of old/new schema
+    if (!date || isNaN(rating)) return;
+    if (!byDate.has(date)) byDate.set(date, { sum: 0, count: 0 });
+    const e = byDate.get(date);
+    e.sum += rating;
+    e.count += 1;
+  });
+  return [...byDate.entries()]
+    .map(([date, e]) => ({ date, avg: e.sum / e.count }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
 
 let currentRestaurantObj = null;
@@ -1468,26 +1504,41 @@ function refreshMenuInsights() {
   const stats    = computeItemStats(currentRestaurantObj.name);
   const favSet   = new Set();
   const dislikeMap = new Map();
+  const controversialMap = new Map();
   stats.forEach((s, key) => {
+    const avg = s.ratingCount > 0 ? s.ratingSum / s.ratingCount : null;
     if (s.weeksOrdered.size >= 2) favSet.add(key);
-    if (s.ratingCount > 0 && (s.ratingSum / s.ratingCount) < 3) dislikeMap.set(key, s.ratingSum / s.ratingCount);
+    if (avg !== null && avg < 3) dislikeMap.set(key, avg);
+    // Ordered more than twice (3+ separate weeks) but still averaging below
+    // a middling 5/10 -- popular enough to keep coming back to, yet split
+    // opinion on whether it's actually good.
+    if (s.weeksOrdered.size > 2 && avg !== null && avg < 5) controversialMap.set(key, avg);
   });
   const imgs = currentRestaurantObj.menuImages ||
     (currentRestaurantObj.menuImage ? [currentRestaurantObj.menuImage] : []);
-  buildMenuPanel(currentRestaurantObj.menu || [], currentRestaurantObj.name, currentRestaurantObj.menuUrl || "", imgs, favSet, dislikeMap);
+  buildMenuPanel(currentRestaurantObj.menu || [], currentRestaurantObj.name, currentRestaurantObj.menuUrl || "", imgs, favSet, dislikeMap, controversialMap);
 }
 
+// The Ratings sheet has no Name column (kept anonymous even in the raw
+// sheet), so "have I already rated this" can't be looked up from the
+// shared data anymore -- it's tracked per-browser in localStorage instead.
 // A rating task is keyed by date+restaurant+item+name -- the same dish name
 // can legitimately appear across different weeks (or twice in one week, if
-// a round was reopened), so all four fields must match for something to
-// count as already rated.
+// a round was reopened), so all four fields go into the key.
+function ratedKey(date, restaurant, item, name) {
+  return `${date}|${restaurant.trim().toLowerCase()}|${item.toLowerCase()}|${name.trim().toLowerCase()}`;
+}
+function getLocallyRatedKeys() {
+  try { return new Set(JSON.parse(localStorage.getItem("ratedItemKeys") || "[]")); }
+  catch { return new Set(); }
+}
+function markLocallyRated(keys) {
+  const set = getLocallyRatedKeys();
+  keys.forEach(k => set.add(k));
+  localStorage.setItem("ratedItemKeys", JSON.stringify([...set]));
+}
 function isRated(date, restaurant, item, name) {
-  return _allRatingRows.some(r =>
-    (r[1] || "").trim() === date &&
-    (r[2] || "").trim().toLowerCase() === restaurant.trim().toLowerCase() &&
-    (r[3] || "").trim().toLowerCase() === item.toLowerCase() &&
-    (r[4] || "").trim().toLowerCase() === name.toLowerCase()
-  );
+  return getLocallyRatedKeys().has(ratedKey(date, restaurant, item, name));
 }
 
 // Pending ratings for a person, across all-time History (not just the
@@ -1651,7 +1702,7 @@ document.getElementById("rating-submit-btn")?.addEventListener("click", async ()
   try {
     const now = new Date().toISOString();
     if (MOCK_MODE) {
-      toSubmit.forEach(r => _mockRatings.push([now, r.date, r.restaurant, r.item, name, r.slider.value]));
+      toSubmit.forEach(r => _mockRatings.push([now, r.date, r.restaurant, r.item, r.slider.value]));
     } else {
       if (!APPS_SCRIPT_URL) throw new Error("APPS_SCRIPT_URL not configured");
       await Promise.all(toSubmit.map(r => {
@@ -1660,7 +1711,6 @@ document.getElementById("rating-submit-btn")?.addEventListener("click", async ()
           date: r.date,
           restaurant: r.restaurant,
           item: r.item,
-          name,
           rating: r.slider.value,
         });
         return fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { mode: "no-cors" });
@@ -1669,11 +1719,14 @@ document.getElementById("rating-submit-btn")?.addEventListener("click", async ()
       // later refetch against a still-stale CSV export can't revive the
       // just-rated items (loadRatings always merges these back in).
       toSubmit.forEach(r => {
-        const row = [now, r.date, r.restaurant, r.item, name, r.slider.value];
+        const row = [now, r.date, r.restaurant, r.item, r.slider.value];
         _allRatingRows.push(row);
         _optimisticRatings.push(row);
       });
     }
+    // "Already rated" is tracked per-browser now that the sheet has no name
+    // column to check against.
+    markLocallyRated(toSubmit.map(r => ratedKey(r.date, r.restaurant, r.item, name)));
     _ratingTouched.clear();
     status.style.display = "block";
     status.textContent = `Submitted ${toSubmit.length} rating${toSubmit.length === 1 ? "" : "s"}. Thank you!`;
@@ -2100,6 +2153,33 @@ function foldDiacritics(s) {
     .replace(/Đ/g, "D");
 }
 
+// CSS `resize: vertical` has no touch affordance at all on mobile browsers
+// (no handle renders, nothing to drag) -- this wires an explicit drag bar
+// with Pointer Events, which unify mouse and touch, as a mobile-friendly
+// stand-in that works alongside the native corner grabber on desktop.
+function makeManualResizable(el, grip, minH, maxH) {
+  if (!el || !grip) return;
+  let startY = 0, startH = 0, active = false;
+  grip.addEventListener("pointerdown", e => {
+    active = true;
+    startY = e.clientY;
+    startH = el.getBoundingClientRect().height;
+    grip.classList.add("dragging");
+    grip.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  grip.addEventListener("pointermove", e => {
+    if (!active) return;
+    const h = Math.max(minH, Math.min(maxH, startH + (e.clientY - startY)));
+    el.style.height = `${h}px`;
+  });
+  function end() { active = false; grip.classList.remove("dragging"); }
+  grip.addEventListener("pointerup", end);
+  grip.addEventListener("pointercancel", end);
+}
+makeManualResizable(document.getElementById("menu-panel"), document.getElementById("menu-panel-grip"), 160, 2000);
+makeManualResizable(document.getElementById("plinko-board"), document.getElementById("plinko-board-grip"), 290, 3000);
+
 function esc(s) {
   return String(s)
     .replace(/&/g, "&amp;")
@@ -2276,14 +2356,36 @@ function startCountdown() {
 // ── Theme & dark mode ──────────────────────────────────────────────────
 (function() {
   const SWATCH_COLORS = {
-    yellow: "#fcf811", green: "#39ff14", pink: "#fc16ac", lightpink: "#ffd1e8", cyan: "#04f2d6", white: "#ffffff", offwhite: "#fafcc4", grey: "#b8c4c6",
-    newspaper: "#e8e4d2", wrinkled: "#f0ead6"
+    white: "#ffffff", offwhite: "#fafcc4", wrinkled: "#f0ead6", newspaper: "#e8e4d2",
+    lightpink: "#ffd1e8", yellow: "#fcf811", juicyyellow: "#ffd500", grey: "#b8c4c6",
+    green: "#39ff14", emerald: "#10b981", cyan: "#0abab5", pink: "#fc16ac"
   };
   const switcher   = document.getElementById("theme-switcher");
   const darkBtn    = document.getElementById("dark-toggle");
   const currentEl  = document.getElementById("theme-current");
   const swatches   = document.querySelectorAll(".theme-swatch");
   const themeColorMeta = document.getElementById("theme-color-meta");
+
+  // `position: fixed; bottom: ...` alone is unreliable on mobile browsers --
+  // the dynamic address-bar/toolbar showing or hiding changes the *visible*
+  // (visual) viewport without necessarily reflowing what `vh`/fixed-bottom
+  // are computed against, so the widget can end up floating well above the
+  // real bottom of the screen. window.visualViewport tracks the actually-
+  // visible area directly, so anchor to that instead whenever it exists.
+  if (switcher && window.visualViewport) {
+    const MARGIN = 20; // ~1.25rem
+    const vv = window.visualViewport;
+    function pinToVisualViewport() {
+      const rightGap  = window.innerWidth  - (vv.offsetLeft + vv.width);
+      const bottomGap = window.innerHeight - (vv.offsetTop + vv.height);
+      switcher.style.right  = `${rightGap + MARGIN}px`;
+      switcher.style.bottom = `${bottomGap + MARGIN}px`;
+    }
+    vv.addEventListener("resize", pinToVisualViewport);
+    vv.addEventListener("scroll", pinToVisualViewport);
+    window.addEventListener("resize", pinToVisualViewport);
+    pinToVisualViewport();
+  }
 
   let _activeThemeName = "yellow";
 
@@ -2691,7 +2793,6 @@ function refreshReportModal() {
   // the Total Spent line -- the Item Stats table always shows its all-time
   // aggregate columns as-is.
   const showTax     = document.getElementById("report-show-tax")?.checked;
-  const showRatings = document.getElementById("report-show-ratings")?.checked;
   const showNames   = document.getElementById("report-show-names")?.checked;
 
   const tbody = document.getElementById("report-modal-tbody");
@@ -2723,15 +2824,18 @@ function refreshReportModal() {
       const avg = s.ratingCount ? (s.ratingSum / s.ratingCount) : null;
       const avgLabel = avg === null ? "—" : `${avg.toFixed(1)}/10`;
       const cls = s.weeksOrdered.size >= 2 ? "report-fav" : (avg !== null && avg < 3 ? "report-dislike" : "");
-      return `<tr>
+      return `<tr class="report-item-row" data-item="${escAttr(s.label)}">
         <td class="${cls}">${esc(s.label)}</td>
         <td>${s.qty}</td>
         <td>${avgLabel}</td>
       </tr>`;
     }).join("");
+    tbody.querySelectorAll(".report-item-row").forEach(tr => {
+      tr.addEventListener("click", () => openItemDetail(_reportRestaurant, tr.dataset.item));
+    });
   }
 
-  renderReportHistory(groups, showNames, showTax, showRatings);
+  renderReportHistory(groups, showNames, showTax);
 }
 
 // Per-date breakdown for the "Past Orders" section: one entry PER PERSON
@@ -2768,21 +2872,16 @@ function computeDateBreakdown() {
     const items = [...entries.values()].map(e => {
       const resolvedPrice = resolveItemPrice(e.item, _reportMenu);
       const price = resolvedPrice || null;
-      const ratingRow = e.person ? _allRatingRows.find(r =>
-        (r[1] || "").trim() === date &&
-        (r[2] || "").trim().toLowerCase() === name &&
-        (r[3] || "").trim().toLowerCase() === e.item.toLowerCase() &&
-        (r[4] || "").trim().toLowerCase() === e.person.toLowerCase()
-      ) : null;
-      const rating = ratingRow ? Number(ratingRow[5]) : NaN;
-      return { person: e.person, item: e.item, qty: e.qty || 1, price, rating: isNaN(rating) ? null : rating };
+      // Ratings have no name column (kept anonymous even in the raw sheet),
+      // so a per-person rating can no longer be looked up here at all.
+      return { person: e.person, item: e.item, qty: e.qty || 1, price };
     }).sort((a, b) => a.person.localeCompare(b.person) || a.item.localeCompare(b.item));
     const subtotal = items.reduce((sum, it) => sum + (it.price ? it.price * it.qty : 0), 0);
     return { date, items, subtotal };
   }).sort((a, b) => b.date.localeCompare(a.date));
 }
 
-function renderReportHistory(groups, showNames, showTax, showRatings) {
+function renderReportHistory(groups, showNames, showTax) {
   const container = document.getElementById("report-modal-history");
   const titlebar  = document.getElementById("report-history-titlebar");
   if (!container) return;
@@ -2798,19 +2897,21 @@ function renderReportHistory(groups, showNames, showTax, showRatings) {
     const subtotal = showTax ? g.subtotal * TAX_RATE : g.subtotal;
     const open = _openReportDates.has(g.date);
     // Flat rows sorted by username (computeDateBreakdown already sorts by
-    // person, then item): name on top, item under it, price/rating right.
+    // person, then item): name and item sit flat on one line, price right.
+    // Ratings are never shown here (they're per-person) to keep them
+    // anonymous -- only the Item Stats' all-time average is ever exposed.
     const rows = g.items.map(it => {
       const qtyLabel    = it.qty > 1 ? ` &times;${it.qty}` : "";
       const price       = it.price !== null ? it.price * it.qty * (showTax ? TAX_RATE : 1) : null;
       const priceLabel  = price !== null ? `$${price.toFixed(2)}` : "";
-      const ratingLabel = showRatings && it.rating !== null ? `${it.rating}/10` : "";
-      const metaBits = [priceLabel, ratingLabel].filter(Boolean).join(" &middot; ");
+      // Name/item/price are always 3 fixed grid columns (25%/60%/15%) --
+      // the name cell is still rendered (just left empty) when the Names
+      // checkbox is off, so hiding it doesn't shift item/price out of
+      // their columns.
       return `<div class="report-history-item">
-        <div class="rhi-main">
-          ${showNames && it.person ? `<span class="rhi-user">${esc(it.person)}</span>` : ""}
-          <span class="rhi-item">${esc(it.item)}${qtyLabel}</span>
-        </div>
-        <span class="report-history-item-meta">${metaBits}</span>
+        <span class="rhi-user">${showNames && it.person ? esc(it.person) : ""}</span>
+        <span class="rhi-item">${esc(it.item)}${qtyLabel}</span>
+        <span class="report-history-item-meta">${priceLabel}</span>
       </div>`;
     }).join("");
     return `<div class="report-history-group">
@@ -2843,7 +2944,6 @@ function ensureReportListeners() {
 
   document.getElementById("report-show-names")?.addEventListener("change", refreshReportModal);
   document.getElementById("report-show-tax")?.addEventListener("change", refreshReportModal);
-  document.getElementById("report-show-ratings")?.addEventListener("change", refreshReportModal);
 
   document.getElementById("report-stats-toggle-btn")?.addEventListener("click", () => {
     const btn   = document.getElementById("report-stats-toggle-btn");
@@ -2857,6 +2957,100 @@ function ensureReportListeners() {
 function closeMenuReport(e) {
   if (e && e.target !== e.currentTarget) return;
   document.getElementById("report-modal").classList.remove("open");
+}
+
+// ── Item detail: rating trend chart ─────────────────────────────────────
+function openItemDetail(restaurant, item) {
+  document.getElementById("item-detail-title").textContent = item;
+
+  const trend = computeItemRatingTrend(restaurant, item);
+  const stats = computeItemStats(restaurant).get((item || "").trim().toLowerCase());
+  const avgPrice = resolveItemPrice(item, _reportMenu);
+
+  const bits = [];
+  if (stats) bits.push(`<span class="item-detail-stat"><strong>${stats.qty}</strong> ordered</span>`);
+  if (avgPrice) bits.push(`<span class="item-detail-stat"><strong>$${avgPrice.toFixed(2)}</strong> price</span>`);
+  if (stats?.ratingCount) {
+    bits.push(`<span class="item-detail-stat"><strong>${(stats.ratingSum / stats.ratingCount).toFixed(1)}/10</strong> avg rating</span>`);
+  }
+  document.getElementById("item-detail-stats").innerHTML = bits.join("");
+
+  renderItemTrendChart(trend);
+  document.getElementById("item-detail-modal").classList.add("open");
+}
+
+function closeItemDetail(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById("item-detail-modal").classList.remove("open");
+}
+
+function renderItemTrendChart(trend) {
+  const svg   = document.getElementById("item-detail-chart");
+  const empty = document.getElementById("item-detail-empty");
+  if (!trend.length) {
+    svg.innerHTML = "";
+    svg.style.display = "none";
+    empty.style.display = "block";
+    return;
+  }
+  svg.style.display = "block";
+  empty.style.display = "none";
+
+  const W = 480, H = 220, padL = 28, padR = 16, padT = 16, padB = 26;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const n = trend.length;
+  const xAt = i => n === 1 ? padL + plotW / 2 : padL + (i / (n - 1)) * plotW;
+  const yAt = v => padT + plotH - (v / 10) * plotH;
+
+  const ink = getComputedStyle(document.body).getPropertyValue("--ink").trim() || "#000";
+
+  // Recessive gridlines + a muted-ink axis label at 0/2/4/6/8/10 -- the
+  // line itself is the only thing meant to draw the eye.
+  let gridSvg = "";
+  [0, 2, 4, 6, 8, 10].forEach(v => {
+    gridSvg += `<line x1="${padL}" y1="${yAt(v)}" x2="${W - padR}" y2="${yAt(v)}" stroke="${ink}" stroke-opacity="0.15"/>`;
+    gridSvg += `<text x="${padL - 6}" y="${yAt(v) + 3}" text-anchor="end" font-size="9" fill="${ink}" fill-opacity="0.6">${v}</text>`;
+  });
+
+  const pathD = trend.map((p, i) => `${i === 0 ? "M" : "L"} ${xAt(i).toFixed(1)} ${yAt(p.avg).toFixed(1)}`).join(" ");
+
+  let dotsSvg = "", hitsSvg = "";
+  trend.forEach((p, i) => {
+    const cx = xAt(i).toFixed(1), cy = yAt(p.avg).toFixed(1);
+    dotsSvg += `<circle cx="${cx}" cy="${cy}" r="4" fill="${ink}"/>`;
+    hitsSvg += `<circle cx="${cx}" cy="${cy}" r="11" fill="transparent" class="item-detail-hit" data-date="${escAttr(fmtRatingDate(p.date))}" data-rating="${p.avg.toFixed(1)}"/>`;
+  });
+
+  // Sparse date labels (first/middle/last) rather than one per point, which
+  // collides badly once there's more than a handful of dates.
+  const labelIdxs = n <= 4 ? trend.map((_, i) => i) : [0, Math.floor((n - 1) / 2), n - 1];
+  let xLabelSvg = "";
+  labelIdxs.forEach(i => {
+    xLabelSvg += `<text x="${xAt(i).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="9" fill="${ink}" fill-opacity="0.6">${esc(fmtRatingDate(trend[i].date))}</text>`;
+  });
+
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.innerHTML = `${gridSvg}
+    <path d="${pathD}" fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dotsSvg}
+    ${xLabelSvg}
+    ${hitsSvg}`;
+
+  const tooltip = document.getElementById("item-detail-tooltip");
+  svg.querySelectorAll(".item-detail-hit").forEach(hit => {
+    hit.addEventListener("mouseenter", () => {
+      tooltip.textContent = `${hit.dataset.date} — ${hit.dataset.rating}/10`;
+      tooltip.style.display = "block";
+      const wrap = document.getElementById("item-detail-chart-wrap").getBoundingClientRect();
+      const hr = hit.getBoundingClientRect();
+      const tr = tooltip.getBoundingClientRect();
+      let left = hr.left - wrap.left + hr.width / 2 - tr.width / 2;
+      left = Math.max(4, Math.min(left, wrap.width - tr.width - 4));
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top  = `${hr.top - wrap.top - tr.height - 8}px`;
+    });
+    hit.addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
+  });
 }
 
 let _lbImages = [];
@@ -3010,14 +3204,12 @@ scheduleStripeToggle();
   const BALL_R    = 9;
   const PEG_R     = 4;
   const COL_SPACE = 34;   // target horizontal spacing between peg columns
-  const ROW_SPACE = 30;   // vertical spacing between peg rows
+  const BASE_ROW_SPACE = 30; // vertical spacing between peg rows
   const TOP_MARGIN = 40;  // gap above first peg row (the ball's drag lane)
   const SLOT_H    = 70;   // height reserved for the slot area at the bottom
   const GRAVITY   = 0.32;
   const RESTITUTION = 0.62;
   const MIN_COLORED = 0, MAX_COLORED = 6, MAX_BALLS = 12;
-  const PALETTE = ["#e63946","#f3722c","#f8961e","#f9c74f","#90be6d","#43aa8b",
-                   "#4d908e","#577590","#277da1","#9d4edd","#f72585","#ff6b6b"];
 
   function shuffled(arr) {
     const a = arr.slice();
@@ -3031,8 +3223,7 @@ scheduleStripeToggle();
   let cssW = 0, cssH = 0;
   let pegs = [];
   let slotCount = 0, slotW = 0, pegsBottomY = 0, floorY = 0;
-  let winningSlot = 0;
-  let paletteOrder = shuffled(PALETTE);
+  let pegRowCount = 0; // how many peg rows the board currently has -- taller board (resized), more rows
   let coloredSlots = null;  // how many slots get a distinct color; null = not yet chosen
   let coloredSlotIndices = new Set(); // which slot indices (scattered, not left-to-right) are colored
 
@@ -3040,13 +3231,33 @@ scheduleStripeToggle();
     const all = Array.from({ length: slotCount }, (_, i) => i);
     return new Set(shuffled(all).slice(0, n));
   }
+  let restaurantMode = false;
+  let restaurantNames = [];       // unique rotation restaurant names
+  let restaurantAssignment = [];  // slot index -> restaurant name (or "Other"), shuffled
+
+  function getRestaurantNames() {
+    return [...new Set((_restaurantsConfig?.restaurants || []).map(r => r.name).filter(Boolean))];
+  }
+
+  function renderRestaurantLegend() {
+    const legend = document.getElementById("plinko-restaurant-legend");
+    if (!legend) return;
+    legend.innerHTML = restaurantAssignment.map((name, i) =>
+      `<div class="plinko-legend-row"><span class="plinko-legend-num">${i + 1}</span><span>${esc(name)}</span></div>`
+    ).join("");
+  }
+
   let ballCount = 1;        // how many balls drop per release
   let balls = [];           // in-flight/settled balls: { x, y, vx, vy, moving }
   let dragBall = { x: 0, y: 0 }; // the draggable staging marker shown when idle
   let dragging = false;
+  let spawningGold = false; // true while gold balls are still trickling in via setTimeout
   let stuckBeyondRecovery = false;
   let rafId = null;
   let initialized = false;
+  let roundStartTime = 0;
+  const MAX_ROUND_MS = 30000; // hard cap -- balls piled in one slot can shove each other forever otherwise
+  let allPastLineSince = null; // when every ball first had crossed into its slot (still jiggling is fine)
 
   function layout() {
     cssW = board.clientWidth;
@@ -3058,18 +3269,26 @@ scheduleStripeToggle();
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
     floorY = cssH;
-    const pegAreaH = Math.max(ROW_SPACE * 3, cssH - TOP_MARGIN - SLOT_H);
-    const rows = Math.max(4, Math.round(pegAreaH / ROW_SPACE));
-    pegsBottomY = TOP_MARGIN + rows * ROW_SPACE;
 
+    // The peg field always uses the same dense, auto-fit grid regardless of
+    // mode -- Restaurant Picker doesn't touch ball/peg size or row spacing
+    // at all, it only changes how many (wider) slots the bottom is divided
+    // into. Since the peg density near the walls is unchanged from normal
+    // play, there's no edge gap for a ball to slip straight through; no
+    // special-cased edge pegs needed.
     const cols = Math.max(4, Math.floor(cssW / COL_SPACE) - 1);
     const colSpace = cssW / (cols + 1);
     const usableW = cols * colSpace;
     const xOffset = (cssW - usableW) / 2;
 
+    const pegAreaH = Math.max(BASE_ROW_SPACE * 3, cssH - TOP_MARGIN - SLOT_H);
+    const rows = Math.max(4, Math.round(pegAreaH / BASE_ROW_SPACE));
+    pegRowCount = rows;
+    pegsBottomY = TOP_MARGIN + rows * BASE_ROW_SPACE;
+
     pegs = [];
     for (let r = 0; r < rows; r++) {
-      const y = TOP_MARGIN + r * ROW_SPACE;
+      const y = TOP_MARGIN + r * BASE_ROW_SPACE;
       const rowOffset = (r % 2 === 0) ? 0 : colSpace / 2;
       const rowCols = (r % 2 === 0) ? cols + 1 : cols;
       for (let c = 0; c < rowCols; c++) {
@@ -3082,16 +3301,26 @@ scheduleStripeToggle();
       }
     }
 
-    slotCount = cols + 1;
+    // Restaurant Picker mode divides the (unchanged) board width into a
+    // slot per rotation restaurant plus one "Other" -- independent of the
+    // peg grid's own column count above, so the pegs stay dense/normal
+    // while the slots themselves get wider to fit fewer of them.
+    slotCount = (restaurantMode && restaurantNames.length) ? restaurantNames.length + 1 : cols + 1;
     slotW = cssW / slotCount;
     // The top tip of each slot divider is itself a small bumper peg -- a
     // ball landing right on a boundary can still bounce to either side,
     // instead of being forced into whichever slot half it's nominally over.
     for (let i = 0; i <= slotCount; i++) pegs.push({ x: i * slotW, y: pegsBottomY });
-    winningSlot = Math.floor(Math.random() * slotCount);
     if (coloredSlots === null) coloredSlots = 2 + Math.floor(Math.random() * 3); // 2-4
     coloredSlots = Math.min(coloredSlots, MAX_COLORED, slotCount);
     coloredSlotIndices = pickColoredIndices(coloredSlots);
+
+    if (restaurantMode && restaurantNames.length) {
+      // Randomize which restaurant sits behind which number every time --
+      // otherwise it'd always read 1, 2, 3... in rotation-list order.
+      restaurantAssignment = shuffled([...restaurantNames, "Other"]);
+      renderRestaurantLegend();
+    }
 
     updateControlLabels();
     resetBalls();
@@ -3128,14 +3357,167 @@ scheduleStripeToggle();
   function resetBalls() {
     balls = [];
     dragBall = { x: cssW / 2, y: TOP_MARGIN / 2 };
+    allPastLineSince = null;
+    spawningGold = false;
+    hideComment();
   }
 
-  function slotColor(i, alpha) {
-    if (i === winningSlot) return `rgba(255,196,0,${alpha})`;
-    if (!coloredSlotIndices.has(i)) return `rgba(120,120,120,${alpha * 0.35})`;
-    const hex = paletteOrder[i % paletteOrder.length];
+  // ── Reward / comment feedback shown after a round settles ──────────────
+  const GOLD_PER_BALL = 50; // reward balls per original ball that landed colored, at the reference row count
+  const REFERENCE_ROWS = 14; // peg row count at the board's default (unresized) height
+  const GOLD_R = BALL_R * 0.75; // smaller than a regular ball
+
+  // The reward balls actually drop through the machine like real balls
+  // (same pegs, same physics) rather than a decorative overlay -- they
+  // start above the board (anywhere along the top, not scattered through
+  // the whole field) and trickle in one at a time with a slight random
+  // stagger, then fall and settle like anything else.
+  function spawnGoldBalls(count) {
+    startPhysics();
+    // The staggered trickle runs on its own setTimeout chain, independent
+    // of the physics loop -- without this flag, the loop can see "nothing
+    // is moving right now" in the gap between two trickled-in balls and
+    // conclude the round is over (calling evaluateOutcome, showing the win
+    // comment, and stopping) long before all the reward balls have even
+    // been added, silently orphaning the rest.
+    spawningGold = true;
+    let spawned = 0;
+    function spawnOne() {
+      balls.push({
+        x: GOLD_R + Math.random() * (cssW - 2 * GOLD_R),
+        y: -Math.random() * 120,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: 0,
+        moving: true,
+        isReward: true,
+        r: GOLD_R,
+      });
+      spawned++;
+      if (spawned < count) setTimeout(spawnOne, 12 + Math.random() * 25);
+      else spawningGold = false;
+    }
+    spawnOne();
+  }
+
+  function showCommentFrom(list, isWin) {
+    const el = document.getElementById("plinko-comment");
+    if (!el) return;
+    const safeList = (list && list.length) ? list : ["No luck this round."];
+    el.textContent = safeList[Math.floor(Math.random() * safeList.length)];
+    el.classList.toggle("win", !!isWin);
+    el.classList.add("show");
+  }
+
+  function showComment() {
+    showCommentFrom(typeof PLINKO_COMMENTS !== "undefined" ? PLINKO_COMMENTS : null, false);
+  }
+
+  function showWinComment() {
+    showCommentFrom(typeof PLINKO_WIN_COMMENTS !== "undefined" ? PLINKO_WIN_COMMENTS : null, true);
+  }
+
+  function hideComment() {
+    document.getElementById("plinko-comment")?.classList.remove("show", "win");
+  }
+
+  // Once every ball has settled, check whether any of the ORIGINAL (non-
+  // reward) balls landed in a colored slot -- each one that did pays out
+  // GOLD_PER_BALL reward balls. If none did, a random consolation comment
+  // instead. Once those reward balls finish falling and settle, this runs
+  // again -- that second pass is where the winning comment shows, once the
+  // whole shower has actually landed.
+  function evaluateOutcome() {
+    // Restaurant Picker is just a number picker -- no colors, no reward,
+    // no commentary. The board just stays put with the result showing
+    // until restart is clicked.
+    if (restaurantMode) return;
+    if (balls.some(b => b.isReward)) { showWinComment(); return; }
+    // Use the slot each ball was frozen into the instant it first touched
+    // down (not its current x), so later jostling from more balls piling
+    // in can't disagree with what the ball visibly landed in.
+    const coloredCount = balls.filter(b => {
+      const idx = b.slotIndex ?? Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
+      return coloredSlotIndices.has(idx);
+    }).length;
+    if (coloredCount > 0) {
+      // A taller board (more peg rows, i.e. the user dragged it open more)
+      // pays out proportionally more per hit -- more rows means the ball
+      // earned it by surviving more chances to bounce the wrong way.
+      const rowFactor = pegRowCount / REFERENCE_ROWS;
+      const perBall = Math.round(GOLD_PER_BALL * rowFactor);
+      spawnGoldBalls(perBall * coloredCount);
+    } else {
+      showComment();
+    }
+  }
+
+  // Hex <-> HSL round trip, used to find the theme's true opposite on the
+  // color wheel (hue + 180deg) rather than just reusing --ink.
+  function hexToHsl(hex) {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h *= 60;
+    }
+    return [h, s, l];
+  }
+  function hslToHex(h, s, l) {
+    h = ((h % 360) + 360) % 360 / 360;
+    function hue2rgb(p, q, t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    }
+    let r, g, b;
+    if (s === 0) { r = g = b = l; }
+    else {
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+    }
+    const toHex = x => Math.round(x * 255).toString(16).padStart(2, "0");
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+  function complementaryOf(hex) {
+    const [h, s, l] = hexToHsl(hex);
+    // A pure hue-only flip can land close to the original for very
+    // desaturated/near-neutral themes (white, grey, offwhite) -- floor the
+    // saturation and keep lightness readable so it still visibly contrasts.
+    const s2 = Math.max(s, 0.65);
+    const l2 = Math.min(Math.max(l, 0.35), 0.65);
+    return hslToHex(h + 180, s2, l2);
+  }
+  function hexToRgba(hex, alpha) {
     const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
     return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  // Colored slots are all one color -- the true opposite of the theme's own
+  // accent on the color wheel (hue rotated 180deg), not a rainbow of
+  // different hues.
+  function slotColor(i, alpha, accentColor) {
+    // Restaurant Picker is just a number picker -- no colors/reward game
+    // layered on top, so every slot stays neutral.
+    if (restaurantMode) return `rgba(120,120,120,${alpha * 0.35})`;
+    if (!coloredSlotIndices.has(i)) return `rgba(120,120,120,${alpha * 0.35})`;
+    const hex = accentColor.startsWith("#") ? complementaryOf(accentColor) : "#e63946";
+    return hexToRgba(hex, alpha);
   }
 
   function draw() {
@@ -3147,7 +3529,7 @@ scheduleStripeToggle();
 
     // slot columns
     for (let i = 0; i < slotCount; i++) {
-      ctx.fillStyle = slotColor(i, 0.9);
+      ctx.fillStyle = slotColor(i, 0.9, accentColor);
       ctx.fillRect(i * slotW, pegsBottomY, slotW, floorY - pegsBottomY);
     }
     // slot dividers
@@ -3163,6 +3545,18 @@ scheduleStripeToggle();
     }
     ctx.globalAlpha = 1;
 
+    // Restaurant Picker mode -- a plain number per slot; the legend below
+    // the board maps each number to a restaurant (or "Other").
+    if (restaurantMode && restaurantAssignment.length === slotCount) {
+      ctx.fillStyle = inkColor;
+      ctx.font = `900 ${Math.max(12, Math.min(20, slotW * 0.32))}px inherit`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (let i = 0; i < slotCount; i++) {
+        ctx.fillText(String(i + 1), (i + 0.5) * slotW, pegsBottomY + (floorY - pegsBottomY) / 2);
+      }
+    }
+
     // pegs -- filled in ink (black in light mode, bright accent in dark
     // mode) with an accent-colored outline so they never blend into the
     // board background regardless of theme (some themes use the same
@@ -3172,7 +3566,7 @@ scheduleStripeToggle();
     ctx.lineWidth = 1.5;
     pegs.forEach(p => {
       ctx.beginPath();
-      ctx.arc(p.x, p.y, PEG_R, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, p.r || PEG_R, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
     });
@@ -3199,14 +3593,16 @@ scheduleStripeToggle();
 
     // in-flight / settled balls -- same ink-fill/accent-stroke pairing as
     // the staging marker, guaranteed to contrast against the board bg even
-    // in themes where --accent and --bg are the same color.
+    // in themes where --accent and --bg are the same color. Reward balls
+    // (from landing in a colored slot) render gold instead so they read as
+    // a distinct payout, even though they're falling through the same pegs.
     balls.forEach(b => {
       ctx.beginPath();
-      ctx.fillStyle = inkColor;
-      ctx.arc(b.x, b.y, BALL_R, 0, Math.PI * 2);
+      ctx.fillStyle = b.isReward ? "#ffc400" : inkColor;
+      ctx.arc(b.x, b.y, b.r || BALL_R, 0, Math.PI * 2);
       ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = accentColor;
+      ctx.lineWidth = b.isReward ? 1 : 2;
+      ctx.strokeStyle = b.isReward ? "#000" : accentColor;
       ctx.stroke();
     });
   }
@@ -3219,8 +3615,9 @@ scheduleStripeToggle();
     b.y  += b.vy;
 
     // walls
-    if (b.x - BALL_R < 0) { b.x = BALL_R; b.vx = -b.vx * 0.7; }
-    if (b.x + BALL_R > cssW) { b.x = cssW - BALL_R; b.vx = -b.vx * 0.7; }
+    const br = b.r || BALL_R;
+    if (b.x - br < 0) { b.x = br; b.vx = -b.vx * 0.7; }
+    if (b.x + br > cssW) { b.x = cssW - br; b.vx = -b.vx * 0.7; }
 
     // Safety net against getting wedged (e.g. wall + peg, or peg + peg) --
     // if a ball hasn't made real downward progress for a while, give it a
@@ -3247,7 +3644,7 @@ scheduleStripeToggle();
     for (const p of pegs) {
       const dx = b.x - p.x, dy = b.y - p.y;
       const dist = Math.hypot(dx, dy);
-      const minDist = BALL_R + PEG_R;
+      const minDist = br + (p.r || PEG_R);
       if (dist > 0 && dist < minDist) {
         const nx = dx / dist, ny = dy / dist;
         const overlap = minDist - dist;
@@ -3265,17 +3662,22 @@ scheduleStripeToggle();
     // the rest of the drop.
     if (b.y > pegsBottomY + PEG_R * 3) {
       const idx = Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
-      const left  = idx * slotW + BALL_R + 1;
-      const right = (idx + 1) * slotW - BALL_R - 1;
+      const left  = idx * slotW + br + 1;
+      const right = (idx + 1) * slotW - br - 1;
       if (b.x < left)  { b.x = left;  b.vx = 0; }
       if (b.x > right) { b.x = right; b.vx = 0; }
     }
 
-    // settle into a slot
-    if (b.y + BALL_R >= floorY) {
-      b.y = floorY - BALL_R;
+    // settle into a slot -- freeze which slot it landed in right now, since
+    // ball-ball jostling afterward (from more balls piling in) can still
+    // shove a settled ball a few pixels sideways into a neighboring slot's
+    // territory without this, making the win/lose check disagree with
+    // whatever slot the ball visibly landed in first.
+    if (b.y + br >= floorY) {
+      b.y = floorY - br;
       b.vx = 0; b.vy = 0;
       b.moving = false;
+      b.slotIndex = Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
     }
   }
 
@@ -3288,7 +3690,7 @@ scheduleStripeToggle();
         const a = balls[i], b = balls[j];
         const dx = b.x - a.x, dy = b.y - a.y;
         const dist = Math.hypot(dx, dy);
-        const minDist = BALL_R * 2;
+        const minDist = (a.r || BALL_R) + (b.r || BALL_R);
         if (dist > 0 && dist < minDist) {
           const nx = dx / dist, ny = dy / dist;
           const overlap = (minDist - dist) / 2;
@@ -3303,9 +3705,60 @@ scheduleStripeToggle();
     }
   }
 
+  // Ball-ball collisions can shove a resting ball straight through the
+  // floor or out of its slot's side walls (the shove itself doesn't know
+  // about those boundaries) -- clamp everyone back inside afterward.
+  function clampToBounds(b) {
+    const br = b.r || BALL_R;
+    if (b.y + br > floorY) { b.y = floorY - br; b.vy = 0; }
+    if (b.y > pegsBottomY) {
+      const idx = Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
+      const left  = idx * slotW + br + 1;
+      const right = (idx + 1) * slotW - br - 1;
+      if (b.x < left)  b.x = left;
+      if (b.x > right) b.x = right;
+    }
+    if (b.x - br < 0) b.x = br;
+    if (b.x + br > cssW) b.x = cssW - br;
+  }
+
   function step() {
+    // Several balls can end up in a shoving match squeezed into one narrow
+    // slot, each pushing the others just enough that none of them ever
+    // individually satisfies "touching the floor" -- rather than wait on
+    // that (or the much longer stuck-timeout below), once every ball has
+    // crossed the line into its slot, a short grace period for the jiggling
+    // to visually settle is enough; then force the finish immediately
+    // instead of waiting on a timer.
+    const allPastLine = balls.length > 0 && balls.every(b => !b.moving || b.y > pegsBottomY + PEG_R * 3);
+    if (allPastLine) {
+      if (allPastLineSince === null) allPastLineSince = performance.now();
+    } else {
+      allPastLineSince = null;
+    }
+    const settledEnough = allPastLineSince !== null && performance.now() - allPastLineSince > 600;
+
+    // Longer-running backstop for anything that never even reaches its
+    // slot (e.g. wedged higher up in the peg field) -- force everything to
+    // settle once a round has been running too long, regardless of position.
+    // The reward shower is exempt -- once gold balls start falling, let the
+    // whole thing play out to the winning comment with no time limit.
+    const inRewardPhase = spawningGold || balls.some(b => b.isReward);
+    const timedOut = !inRewardPhase && performance.now() - roundStartTime > MAX_ROUND_MS;
+
+    if (settledEnough || timedOut) {
+      balls.forEach(b => {
+        if (!b.moving) return;
+        const br = b.r || BALL_R;
+        b.y = Math.min(b.y, floorY - br);
+        b.vx = 0; b.vy = 0;
+        b.moving = false;
+        b.slotIndex = Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
+      });
+    }
     balls.forEach(stepBall);
     resolveBallCollisions();
+    balls.forEach(clampToBounds);
     draw();
     if (stuckBeyondRecovery) {
       stuckBeyondRecovery = false;
@@ -3313,20 +3766,23 @@ scheduleStripeToggle();
       layout(); // full reset: fresh pegs, fresh winning slot, empty board
       return;
     }
-    if (balls.some(b => b.moving)) {
+    if (balls.some(b => b.moving) || spawningGold) {
       rafId = requestAnimationFrame(step);
+    } else if (pendingRelayout) {
+      // A resize that arrived mid-drop (e.g. a mobile browser's address bar
+      // showing/hiding, which fires ResizeObserver too) is applied now
+      // instead of yanking the board out from under an active drop.
+      pendingRelayout = false;
+      layout();
     } else {
-      setTimeout(() => {
-        // A resize that arrived mid-drop (e.g. a mobile browser's address
-        // bar showing/hiding, which fires ResizeObserver too) is applied
-        // now instead of yanking the board out from under an active drop.
-        if (pendingRelayout) { pendingRelayout = false; layout(); }
-        else { resetBalls(); draw(); }
-      }, 1600);
+      // Balls stay right where they landed -- no auto-reset. The board only
+      // clears when the user clicks the restart button.
+      evaluateOutcome();
     }
   }
 
   function startPhysics() {
+    roundStartTime = performance.now();
     cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(step);
   }
@@ -3381,11 +3837,26 @@ scheduleStripeToggle();
     layout();
   });
 
-  document.getElementById("plinko-colors-slider")?.addEventListener("input", e => {
-    paletteOrder = shuffled(PALETTE);
-    setColoredSlots(Number(e.target.value));
-  });
+  document.getElementById("plinko-colors-slider")?.addEventListener("input", e => setColoredSlots(Number(e.target.value)));
   document.getElementById("plinko-balls-slider")?.addEventListener("input", e => setBallCount(Number(e.target.value)));
+
+  document.getElementById("plinko-restart-btn")?.addEventListener("click", () => {
+    cancelAnimationFrame(rafId);
+    dragging = false;
+    canvas.classList.remove("dragging");
+    layout(); // fresh pegs, winning slot, colored slots, and an empty board
+  });
+
+  document.getElementById("plinko-restaurant-mode")?.addEventListener("change", e => {
+    restaurantMode = e.target.checked;
+    if (restaurantMode) restaurantNames = getRestaurantNames();
+    const legend = document.getElementById("plinko-restaurant-legend");
+    legend?.classList.toggle("open", restaurantMode);
+    cancelAnimationFrame(rafId);
+    dragging = false;
+    canvas.classList.remove("dragging");
+    layout();
+  });
 
   const card = document.getElementById("plinko-card");
   toggleBtn.addEventListener("click", () => {
@@ -3396,6 +3867,22 @@ scheduleStripeToggle();
     if (open && !initialized) {
       initialized = true;
       requestAnimationFrame(() => { layout(); ro.observe(board); });
+      startClock();
     }
   });
+
+  // A simple stopwatch, not tied to any round -- starts the moment the
+  // panel is first opened and just keeps counting for the rest of the
+  // session, even if the panel is later collapsed and reopened.
+  function startClock() {
+    const el = document.getElementById("plinko-clock");
+    if (!el) return;
+    const startedAt = Date.now();
+    setInterval(() => {
+      const secs = Math.floor((Date.now() - startedAt) / 1000);
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      el.textContent = `${m}:${String(s).padStart(2, "0")}`;
+    }, 1000);
+  }
 })();
