@@ -39,8 +39,16 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.10.0";
+const APP_VERSION = "1.11.0";
 const CHANGELOG = [
+  { version: "1.11.0", date: "2026-07-09", notes: [
+    "Drop Game: removed Roulette (Wheel of Fortune stays); UI overhaul with a compact accessory row (preset/Edit Items/Shuffle/Clear All) and a big Spin bar docked against the wheel",
+    "Drop Game gold reward overhauled: difficulty-scaled payout (fewer slots/balls/colors = bigger prize), a session gold-ball counter, and a real gold tray with a hinged floor bar that opens a ramp for the shower and closes once it settles",
+    "Gold tray bags up at 150 balls into a running bag count (hover the bag icon to see the conversion); tray gold persists across resets instead of clearing every round",
+    "Plinko performance: capped canvas pixel ratio, spatial-hash peg collisions, and skipped ball-ball checks between two already-settled balls -- much lighter on mobile",
+    "Click anywhere on the Plinko machine to reset once a round has settled, not just the restart button",
+    "Access code entry is now masked (password-style) instead of showing typed characters in plain text",
+  ]},
   { version: "1.10.0", date: "2026-07-09", notes: [
     "New Wheel of Fortune and Roulette game modes for the Drop Game -- same arrow toggle now cycles Drop Game -> Wheel -> Roulette; both spin the same hand-typed (or preset) picks",
     "Wheel/Roulette presets: Restaurant Picker, Food (Popular Picks / Meat Types), Event, and Names, each editable and save-able as your own named presets",
@@ -2237,10 +2245,9 @@ function makeManualResizable(el, grip, minH, maxH) {
 }
 makeManualResizable(document.getElementById("menu-panel"), document.getElementById("menu-panel-grip"), 160, 2000);
 makeManualResizable(document.getElementById("plinko-board"), document.getElementById("plinko-board-grip"), 290, 3000);
-// Same grip also resizes the Wheel and Roulette boards (only one of the
-// three is ever visible at once) so switching modes doesn't reset size.
+// Same grip also resizes the Wheel board (only one of the two is ever
+// visible at once) so switching modes doesn't reset size.
 makeManualResizable(document.getElementById("wheel-board"), document.getElementById("plinko-board-grip"), 290, 3000);
-makeManualResizable(document.getElementById("roulette-board"), document.getElementById("plinko-board-grip"), 290, 3000);
 
 function esc(s) {
   return String(s)
@@ -2497,6 +2504,47 @@ function startCountdown() {
   darkBtn.addEventListener("click", () => applyDark(!document.body.classList.contains("dark")));
 
   document.addEventListener("click", () => switcher.classList.remove("open"));
+})();
+
+// Exposes the current theme's true color-wheel complement (same HSL
+// hue+180 math as the Drop Game's colored slots) as a CSS custom property,
+// so any stylesheet rule can pick it up with var(--theme-complement)
+// instead of a fixed hover color -- used by the menu search dropdown.
+(function() {
+  function hexToHsl(hex) {
+    let r = parseInt(hex.slice(1, 3), 16) / 255;
+    let g = parseInt(hex.slice(3, 5), 16) / 255;
+    let b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0, l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        default: h = (r - g) / d + 4;
+      }
+      h *= 60;
+    }
+    return [h, s * 100, l * 100];
+  }
+  function hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    const toHex = x => Math.round(x * 255).toString(16).padStart(2, "0");
+    return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
+  }
+  function updateThemeComplement() {
+    const accent = getComputedStyle(document.body).getPropertyValue("--accent").trim() || "#fcf811";
+    const [h, s, l] = hexToHsl(accent);
+    const complement = hslToHex((h + 180) % 360, Math.max(s, 55), l);
+    document.documentElement.style.setProperty("--theme-complement", complement);
+  }
+  document.addEventListener("themechange", updateThemeComplement);
+  updateThemeComplement();
 })();
 
 startCountdown();
@@ -3267,7 +3315,10 @@ scheduleStripeToggle();
   if (!toggleBtn || !panel || !board || !canvas) return;
 
   const ctx = canvas.getContext("2d");
-  const DPR = window.devicePixelRatio || 1;
+  // Capped at 2: a 3x phone renders 2.25x the pixels of 2x for no visible
+  // gain on a physics toy, and the canvas fill cost is most of the mobile
+  // frame budget.
+  const DPR = Math.min(2, window.devicePixelRatio || 1);
 
   const BALL_R    = 9;
   const PEG_R     = 4;
@@ -3275,6 +3326,11 @@ scheduleStripeToggle();
   const BASE_ROW_SPACE = 30; // vertical spacing between peg rows
   const TOP_MARGIN = 40;  // gap above first peg row (the ball's drag lane)
   const SLOT_H    = 70;   // height reserved for the slot area at the bottom
+  const TRAY_H    = 80;   // gold-ball tray below the slots -- rewards collect here, visibly held
+  const BAR_H     = 10;   // the slot baseline is a real bar (a hinged plate), not a hairline
+  const RAMP_TILT = 30;   // how far the bar's free end swings down when it opens
+  const RAMP_GAP  = 50;   // opening at the swung-down end that gold drops through
+  const TRAY_CAPACITY = 150; // tray holds this many gold balls before they're bagged
   const GRAVITY   = 0.32;
   const RESTITUTION = 0.62;
   const MIN_COLORED = 1, MAX_COLORED = 6, MAX_BALLS = 12;
@@ -3303,7 +3359,65 @@ scheduleStripeToggle();
 
   let cssW = 0, cssH = 0;
   let pegs = [];
-  let slotCount = 0, slotW = 0, pegsBottomY = 0, floorY = 0;
+  // Spatial hash over the peg field: cell -> pegs in it. A ball only ever
+  // needs the pegs in its own 3x3 cell neighborhood, so per-frame collision
+  // work stops scaling with the TOTAL peg count (which is what made big
+  // boards + a 100-ball gold shower chug on phones).
+  const PEG_CELL = 48;
+  let pegGrid = new Map();
+  function buildPegGrid() {
+    pegGrid = new Map();
+    for (const p of pegs) {
+      const key = `${Math.floor(p.x / PEG_CELL)},${Math.floor(p.y / PEG_CELL)}`;
+      let bucket = pegGrid.get(key);
+      if (!bucket) { bucket = []; pegGrid.set(key, bucket); }
+      bucket.push(p);
+    }
+  }
+  function pegsNear(x, y) {
+    const cx = Math.floor(x / PEG_CELL), cy = Math.floor(y / PEG_CELL);
+    const out = [];
+    for (let gx = cx - 1; gx <= cx + 1; gx++) {
+      for (let gy = cy - 1; gy <= cy + 1; gy++) {
+        const bucket = pegGrid.get(`${gx},${gy}`);
+        if (bucket) out.push(...bucket);
+      }
+    }
+    return out;
+  }
+  let slotCount = 0, slotW = 0, pegsBottomY = 0, floorY = 0, trayFloorY = 0;
+
+  // ── The hinged floor bar ──
+  // The slot baseline is a physical bar. During a gold shower it hinges
+  // open: one side swings down into a ramp and its free end pulls back
+  // from the wall, opening a gap the gold rolls down through into the
+  // tray. Once every gold ball is down, it swings shut again.
+  let rampProgress = 0;      // 0 = shut flat, 1 = fully open
+  let rampTarget = 0;
+  let rampSide = "right";    // which side swings down (re-rolled per shower)
+  let goldShowerActive = false; // a shower is in progress this round
+  let showerStartedAt = 0;   // watchdog reference for a shower that never finishes
+  let roundOver = false;     // outcome already shown for this round
+
+  function rampYAt(x) {
+    if (rampProgress <= 0) return floorY;
+    const t = rampSide === "right" ? x / cssW : 1 - x / cssW;
+    return floorY + rampProgress * RAMP_TILT * t;
+  }
+  function inRampGap(x) {
+    if (rampProgress < 0.6) return false;
+    return rampSide === "right" ? x > cssW - RAMP_GAP : x < RAMP_GAP;
+  }
+  // Regular balls always rest on the bar (flat or tilted). Gold rests on
+  // the bar too while it's rolling toward the opening -- but through the
+  // gap, or once it's below the bar, its floor is the tray's.
+  function floorFor(b) {
+    if (!b.isReward) return rampYAt(b.x);
+    const br = b.r || BALL_R;
+    if (b.y - br > rampYAt(b.x) + BAR_H) return trayFloorY;
+    if (inRampGap(b.x)) return trayFloorY;
+    return rampYAt(b.x);
+  }
   let pegRowCount = 0; // how many peg rows the board currently has -- taller board (resized), more rows
   let coloredSlots = null;  // how many slots get a distinct color; null = not yet chosen
   let coloredSlotIndices = new Set(); // which slot indices (scattered, not left-to-right) are colored
@@ -3349,7 +3463,8 @@ scheduleStripeToggle();
     canvas.height = Math.round(cssH * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-    floorY = cssH;
+    trayFloorY = cssH;
+    floorY = cssH - TRAY_H;
 
     // The peg field always uses the same dense, auto-fit grid regardless of
     // mode -- Restaurant Picker doesn't touch ball/peg size or row spacing
@@ -3362,7 +3477,7 @@ scheduleStripeToggle();
     const usableW = cols * colSpace;
     const xOffset = (cssW - usableW) / 2;
 
-    const pegAreaH = Math.max(BASE_ROW_SPACE * 3, cssH - TOP_MARGIN - SLOT_H);
+    const pegAreaH = Math.max(BASE_ROW_SPACE * 3, cssH - TOP_MARGIN - SLOT_H - TRAY_H);
     const rows = Math.max(4, Math.round(pegAreaH / BASE_ROW_SPACE));
     pegRowCount = rows;
     pegsBottomY = TOP_MARGIN + rows * BASE_ROW_SPACE;
@@ -3392,6 +3507,7 @@ scheduleStripeToggle();
     // ball landing right on a boundary can still bounce to either side,
     // instead of being forced into whichever slot half it's nominally over.
     for (let i = 0; i <= slotCount; i++) pegs.push({ x: i * slotW, y: pegsBottomY });
+    buildPegGrid();
     if (coloredSlots === null) coloredSlots = 2 + Math.floor(Math.random() * 3); // 2-4
     coloredSlots = Math.max(MIN_COLORED, Math.min(coloredSlots, maxColoredForSlots()));
     coloredSlotIndices = pickColoredIndices(coloredSlots);
@@ -3440,17 +3556,68 @@ scheduleStripeToggle();
   }
 
   function resetBalls() {
-    balls = [];
+    // The tray's gold survives a reset -- it's the player's stash, held
+    // until it fills up and gets bagged. Only the round's black balls (and
+    // any stray unsettled gold) are cleared. Kept gold is re-seated inside
+    // the (possibly resized) tray bounds.
+    balls = balls.filter(b => b.isReward && !b.moving);
+    balls.forEach(b => {
+      const br = b.r || BALL_R;
+      b.x = Math.min(Math.max(b.x, br), cssW - br);
+      b.y = Math.min(Math.max(b.y, floorY + BAR_H + br), trayFloorY - br);
+    });
     dragBall = { x: cssW / 2, y: TOP_MARGIN / 2 };
     allPastLineSince = null;
     spawningGold = false;
+    goldShowerActive = false;
+    roundOver = false;
+    rampProgress = 0;
+    rampTarget = 0;
     hideComment();
   }
 
   // ── Reward / comment feedback shown after a round settles ──────────────
-  const GOLD_PER_BALL = 50; // reward balls per original ball that landed colored, at the reference row count
-  const REFERENCE_ROWS = 14; // peg row count at the board's default (unresized) height
+  // Difficulty-scaled payout: perHit = GOLD_RATE * (slotCount/coloredSlots)
+  // / ballsDropped * rowFactor. The riskier the setup, the bigger the win:
+  //   - desktop (~25-33 slots), 1 ball, 1 colored slot -> 100-130 balls
+  //   - mobile (~11 slots), 1 ball, 1 colored slot -> ~44 (fewer slots =
+  //     an easier hit, so less than desktop -- but still far above easier
+  //     configs, e.g. mobile with 3 colors + 2 balls pays ~7 per hit)
+  // Total spawn is capped so a jackpot can't melt a phone.
+  const GOLD_RATE = 4;
+  const REFERENCE_ROWS = 12; // peg row count at the board's default (unresized) height, tray included
   const GOLD_R = BALL_R * 0.75; // smaller than a regular ball
+  const MAX_GOLD_MOBILE = 150, MAX_GOLD_DESKTOP = 400;
+
+  // Session total of golden balls won, shown in the top control bar and
+  // remembered per-browser.
+  let goldTotal = Number(localStorage.getItem("plinkoGoldTotal")) || 0;
+  function updateGoldCount(add) {
+    if (add) {
+      goldTotal += add;
+      localStorage.setItem("plinkoGoldTotal", String(goldTotal));
+    }
+    const el = document.getElementById("plinko-gold-count");
+    if (el) el.innerHTML = `&#x1F7E1; ${goldTotal}`;
+  }
+  updateGoldCount(0);
+
+  // Bags: once the tray holds TRAY_CAPACITY gold balls, they're swept into
+  // a bag -- the bag tally (persisted per-browser) is painted in the tray
+  // corner as the money-bag sign.
+  let goldBags = Number(localStorage.getItem("plinkoGoldBags")) || 0;
+  function bagUpTray() {
+    const trayCount = balls.reduce((n, b) => n + (b.isReward ? 1 : 0), 0);
+    if (trayCount < TRAY_CAPACITY) return;
+    const bagsGained = Math.floor(trayCount / TRAY_CAPACITY);
+    goldBags += bagsGained;
+    localStorage.setItem("plinkoGoldBags", String(goldBags));
+    let toRemove = bagsGained * TRAY_CAPACITY;
+    balls = balls.filter(b => {
+      if (b.isReward && toRemove > 0) { toRemove--; return false; }
+      return true;
+    });
+  }
 
   // The reward balls actually drop through the machine like real balls
   // (same pegs, same physics) rather than a decorative overlay -- they
@@ -3458,6 +3625,14 @@ scheduleStripeToggle();
   // the whole field) and trickle in one at a time with a slight random
   // stagger, then fall and settle like anything else.
   function spawnGoldBalls(count) {
+    // Swing the floor bar open (random side each shower) so the gold has
+    // somewhere to roll down into the tray; wake the settled black balls
+    // so they ride the tilting bar instead of hanging in the air.
+    goldShowerActive = true;
+    showerStartedAt = performance.now();
+    rampSide = Math.random() < 0.5 ? "left" : "right";
+    rampTarget = 1;
+    balls.forEach(b => { if (!b.isReward) b.moving = true; });
     startPhysics();
     // The staggered trickle runs on its own setTimeout chain, independent
     // of the physics loop -- without this flag, the loop can see "nothing
@@ -3506,12 +3681,13 @@ scheduleStripeToggle();
   }
 
   // Once every ball has settled, check whether any of the ORIGINAL (non-
-  // reward) balls landed in a colored slot -- each one that did pays out
-  // GOLD_PER_BALL reward balls. If none did, a random consolation comment
+  // reward) balls landed in a colored slot -- each hit pays out the
+  // difficulty-scaled prize. If none did, a random consolation comment
   // instead. Once those reward balls finish falling and settle, this runs
   // again -- that second pass is where the winning comment shows, once the
   // whole shower has actually landed.
   function evaluateOutcome() {
+    if (roundOver) return; // outcome already shown; loop re-entry (e.g. the bar shutting) is a no-op
     // Restaurant Picker: no colors/reward, but the winning restaurant's
     // name shows in the same stamped gold "win" style as a real win,
     // instead of leaving you to go look the number up in the legend.
@@ -3520,25 +3696,45 @@ scheduleStripeToggle();
       const idx = settled?.slotIndex ?? Math.max(0, Math.min(slotCount - 1, Math.floor((settled?.x || 0) / slotW)));
       const name = restaurantAssignment[idx] || "Other";
       showCommentFrom([name], true);
+      roundOver = true;
       return;
     }
-    if (balls.some(b => b.isReward)) { showWinComment(); return; }
+    // Shower finished: every gold ball is down in the tray. Bag the tray
+    // if it's full, swing the bar shut, and show the win.
+    if (goldShowerActive) {
+      goldShowerActive = false;
+      rampTarget = 0;
+      bagUpTray();
+      showWinComment();
+      roundOver = true;
+      startPhysics(); // keep frames coming for the bar-shut animation
+      return;
+    }
     // Use the slot each ball was frozen into the instant it first touched
     // down (not its current x), so later jostling from more balls piling
-    // in can't disagree with what the ball visibly landed in.
+    // in can't disagree with what the ball visibly landed in. Tray gold
+    // left over from earlier rounds doesn't count -- originals only.
     const coloredCount = balls.filter(b => {
+      if (b.isReward) return false;
       const idx = b.slotIndex ?? Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
       return coloredSlotIndices.has(idx);
     }).length;
     if (coloredCount > 0) {
-      // A taller board (more peg rows, i.e. the user dragged it open more)
-      // pays out proportionally more per hit -- more rows means the ball
-      // earned it by surviving more chances to bounce the wrong way.
+      // Difficulty-scaled payout (see GOLD_RATE comment above): more
+      // slots, fewer colored slots, and fewer balls dropped all raise the
+      // per-hit prize; a taller board (more peg rows) still multiplies it.
       const rowFactor = pegRowCount / REFERENCE_ROWS;
-      const perBall = Math.round(GOLD_PER_BALL * rowFactor);
-      spawnGoldBalls(perBall * coloredCount);
+      const originals = Math.max(1, balls.filter(b => !b.isReward).length);
+      const perHit = Math.max(5, Math.round(
+        GOLD_RATE * (slotCount / Math.max(1, coloredSlots)) / originals * rowFactor
+      ));
+      const cap = slotCount <= MOBILE_SLOT_THRESHOLD ? MAX_GOLD_MOBILE : MAX_GOLD_DESKTOP;
+      const total = Math.min(cap, perHit * coloredCount);
+      updateGoldCount(total);
+      spawnGoldBalls(total);
     } else {
       showComment();
+      roundOver = true;
     }
   }
 
@@ -3618,12 +3814,19 @@ scheduleStripeToggle();
     const inkColor  = bodyStyle.getPropertyValue("--ink").trim() || "#000";
     const accentColor = bodyStyle.getPropertyValue("--accent").trim() || "#fcf811";
 
-    // slot columns
+    // gold tray -- an open holding pen below the slots where reward balls
+    // collect and stay visible; drawn first so slots/balls sit on top.
+    ctx.fillStyle = "rgba(255, 196, 0, 0.15)";
+    ctx.fillRect(0, floorY, cssW, trayFloorY - floorY);
+
+    // slot columns -- bottoms follow the bar, so tilting it visibly drags
+    // the slot floor down with it
     for (let i = 0; i < slotCount; i++) {
+      const cx = (i + 0.5) * slotW;
       ctx.fillStyle = slotColor(i, 0.9, accentColor);
-      ctx.fillRect(i * slotW, pegsBottomY, slotW, floorY - pegsBottomY);
+      ctx.fillRect(i * slotW, pegsBottomY, slotW, rampYAt(cx) - pegsBottomY);
     }
-    // slot dividers
+    // slot dividers, down to wherever the bar currently sits under each
     ctx.strokeStyle = inkColor;
     ctx.globalAlpha = 0.6;
     ctx.lineWidth = 2;
@@ -3631,10 +3834,30 @@ scheduleStripeToggle();
       const x = i * slotW;
       ctx.beginPath();
       ctx.moveTo(x, pegsBottomY);
-      ctx.lineTo(x, floorY);
+      ctx.lineTo(x, rampYAt(x));
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
+
+    // The floor bar itself: a solid hinged plate, drawn as a thick slab so
+    // it reads as a real mechanism. When open, it stops short of the low
+    // wall -- that missing stretch IS the hatch the gold drops through.
+    {
+      const gapOpen = rampProgress >= 0.6;
+      const x0 = (gapOpen && rampSide === "left") ? RAMP_GAP : 0;
+      const x1 = (gapOpen && rampSide === "right") ? cssW - RAMP_GAP : cssW;
+      ctx.beginPath();
+      ctx.moveTo(x0, rampYAt(x0));
+      ctx.lineTo(x1, rampYAt(x1));
+      ctx.lineTo(x1, rampYAt(x1) + BAR_H);
+      ctx.lineTo(x0, rampYAt(x0) + BAR_H);
+      ctx.closePath();
+      ctx.fillStyle = inkColor;
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "#a07800";
+      ctx.stroke();
+    }
 
     // Restaurant Picker mode -- a plain number per slot; the legend below
     // the board maps each number to a restaurant (or "Other").
@@ -3662,8 +3885,9 @@ scheduleStripeToggle();
       ctx.stroke();
     });
 
-    // drag lane hint + staging marker, only while nothing is in flight
-    if (!balls.length) {
+    // drag lane hint + staging marker, only while no round is in flight
+    // (gold held in the tray doesn't block the next drop)
+    if (!balls.some(b => !b.isReward)) {
       ctx.strokeStyle = "rgba(128,128,128,0.5)";
       ctx.lineWidth = 1;
       ctx.setLineDash([3, 4]);
@@ -3696,6 +3920,43 @@ scheduleStripeToggle();
       ctx.strokeStyle = b.isReward ? "#000" : accentColor;
       ctx.stroke();
     });
+
+    // Bag tally -- painted in the tray corner, on top of the pile, so you
+    // can always see how many full trays you've bagged.
+    ctx.font = '900 15px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = "#a07800";
+    ctx.fillText(`\u{1F4B0} ×${goldBags}`, 8, trayFloorY - 8);
+  }
+
+  // Is this ball meaningfully embedded in an already-settled ball? (A
+  // couple px of squish is allowed so piles still pack snugly.)
+  function overlapsSettledBall(b) {
+    const br = b.r || BALL_R;
+    for (const o of balls) {
+      if (o === b || o.moving) continue;
+      const or2 = o.r || BALL_R;
+      const dx = b.x - o.x, dy = b.y - o.y;
+      const min = br + or2 - 2;
+      if (dx * dx + dy * dy < min * min) return true;
+    }
+    return false;
+  }
+
+  // Is this ball supported from below by a settled ball? Needed because a
+  // ball perched on the pile never touches the floor, so the floor-contact
+  // settle can never fire for it.
+  function restingOnPile(b) {
+    const br = b.r || BALL_R;
+    for (const o of balls) {
+      if (o === b || o.moving) continue;
+      const or2 = o.r || BALL_R;
+      const dx = b.x - o.x, dy = b.y - o.y;
+      const min = br + or2 + 1.5;
+      if (dy < 0 && -dy > (br + or2) * 0.35 && dx * dx + dy * dy < min * min) return true;
+    }
+    return false;
   }
 
   function stepBall(b) {
@@ -3720,7 +3981,12 @@ scheduleStripeToggle();
       b._stallFrames++;
       if (b._stallFrames > 45) {
         b._nudges++;
-        if (b._nudges > 6) { stuckBeyondRecovery = true; return; }
+        // A gold ball queuing at the hatch is normal congestion, not a
+        // wedged board -- keep nudging it rather than nuking the round.
+        if (b._nudges > 6) {
+          if (b.isReward) { b._nudges = 0; } else { stuckBeyondRecovery = true; }
+          return;
+        }
         b.vx += (Math.random() - 0.5) * 3;
         b.vy += 0.8;
         b._stallFrames = 0;
@@ -3731,27 +3997,33 @@ scheduleStripeToggle();
       b._nudges = 0;
     }
 
-    // pegs
-    for (const p of pegs) {
-      const dx = b.x - p.x, dy = b.y - p.y;
-      const dist = Math.hypot(dx, dy);
-      const minDist = br + (p.r || PEG_R);
-      if (dist > 0 && dist < minDist) {
-        const nx = dx / dist, ny = dy / dist;
-        const overlap = minDist - dist;
-        b.x += nx * overlap;
-        b.y += ny * overlap;
-        const dot = b.vx * nx + b.vy * ny;
-        b.vx = (b.vx - 2 * dot * nx) * RESTITUTION + (Math.random() - 0.5) * 0.6;
-        b.vy = (b.vy - 2 * dot * ny) * RESTITUTION;
+    // pegs -- only the 3x3 spatial-hash neighborhood around the ball, with
+    // a squared-distance early reject (no sqrt until an actual hit). Balls
+    // already below the peg field skip the lookup entirely.
+    if (b.y < pegsBottomY + PEG_R * 4) {
+      for (const p of pegsNear(b.x, b.y)) {
+        const dx = b.x - p.x, dy = b.y - p.y;
+        const minDist = br + (p.r || PEG_R);
+        const d2 = dx * dx + dy * dy;
+        if (d2 > 0 && d2 < minDist * minDist) {
+          const dist = Math.sqrt(d2);
+          const nx = dx / dist, ny = dy / dist;
+          const overlap = minDist - dist;
+          b.x += nx * overlap;
+          b.y += ny * overlap;
+          const dot = b.vx * nx + b.vy * ny;
+          b.vx = (b.vx - 2 * dot * nx) * RESTITUTION + (Math.random() - 0.5) * 0.6;
+          b.vy = (b.vy - 2 * dot * ny) * RESTITUTION;
+        }
       }
     }
 
     // A bit below the divider tips (giving the tip-bumper collision above
     // first crack at redirecting a borderline ball), the dividers become
     // solid walls -- whichever slot the ball ends up in, it's locked to for
-    // the rest of the drop.
-    if (b.y > pegsBottomY + PEG_R * 3) {
+    // the rest of the drop. Gold reward balls are exempt: they fall
+    // straight through the slot area into the tray below.
+    if (!b.isReward && b.y > pegsBottomY + PEG_R * 3) {
       const idx = Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
       const left  = idx * slotW + br + 1;
       const right = (idx + 1) * slotW - br - 1;
@@ -3764,8 +4036,46 @@ scheduleStripeToggle();
     // shove a settled ball a few pixels sideways into a neighboring slot's
     // territory without this, making the win/lose check disagree with
     // whatever slot the ball visibly landed in first.
-    if (b.y + br >= floorY) {
-      b.y = floorY - br;
+    const settleY = floorFor(b);
+    if (b.y + br >= settleY) {
+      if (b.isReward && settleY < trayFloorY - 0.5) {
+        // Gold resting on the tilted bar doesn't settle -- it rolls toward
+        // the opening, picking up a downhill push each frame.
+        b.y = settleY - br;
+        b.vy = 0;
+        b.vx += (rampSide === "right" ? 0.35 : -0.35) * Math.max(0.3, rampProgress);
+        b.vx *= 0.98;
+      } else if (b.vy > 1.5) {
+        // A real bounce on impact instead of dead-stopping on first touch
+        // (which read as the floor being sticky) -- the ball only settles
+        // once it comes down soft.
+        b.y = settleY - br;
+        b.vy = -b.vy * RESTITUTION;
+        b.vx *= 0.92;
+      } else if (Math.abs(b.vx) > 0.35) {
+        // Landed soft but still carrying sideways momentum -- roll along
+        // the floor with friction (bouncing off walls/the pile) instead of
+        // freezing mid-roll where it first touched down.
+        b.y = settleY - br;
+        b.vy = 0;
+        b.vx *= 0.965;
+      } else if (overlapsSettledBall(b)) {
+        // Came to rest INSIDE the pile -- pop it up gently and let the
+        // collision pass walk it to a free spot, so settled balls take up
+        // real space instead of stacking into each other.
+        b.y = settleY - br;
+        b.vy = -1.4;
+        b.vx += (Math.random() - 0.5) * 0.8;
+      } else {
+        b.y = settleY - br;
+        b.vx = 0; b.vy = 0;
+        b.moving = false;
+        b.slotIndex = Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
+      }
+    } else if (Math.abs(b.vx) < 0.25 && b.vy < 0.7 && !overlapsSettledBall(b) && restingOnPile(b)) {
+      // Perched on top of the pile, basically stationary, and not embedded
+      // in anyone -- settle right there. Without this, a ball resting on
+      // other balls (never touching the floor) would stay "moving" forever.
       b.vx = 0; b.vy = 0;
       b.moving = false;
       b.slotIndex = Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
@@ -3779,18 +4089,44 @@ scheduleStripeToggle();
     for (let i = 0; i < balls.length; i++) {
       for (let j = i + 1; j < balls.length; j++) {
         const a = balls[i], b = balls[j];
+        // Two settled balls have already been shoved apart -- skipping
+        // them turns the O(n^2) pass into near-O(moving x n), which is
+        // what matters once ~100 gold balls have piled up in the tray.
+        if (!a.moving && !b.moving) continue;
+        // Gold passes THROUGH regular balls (otherwise it would pile on
+        // top of the black balls in the slots and never reach the tray);
+        // gold still stacks against gold once it's down there.
+        if (a.isReward !== b.isReward) continue;
         const dx = b.x - a.x, dy = b.y - a.y;
-        const dist = Math.hypot(dx, dy);
         const minDist = (a.r || BALL_R) + (b.r || BALL_R);
+        // Cheap axis reject before any sqrt.
+        if (dx > minDist || dx < -minDist || dy > minDist || dy < -minDist) continue;
+        const dist = Math.hypot(dx, dy);
         if (dist > 0 && dist < minDist) {
           const nx = dx / dist, ny = dy / dist;
-          const overlap = (minDist - dist) / 2;
-          a.x -= nx * overlap; a.y -= ny * overlap;
-          b.x += nx * overlap; b.y += ny * overlap;
-          const avn = a.vx * nx + a.vy * ny;
-          const bvn = b.vx * nx + b.vy * ny;
-          a.vx += (bvn - avn) * nx; a.vy += (bvn - avn) * ny;
-          b.vx += (avn - bvn) * nx; b.vy += (avn - bvn) * ny;
+          if (a.moving && b.moving) {
+            const overlap = (minDist - dist) / 2;
+            a.x -= nx * overlap; a.y -= ny * overlap;
+            b.x += nx * overlap; b.y += ny * overlap;
+            const avn = a.vx * nx + a.vy * ny;
+            const bvn = b.vx * nx + b.vy * ny;
+            a.vx += (bvn - avn) * nx; a.vy += (bvn - avn) * ny;
+            b.vx += (avn - bvn) * nx; b.vy += (avn - bvn) * ny;
+          } else {
+            // One of the pair is settled pile: the pile doesn't budge --
+            // the mover takes the FULL separation, with a small upward
+            // kick when the contact is mostly side-on, so it climbs over
+            // the pile instead of tunneling through it at floor level.
+            const m = a.moving ? a : b;
+            const sign = a.moving ? -1 : 1;
+            const overlap = minDist - dist;
+            m.x += sign * nx * overlap;
+            m.y += sign * ny * overlap;
+            if (Math.abs(ny) < 0.35) m.vy -= 0.5;
+            const mvn = m.vx * nx + m.vy * ny;
+            m.vx -= mvn * nx * 1.4;
+            m.vy -= mvn * ny * 1.4;
+          }
         }
       }
     }
@@ -3801,8 +4137,9 @@ scheduleStripeToggle();
   // about those boundaries) -- clamp everyone back inside afterward.
   function clampToBounds(b) {
     const br = b.r || BALL_R;
-    if (b.y + br > floorY) { b.y = floorY - br; b.vy = 0; }
-    if (b.y > pegsBottomY) {
+    const fy = floorFor(b);
+    if (b.y + br > fy) { b.y = fy - br; b.vy = 0; }
+    if (!b.isReward && b.y > pegsBottomY) {
       const idx = Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
       const left  = idx * slotW + br + 1;
       const right = (idx + 1) * slotW - br - 1;
@@ -3814,6 +4151,36 @@ scheduleStripeToggle();
   }
 
   function step() {
+    // The bar is open if and only if a shower is running -- derived every
+    // frame rather than trusting that every code path remembered to shut
+    // it, so it can never be left hanging open after a round ends.
+    rampTarget = (spawningGold || goldShowerActive) ? 1 : 0;
+
+    // Shower watchdog: if gold has been rolling for way too long (wedged
+    // in the hatch, jiggle equilibrium in the pile, etc.), drop every
+    // remaining gold ball straight into the tray and finish the round
+    // rather than leaving the bar open with the machine stuck.
+    if (goldShowerActive && !spawningGold && performance.now() - showerStartedAt > 12000) {
+      balls.forEach(b => {
+        if (!b.isReward || !b.moving) return;
+        const br = b.r || BALL_R;
+        b.y = trayFloorY - br;
+        b.vx = 0; b.vy = 0;
+        b.moving = false;
+      });
+    }
+
+    // Animate the floor bar toward its open/shut target. While it moves,
+    // wake any settled black ball the bar has dropped away from beneath,
+    // so it visibly rides the ramp instead of floating in place.
+    if (rampProgress !== rampTarget) {
+      const d = rampTarget - rampProgress;
+      rampProgress += Math.sign(d) * Math.min(Math.abs(d), 0.06);
+      balls.forEach(b => {
+        if (!b.isReward && !b.moving && b.y + (b.r || BALL_R) < rampYAt(b.x) - 0.5) b.moving = true;
+      });
+    }
+
     // Several balls can end up in a shoving match squeezed into one narrow
     // slot, each pushing the others just enough that none of them ever
     // individually satisfies "touching the floor" -- rather than wait on
@@ -3834,14 +4201,19 @@ scheduleStripeToggle();
     // settle once a round has been running too long, regardless of position.
     // The reward shower is exempt -- once gold balls start falling, let the
     // whole thing play out to the winning comment with no time limit.
-    const inRewardPhase = spawningGold || balls.some(b => b.isReward);
+    const inRewardPhase = spawningGold || goldShowerActive;
     const timedOut = !inRewardPhase && performance.now() - roundStartTime > MAX_ROUND_MS;
 
     if (settledEnough || timedOut) {
       balls.forEach(b => {
         if (!b.moving) return;
         const br = b.r || BALL_R;
-        b.y = Math.min(b.y, floorY - br);
+        // Gold still riding the open bar (or falling above it) is exempt --
+        // it settles when it reaches the tray, not where the timer catches
+        // it. Gold already down IN the tray region is fair game: after the
+        // grace period it freezes wherever the pile jiggling left it.
+        if (b.isReward && goldShowerActive && b.y + br <= rampYAt(b.x) + 2) return;
+        b.y = Math.min(b.y, floorFor(b) - br);
         b.vx = 0; b.vy = 0;
         b.moving = false;
         b.slotIndex = Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
@@ -3857,7 +4229,7 @@ scheduleStripeToggle();
       layout(); // full reset: fresh pegs, fresh winning slot, empty board
       return;
     }
-    if (balls.some(b => b.moving) || spawningGold) {
+    if (balls.some(b => b.moving) || spawningGold || rampProgress !== rampTarget) {
       rafId = requestAnimationFrame(step);
     } else if (pendingRelayout) {
       // A resize that arrived mid-drop (e.g. a mobile browser's address bar
@@ -3886,7 +4258,15 @@ scheduleStripeToggle();
   }
 
   canvas.addEventListener("pointerdown", e => {
-    if (balls.length) return;
+    // Tray gold from earlier rounds doesn't count as an active round --
+    // only the black balls do.
+    if (balls.some(b => !b.isReward)) {
+      // Round is over (comment showing, everything settled) -- clicking
+      // ANYWHERE on the machine resets it, no need to find the ↻ button.
+      // Mid-drop clicks still do nothing.
+      if (!spawningGold && !balls.some(b => b.moving)) layout();
+      return;
+    }
     const p = pointerPos(e);
     if (Math.hypot(p.x - dragBall.x, p.y - dragBall.y) > BALL_R * 3) return;
     e.preventDefault();
@@ -3895,16 +4275,21 @@ scheduleStripeToggle();
     canvas.setPointerCapture(e.pointerId);
   });
   canvas.addEventListener("pointermove", e => {
+    // Hovering the painted bag tally shows what a bag is worth -- the bag
+    // is canvas pixels, not a DOM node, so the tooltip rides canvas.title.
+    const hp = pointerPos(e);
+    const overBag = hp.x >= 4 && hp.x <= 80 && hp.y >= trayFloorY - 26 && hp.y <= trayFloorY;
+    canvas.title = overBag ? `1 bag = ${TRAY_CAPACITY} golden balls` : "";
     if (!dragging) return;
-    const p = pointerPos(e);
-    dragBall.x = Math.max(BALL_R, Math.min(cssW - BALL_R, p.x));
+    dragBall.x = Math.max(BALL_R, Math.min(cssW - BALL_R, hp.x));
     draw();
   });
   function releaseDrag() {
     if (!dragging) return;
     dragging = false;
     canvas.classList.remove("dragging");
-    balls = [];
+    balls = balls.filter(b => b.isReward); // tray stash stays put
+    roundOver = false;
     for (let i = 0; i < ballCount; i++) {
       // Every ball drops near the release point -- not stacked on the exact
       // same pixel, but not scattered across the whole board either.
@@ -3978,8 +4363,8 @@ scheduleStripeToggle();
   }
 })();
 
-// ── Game mode toggle (Drop Game -> Wheel of Fortune -> Roulette) ────────
-// All three boards/control sets live in the DOM together; only one shows
+// ── Game mode toggle (Drop Game <-> Wheel of Fortune) ───────────────────
+// Both boards/control sets live in the DOM together; only one shows
 // at a time, picked by [data-mode] on the card. Kept as its own tiny IIFE
 // since it only needs to know about the arrow button and the card, not
 // any of the three games' internals.
@@ -3988,8 +4373,8 @@ scheduleStripeToggle();
   const btn  = document.getElementById("game-mode-toggle-btn");
   if (!card || !btn) return;
 
-  const MODES = ["plinko", "wheel", "roulette"];
-  const NEXT_LABEL = { plinko: "Wheel", wheel: "Roulette", roulette: "Drop Game" };
+  const MODES = ["plinko", "wheel"];
+  const NEXT_LABEL = { plinko: "Wheel", wheel: "Drop Game" };
   card.dataset.mode = "plinko";
 
   btn.addEventListener("click", () => {
@@ -4254,8 +4639,6 @@ scheduleStripeToggle();
       });
     });
     spinBtn.disabled = items.length < 2;
-    const dropBtnEl = document.getElementById("roulette-drop-btn");
-    if (dropBtnEl) dropBtnEl.disabled = items.length < 2;
   }
 
   form.addEventListener("submit", e => {
@@ -4375,6 +4758,37 @@ scheduleStripeToggle();
     pctx.clearRect(0, 0, size, size);
     if (!n) return r;
 
+    // The pie sits inside a fixed outer border ring, with a bleed gap
+    // between the two -- like a real wheel's housing. The ring does NOT
+    // rotate (drawn outside the rotated context below). Flat off-white
+    // backing regardless of theme, stroked at the same weight as the
+    // wedge lines.
+    const outerR = r - 4;
+    const pieR = r - 20;
+    pctx.beginPath();
+    pctx.arc(r, r, outerR, 0, Math.PI * 2);
+    pctx.fillStyle = "#faf7ef";
+    pctx.fill();
+    pctx.lineWidth = 1.25;
+    pctx.strokeStyle = "#000";
+    pctx.stroke();
+
+    // Drop shadow under the pie for depth -- a backdrop disc drawn with
+    // canvas shadow enabled; the wedges then cover the disc itself, so
+    // only its shadow (spilling into the bleed gap) stays visible.
+    pctx.save();
+    // Dense and tight: high opacity, little blur, small offset -- reads as
+    // the pie sitting just barely off the housing, not floating high.
+    pctx.shadowColor = "rgba(0, 0, 0, 0.65)";
+    pctx.shadowBlur = 5;
+    pctx.shadowOffsetX = 0;
+    pctx.shadowOffsetY = 3;
+    pctx.beginPath();
+    pctx.arc(r, r, pieR, 0, Math.PI * 2);
+    pctx.fillStyle = "#666";
+    pctx.fill();
+    pctx.restore();
+
     const colors = themeWedgeColors();
     const slice = (Math.PI * 2) / n;
     // Starting point for how big the text COULD be, given wedge width and
@@ -4383,7 +4797,7 @@ scheduleStripeToggle();
     // font size down with them.
     const baseFontSize = Math.max(12, Math.min(r * 0.26, (r * 1.15) / n));
     const minFontSize = 9;
-    const availableLen = r - 26; // radial room for the text, rim to hub
+    const availableLen = pieR - 24; // radial room for the text, rim to hub
 
     // Cap at 3 words first (reads better truncated at a word boundary than
     // mid-word, e.g. a long restaurant name), then shrink the font until
@@ -4416,7 +4830,7 @@ scheduleStripeToggle();
       const wedgeColor = colors[i % colors.length];
       pctx.beginPath();
       pctx.moveTo(0, 0);
-      pctx.arc(0, 0, r - 3, start, end);
+      pctx.arc(0, 0, pieR, start, end);
       pctx.closePath();
       pctx.fillStyle = wedgeColor;
       pctx.fill();
@@ -4431,7 +4845,7 @@ scheduleStripeToggle();
       pctx.textBaseline = "middle";
       pctx.fillStyle = "#000"; // always black -- auto contrast (white on light/yellow) wasn't reliable
       pctx.font = `900 ${fsize}px ${CANVAS_FONT_FAMILY}`;
-      pctx.fillText(label, r - 14, 0);
+      pctx.fillText(label, pieR - 12, 0);
       pctx.restore();
     }
     // Pins at each wedge boundary, on the rim -- rotate along with the
@@ -4440,8 +4854,8 @@ scheduleStripeToggle();
     const pinR = Math.max(3, r * 0.02);
     for (let i = 0; i < n; i++) {
       const angle = i * slice;
-      const px = Math.cos(angle) * (r - 2);
-      const py = Math.sin(angle) * (r - 2);
+      const px = Math.cos(angle) * pieR;
+      const py = Math.sin(angle) * pieR;
       pctx.beginPath();
       pctx.arc(px, py, pinR, 0, Math.PI * 2);
       pctx.fillStyle = "#ffc400";
@@ -4594,122 +5008,6 @@ scheduleStripeToggle();
   document.addEventListener("themechange", () => drawWheel());
   if (typeof ResizeObserver !== "undefined") {
     new ResizeObserver(() => { if (board.offsetParent) layout(); }).observe(board);
-  }
-
-  // ── Roulette view ────────────────────────────────────────────────────
-  // Same picks/pockets as the Wheel above (drawPockets is shared), but the
-  // wheel itself stays put -- a ball orbits the rim, decelerates, and
-  // spirals inward to settle in whichever pocket it ends up over. No
-  // separate pointer needed since the ball's own resting position IS the
-  // result.
-  const rBoard     = document.getElementById("roulette-board");
-  const rCanvasWrap= document.getElementById("roulette-canvas-wrap");
-  const rCanvas    = document.getElementById("roulette-canvas");
-  const dropBtn    = document.getElementById("roulette-drop-btn");
-  const rResetBtn  = document.getElementById("roulette-reset-btn");
-  const rResultEl  = document.getElementById("roulette-result");
-
-  if (rBoard && rCanvasWrap && rCanvas && dropBtn && rResultEl) {
-    const rCtx = rCanvas.getContext("2d");
-    let rCssSize = 0;
-    let ballAngle = -Math.PI / 2; // start at the top, purely cosmetic
-    let ballOrbitR = 0;
-    let ballDropping = false;
-
-    function rLayout() {
-      const w = rBoard.clientWidth, h = rBoard.clientHeight;
-      if (w <= 0 || h <= 0) return;
-      rCssSize = Math.max(60, Math.min(w, h) - 40);
-      rCanvasWrap.style.width  = `${rCssSize}px`;
-      rCanvasWrap.style.height = `${rCssSize}px`;
-      rCanvas.width  = Math.round(rCssSize * DPR);
-      rCanvas.height = Math.round(rCssSize * DPR);
-      rCanvas.style.width  = `${rCssSize}px`;
-      rCanvas.style.height = `${rCssSize}px`;
-      rCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      if (!ballOrbitR) ballOrbitR = (rCssSize / 2) - 6;
-      drawRoulette();
-    }
-
-    function drawRoulette() {
-      if (!rCssSize) return;
-      const r = drawPockets(rCtx, rCssSize, 0);
-      if (!items.length) return;
-      const bx = r + Math.cos(ballAngle) * ballOrbitR;
-      const by = r + Math.sin(ballAngle) * ballOrbitR;
-      rCtx.beginPath();
-      rCtx.arc(bx, by, Math.max(4, r * 0.035), 0, Math.PI * 2);
-      rCtx.fillStyle = "#eee";
-      rCtx.fill();
-      rCtx.lineWidth = 1.5;
-      rCtx.strokeStyle = "#000";
-      rCtx.stroke();
-    }
-
-    function normalizeAngle(a) {
-      const twoPi = Math.PI * 2;
-      return ((a % twoPi) + twoPi) % twoPi;
-    }
-    function pocketAtBall() {
-      const n = items.length;
-      if (!n) return -1;
-      const slice = (Math.PI * 2) / n;
-      return Math.floor(normalizeAngle(ballAngle) / slice) % n;
-    }
-
-    function hideRResult() { rResultEl.classList.remove("show"); }
-    function showRResult(text) {
-      rResultEl.textContent = text;
-      rResultEl.classList.add("show");
-    }
-
-    function dropBall() {
-      if (ballDropping || items.length < 2) return;
-      ballDropping = true;
-      hideRResult();
-      dropBtn.disabled = true;
-
-      const outerR = (rCssSize / 2) - 6;
-      const innerR = (rCssSize / 2) * 0.68;
-      const extraOrbits = 6 + Math.random() * 3;
-      const startAngle = ballAngle;
-      const targetAngle = startAngle + extraOrbits * Math.PI * 2 + Math.random() * Math.PI * 2;
-      const duration = 5800;
-      const startTime = performance.now();
-      const easeOutQuint = t => 1 - Math.pow(1 - t, 5);
-
-      function step(now) {
-        const t = Math.min(1, (now - startTime) / duration);
-        const e = easeOutQuint(t);
-        ballAngle = startAngle + (targetAngle - startAngle) * e;
-        ballOrbitR = outerR - (outerR - innerR) * e;
-        drawRoulette();
-        if (t < 1) {
-          requestAnimationFrame(step);
-        } else {
-          ballDropping = false;
-          dropBtn.disabled = items.length < 2;
-          const idx = pocketAtBall();
-          if (idx >= 0) showRResult(items[idx]);
-        }
-      }
-      requestAnimationFrame(step);
-    }
-
-    dropBtn.addEventListener("click", dropBall);
-    rResetBtn?.addEventListener("click", () => {
-      if (ballDropping) return;
-      ballAngle = -Math.PI / 2;
-      ballOrbitR = (rCssSize / 2) - 6;
-      hideRResult();
-      drawRoulette();
-    });
-
-    document.addEventListener("gamemodechange", e => { if (e.detail.mode === "roulette") rLayout(); });
-    document.addEventListener("themechange", () => drawRoulette());
-    if (typeof ResizeObserver !== "undefined") {
-      new ResizeObserver(() => { if (rBoard.offsetParent) rLayout(); }).observe(rBoard);
-    }
   }
 
   renderItemList();

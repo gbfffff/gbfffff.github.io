@@ -24,7 +24,7 @@
   const cells = [];
   for (let i = 0; i < CODE_LENGTH; i++) {
     const cell = document.createElement("input");
-    cell.type = "text";
+    cell.type = "password";
     cell.className = "gate-otp-cell";
     cell.maxLength = 1;
     cell.autocomplete = "off";

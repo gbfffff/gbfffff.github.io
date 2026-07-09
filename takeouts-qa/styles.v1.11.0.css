@@ -814,16 +814,19 @@
 
     .menu-dropdown-item:last-child { border-bottom: none; }
 
+    /* Theme-derived contrasting color (true color-wheel complement of
+       --accent, same math as the Drop Game's colored slots), not a fixed
+       black/accent highlight. */
     .menu-dropdown-item:hover,
     .menu-dropdown-item.focused {
-      background: #000; color: var(--accent);
+      background: var(--theme-complement, #000); color: #000;
     }
     .menu-dropdown-item:hover .dd-name,
     .menu-dropdown-item:hover .dd-price,
     .menu-dropdown-item:hover .dd-protein,
     .menu-dropdown-item.focused .dd-name,
     .menu-dropdown-item.focused .dd-price,
-    .menu-dropdown-item.focused .dd-protein { color: var(--accent) !important; opacity: 1; }
+    .menu-dropdown-item.focused .dd-protein { color: #000 !important; opacity: 1; }
 
     .menu-dropdown-item.is-selected { opacity: 0.4; cursor: default; }
 
@@ -2083,7 +2086,12 @@
     /* ── Mobile layout ── */
     @media (max-width: 600px) {
       body { padding: 1rem 0.5rem 3rem; }
-      .wheel-spin-btn { flex: 1 1 100%; }
+
+      /* Smaller cap on narrow boards -- combined with overflow-wrap above,
+         this keeps long comments/results from overrunning the board. */
+      .plinko-comment { font-size: min(1.6rem, 6.75cqh, 13cqw); }
+      .plinko-comment.win { font-size: min(2.4rem, 12cqh, 18cqw); }
+      .wheel-result { font-size: min(2.4rem, 12cqh, 18cqw); }
 
       /* Single column menu items */
       .mpi-grid { grid-template-columns: 1fr !important; }
@@ -2212,6 +2220,7 @@
     body.dark .plinko-restaurant-toggle { color: var(--ink); }
     body.dark .plinko-restaurant-toggle input { accent-color: var(--ink); }
     body.dark .plinko-clock { color: var(--ink); }
+    body.dark .plinko-gold-count { color: #ffc400; }
     body.dark .plinko-legend-row { border-color: var(--ink); }
     body.dark .plinko-legend-num { background: var(--ink); color: var(--bg); }
     body.dark .game-mode-toggle-btn { border-color: var(--ink); color: var(--ink); }
@@ -2221,16 +2230,17 @@
     body.dark .wheel-edit-panel.open {
       background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 24px, var(--bg) 24px, var(--bg) 48px);
     }
-    body.dark .wheel-controls button:not(.plinko-restart-btn) {
+    body.dark .wheel-accessory-btn,
+    body.dark .wheel-reset-btn {
       border-color: var(--ink);
       color: var(--ink);
-      box-shadow: 3px 3px 0 var(--ink);
     }
-    body.dark .wheel-controls button:not(.plinko-restart-btn):hover:not(:disabled) {
+    body.dark .wheel-accessory-btn:hover:not(:disabled),
+    body.dark .wheel-reset-btn:hover {
       background: var(--ink);
       color: var(--bg);
-      box-shadow: 5px 5px 0 var(--ink);
     }
+    body.dark .wheel-spin-btn { border-color: var(--ink); background: var(--ink); color: var(--bg); }
     body.dark .wheel-item-form input[type="text"] { border-color: var(--ink); }
     body.dark .wheel-item-chip { border-color: var(--ink); }
     body.dark .wheel-item-chip-remove { background: var(--ink); color: var(--bg); }
@@ -2262,13 +2272,13 @@
     body.dark .menu-dropdown { border-color: var(--ink); }
     body.dark .menu-dropdown-item { border-bottom-color: var(--ink); }
     body.dark .menu-dropdown-item:hover,
-    body.dark .menu-dropdown-item.focused { background: var(--ink); color: var(--bg); }
+    body.dark .menu-dropdown-item.focused { background: var(--theme-complement, var(--ink)); color: #000; }
     body.dark .menu-dropdown-item:hover .dd-name,
     body.dark .menu-dropdown-item:hover .dd-price,
     body.dark .menu-dropdown-item:hover .dd-protein,
     body.dark .menu-dropdown-item.focused .dd-name,
     body.dark .menu-dropdown-item.focused .dd-price,
-    body.dark .menu-dropdown-item.focused .dd-protein { color: var(--bg) !important; }
+    body.dark .menu-dropdown-item.focused .dd-protein { color: #000 !important; }
     body.dark .selected-pill { background: var(--ink); color: var(--bg); border-color: var(--ink); }
     body.dark .order-count-icon { color: var(--ink); }
     body.dark .order-count-num { color: var(--ink); }
@@ -2282,13 +2292,11 @@
       background-color: var(--bg);
       background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 6px, var(--bg) 6px, var(--bg) 14px);
     }
-    /* !important since the base .wheel-spin-btn:hover rule also needs it
-       (to beat the generic .wheel-controls button:hover rule), and among
-       competing !important declarations the higher-specificity one wins. */
     body.dark .wheel-spin-btn:hover:not(:disabled) {
-      color: var(--ink) !important;
-      background-color: var(--bg) !important;
-      background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 6px, var(--bg) 6px, var(--bg) 14px) !important;
+      color: var(--ink);
+      background-color: var(--bg);
+      background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 6px, var(--bg) 6px, var(--bg) 14px);
+      text-shadow: 0 0 8px var(--bg), 0 0 3px var(--bg);
     }
     body.dark .btn-secondary { border-color: var(--ink); color: var(--ink); }
     body.dark .btn-secondary:hover { background: var(--ink); color: var(--bg); }
@@ -2530,7 +2538,10 @@
     .theme-switcher.open .theme-options {
       flex-wrap: wrap;
       max-width: 30rem;
-      max-height: 3rem;
+      /* Generous ceiling, not a tight fit -- 3rem only budgeted for ~1 row,
+         but on narrower (mobile) widths this wraps to 2+ rows, and
+         overflow:hidden was clipping/hiding the bottom row entirely. */
+      max-height: 10rem;
       opacity: 1;
     }
     .theme-swatch {
@@ -2669,21 +2680,14 @@
       font-family: inherit;
     }
     .game-mode-toggle-btn:hover { opacity: 1; background: #000; color: var(--accent); }
-    /* Three modes share the same card -- [data-mode] on the card picks
-       which board/control set is visible. Wheel and Roulette share the
-       same item-editing controls (#wheel-controls) since they spin the
-       same picks, just with a different action button each. */
+    /* Two modes share the same card -- [data-mode] on the card picks
+       which board/control set is visible. */
     #plinko-card[data-mode="plinko"] #wheel-controls,
-    #plinko-card[data-mode="plinko"] #wheel-board,
-    #plinko-card[data-mode="plinko"] #roulette-board { display: none; }
+    #plinko-card[data-mode="plinko"] #wheel-board { display: none; }
     #plinko-card:not([data-mode="plinko"]) #plinko-mode-controls,
     #plinko-card:not([data-mode="plinko"]) #plinko-board,
     #plinko-card:not([data-mode="plinko"]) #plinko-restaurant-legend { display: none; }
-    #wheel-only-controls, #roulette-only-controls { display: inline-flex; align-items: stretch; gap: 0.6rem; flex: 1; }
-    #plinko-card:not([data-mode="wheel"]) #wheel-board,
-    #plinko-card:not([data-mode="wheel"]) #wheel-only-controls { display: none; }
-    #plinko-card:not([data-mode="roulette"]) #roulette-board,
-    #plinko-card:not([data-mode="roulette"]) #roulette-only-controls { display: none; }
+    #wheel-only-controls { display: inline-flex; align-items: stretch; gap: 0.6rem; flex: 1; }
     .plinko-controls-label {
       font-size: 0.7rem;
       font-weight: 900;
@@ -2772,6 +2776,13 @@
       font-variant-numeric: tabular-nums;
       color: var(--text-muted);
     }
+    .plinko-gold-count {
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
+      color: #a07800;
+    }
     /* Compact, horizontal chip row (wraps as needed) sitting right under
        the board, instead of a tall one-per-line list. */
     #plinko-restaurant-legend.rotation-panel.open {
@@ -2803,84 +2814,77 @@
       font-size: 0.8rem;
     }
     /* ── Wheel of Fortune ── */
+    /* ── Wheel/Roulette controls ──
+       One clear hierarchy: a compact accessory row up top (preset picker,
+       Edit Items, Shuffle, Clear All -- the tucked-away extras), the
+       collapsible edit panel, and then the big Spin bar LAST so the
+       primary action is docked directly against the wheel below it. */
     .wheel-controls {
       display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      gap: 1rem;
-      padding: 0.6rem 0.85rem;
+      flex-direction: column;
+      gap: 0.65rem;
+      padding: 0.7rem 0.85rem;
       border-bottom: 2px solid #000;
     }
-    /* Same pill + offset-shadow "pressable" look as the menu's category
-       shortcut buttons (.menu-shortcut-btn), for every button in this row
-       except the small circular restart icons (shared with the Drop Game,
-       out of scope here). */
-    .wheel-controls select, .wheel-controls input[type="text"] {
-      border-radius: 8px;
-    }
-    .wheel-controls button:not(.plinko-restart-btn) {
-      position: relative;
-      background: var(--bg);
-      border: 2px solid #000;
-      border-radius: 999px;
-      color: #000;
-      font-size: 0.8rem;
-      font-weight: 700;
-      font-family: "EB Garamond", Garamond, Georgia, serif;
-      letter-spacing: 0.02em;
-      padding: 0.4rem 1rem;
-      cursor: pointer;
-      box-shadow: 3px 3px 0 #000;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.1s, color 0.1s;
-    }
-    .wheel-controls button:not(.plinko-restart-btn):hover:not(:disabled) {
-      background: #000;
-      color: var(--accent);
-      transform: translate(-2px, -2px);
-      box-shadow: 5px 5px 0 #000;
-    }
-    .wheel-controls button:not(.plinko-restart-btn):disabled {
-      opacity: 0.4;
-      cursor: default;
-      box-shadow: 2px 2px 0 #000;
-    }
-    /* Preset picker + Edit Items stack on the left; the action-button
-       group (Clear All/Shuffle/Spin) sits beside them, not below. */
-    .wheel-top-row {
+    .wheel-accessory-row {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    /* Identical fixed-height boxes, one shared font -- the select is
+       OS-rendered, so a hard height is the only reliable way to keep it
+       and the buttons the same size. */
+    .wheel-preset-select, .wheel-accessory-btn {
+      height: 2.4rem;
+      box-sizing: border-box;
+      padding: 0 0.9rem;
+      border: 2px solid #000;
+      border-radius: 8px;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .wheel-preset-select { width: 10rem; padding-right: 2.1rem; }
+    .wheel-accessory-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       gap: 0.4rem;
-      flex-shrink: 0;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
-    .wheel-edit-toggle-btn {
-      width: 100%;
-      border: 2px solid #000 !important;
-      border-radius: 999px;
-    }
-    .wheel-edit-panel { width: 100%; flex-basis: 100%; order: 3; }
+    .wheel-accessory-btn:hover:not(:disabled) { background: #000; color: var(--accent); }
+    .wheel-accessory-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .wheel-edit-panel { width: 100%; }
     .wheel-edit-panel.open {
       padding: 0.6rem 0.5rem;
       background-image: repeating-linear-gradient(45deg, #000 0px, #000 24px, var(--accent) 24px, var(--accent) 48px);
     }
-    .wheel-preset-actions { display: flex; gap: 0.5rem; margin-bottom: 0.6rem; }
-    .wheel-preset-select {
-      width: 9rem;
-      padding: 0.4rem 0.5rem;
-      border: 2px solid #000;
-      background-color: var(--bg);
-      color: var(--text);
+    .wheel-preset-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem; }
+    /* Solid bg (not .btn-secondary's transparent) -- these sit on the
+       edit panel's striped background and would be unreadable otherwise. */
+    .wheel-edit-panel .btn-secondary {
+      padding: 0.45rem 0.9rem;
       font-family: inherit;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 700;
+      border-radius: 8px;
+      background: var(--bg);
       cursor: pointer;
     }
+    .wheel-edit-panel .btn-secondary:disabled { opacity: 0.45; cursor: default; }
     .wheel-item-form { display: flex; align-items: center; gap: 0.5rem; }
     .wheel-item-form input[type="text"] {
       width: 12rem;
       max-width: 40vw;
       padding: 0.4rem 0.6rem;
       border: 2px solid #000;
+      border-radius: 8px;
       background: var(--bg);
       color: var(--text);
       font-family: inherit;
@@ -2929,90 +2933,60 @@
       cursor: pointer;
       font-family: inherit;
     }
-    /* Clear All (top) and Shuffle (below it) form a narrow stack on the
-       left; Spin/Drop Ball sits beside that stack and stretches to match
-       its full combined height. */
-    .wheel-action-row {
-      display: flex;
-      align-items: stretch;
-      gap: 0.5rem;
-      min-width: 16rem;
-      flex: 1;
-    }
-    .wheel-action-stack { display: flex; flex-direction: column; gap: 0.5rem; flex-shrink: 0; width: 8rem; }
-    .wheel-action-row-main { flex: 1; display: flex; align-items: stretch; gap: 0.6rem; }
-    .wheel-action-row-main .plinko-restart-btn { align-self: center; }
-    /* Filled by default (not just on hover, unlike the preset-management
-       buttons above) -- these read as the primary actions in this row.
-       Hover is a color swap only, no lift/movement. */
-    .wheel-action-btn {
-      box-shadow: 3px 3px 0 #000;
-    }
-    /* Plain background + border, square-ish corners -- only Spin gets the
-       pill treatment. */
-    .wheel-clear-btn, .wheel-shuffle-btn {
-      font-size: 0.75rem;
-      padding: 0.5rem 0.8rem;
-      text-align: center;
-      background: var(--bg) !important;
-      border-color: #000 !important;
-      color: #000 !important;
-      border-radius: 6px !important;
-    }
-    .wheel-clear-btn:hover:not(:disabled), .wheel-shuffle-btn:hover:not(:disabled) {
-      background: #000 !important;
-      color: var(--accent) !important;
-      transform: none !important;
-    }
-    /* Spin/Drop Ball: much wider, stretches to the stack's full height,
-       rounded corners (the only button here that keeps the pill shape).
-       Same "stamped" text treatment as the Drop Game's winning comment
-       (.plinko-comment.win) -- gold fill, thick black stroke, drop-shadow
-       stack -- instead of just a bigger font-size. Stroke/shadow kept
-       modest relative to the font size so it reads as crisp lettering,
-       not a smeared block. */
+
+    /* The big Spin bar: full width, last element before the board. */
+    .wheel-spin-bar { display: flex; width: 100%; }
+    .wheel-only-controls { display: flex; flex: 1; align-items: stretch; gap: 0.6rem; }
     .wheel-spin-btn {
-      flex: 0 1 50%;
-      padding: 1.6rem 1.5rem;
-      background: #000 !important;
-      border-radius: 999px !important;
-      color: #ffc400 !important;
+      flex: 1;
+      min-height: 5.5rem;
+      border: 2px solid #000;
+      border-radius: 999px;
+      background: #000;
+      color: #ffc400;
+      font-family: inherit;
       font-weight: 900;
-      font-size: 1.6rem;
-      letter-spacing: 0.04em;
+      font-size: 2.2rem;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      white-space: nowrap;
-      -webkit-text-stroke: 2px #000;
-      paint-order: stroke fill;
-      text-shadow:
-        3px 3px 0 #000,
-        4px 3px 0 #000,
-        3px 4px 0 #000,
-        4px 4px 0 #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
-    /* Same diagonal-stripe hover as the site's other submit buttons
-       (#order-btn, #gate-submit, etc.), not a color-only swap. White fill
-       (not black) -- the stroke/shadow stay black from the base rule, and
-       black text on the black stripe segments would otherwise vanish.
-       Every property here needs !important: the general
-       .wheel-controls button:hover rule above uses the `background`
-       SHORTHAND, which silently resets background-image to none (and
-       adds an unwanted lift via transform) for any property here that
-       isn't also marked important. */
+    .wheel-spin-btn:disabled { opacity: 0.4; cursor: default; }
+    /* Same diagonal-stripe hover as the site's other submit buttons; a
+       subtle black halo keeps the label legible over the stripes. */
     .wheel-spin-btn:hover:not(:disabled) {
-      color: #fff !important;
-      background-color: var(--accent) !important;
+      color: #fff;
+      background-color: var(--accent);
       background-image: repeating-linear-gradient(
         45deg,
         #000 0px, #000 6px,
         var(--accent) 6px, var(--accent) 14px
-      ) !important;
-      transform: none !important;
+      );
+      text-shadow: 0 0 8px #000, 0 0 3px #000;
     }
+    .wheel-reset-btn {
+      width: 5.5rem;
+      flex-shrink: 0;
+      border: 2px solid #000;
+      border-radius: 999px;
+      background: var(--bg);
+      color: #000;
+      font-size: 1.9rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .wheel-reset-btn:hover { background: #000; color: var(--accent); }
     /* #wheel-board (ID) so this beats .plinko-board's display:block --
        same specificity as a class, but .plinko-board is declared later in
        this file and would otherwise win and silently break centering. */
-    #wheel-board, #roulette-board {
+    #wheel-board {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -3024,15 +2998,16 @@
        animation carries a rim pin past it, like a real wheel's clicker.
        Tip only grazes the rim (a couple px) rather than poking deep into
        the wheel; pivot sits clear above it. */
-    /* Tip lands at y=2px (top + height), matching the pins' own radius
-       (r-2, drawn in drawPockets) -- so the flapper's contact point sits
-       right where the pins physically are, not deeper into the wheel. */
+    /* Tip lands at y=20px (top + height), matching the pins' radius (the
+       pie edge, pieR = r-20 in drawPockets) -- so the flapper reaches
+       across the outer bleed ring and contacts exactly where the pins
+       physically are. */
     .wheel-pointer {
       position: absolute;
       top: -66px;
       left: 50%;
       width: 22px;
-      height: 68px;
+      height: 86px;
       transform: translateX(-50%);
       transform-origin: 50% 6%;
       z-index: 5;
@@ -3084,6 +3059,8 @@
       text-transform: uppercase;
       line-height: 1.3;
       text-align: center;
+      overflow-wrap: break-word;
+      word-break: break-word;
       -webkit-text-stroke: 6px #000;
       paint-order: stroke fill;
       text-shadow:
@@ -3167,6 +3144,8 @@
       line-height: 1.3;
       text-align: center;
       white-space: pre-line;
+      overflow-wrap: break-word;
+      word-break: break-word;
       -webkit-text-stroke: 4px #000;
       paint-order: stroke fill;
       text-shadow:
@@ -3281,4 +3260,15 @@
       font-size: 0.72rem;
       color: var(--text-dim);
       line-height: 1.6;
+    }
+
+    /* Wheel/Roulette controls, mobile: accessory buttons share the row
+       space evenly (wrapping as needed); Spin takes the full width with
+       the reset icon wrapping to its own line below. */
+    @media (max-width: 600px) {
+      .wheel-preset-select { width: auto; min-width: 8rem; flex: 1 1 auto; }
+      .wheel-accessory-btn { flex: 1 1 auto; }
+      .wheel-only-controls { flex-wrap: wrap; }
+      .wheel-spin-btn { flex: 1 1 100%; min-height: 4.5rem; }
+      .wheel-reset-btn { flex: 1 1 100%; width: auto; min-height: 2.8rem; margin-top: 0.4rem; }
     }

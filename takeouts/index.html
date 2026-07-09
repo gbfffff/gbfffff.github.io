@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:ital,wght@0,500;0,700;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="styles.v1.10.0.css">
+  <link rel="stylesheet" href="styles.v1.11.0.css">
 </head>
 <body>
 <div id="gate-overlay" class="gate-overlay">
@@ -24,7 +24,7 @@
     <button type="button" id="gate-submit" class="btn btn-primary" style="margin-top:1rem">Enter</button>
   </div>
 </div>
-<script src="gate.v1.10.0.js"></script>
+<script src="gate.v1.11.0.js"></script>
 <div class="debug-clock" id="debug-clock" style="display:none">
   <button type="button" class="debug-clock-label" id="debug-clock-toggle">
     Test Clock <span id="debug-clock-status"></span>
@@ -272,11 +272,12 @@
               Restaurant Picker
             </label>
             <span class="plinko-clock" id="plinko-clock" title="Time since opening Drop Game">0:00</span>
+            <span class="plinko-gold-count" id="plinko-gold-count" title="Golden balls won this session">&#x1F7E1; 0</span>
           </div>
           <button type="button" id="game-mode-toggle-btn" class="game-mode-toggle-btn" title="Wheel">&#8594;</button>
         </div>
         <div class="wheel-controls" id="wheel-controls">
-          <div class="wheel-top-row">
+          <div class="wheel-accessory-row">
             <select id="wheel-preset-select" class="wheel-preset-select">
               <option value="">Load a preset…</option>
               <optgroup label="Built-in">
@@ -288,25 +289,11 @@
               </optgroup>
               <optgroup label="My Presets" id="wheel-preset-custom-group"></optgroup>
             </select>
-            <button type="button" id="wheel-edit-toggle-btn" class="rotation-toggle-btn wheel-edit-toggle-btn">
+            <button type="button" id="wheel-edit-toggle-btn" class="wheel-accessory-btn wheel-edit-toggle-btn">
               Edit Items <span class="rotation-toggle-arrow">&#9660;</span>
             </button>
-          </div>
-          <div class="wheel-action-row">
-            <div class="wheel-action-stack">
-              <button type="button" id="wheel-clear-btn" class="wheel-action-btn wheel-clear-btn">Clear All</button>
-              <button type="button" id="wheel-shuffle-btn" class="wheel-action-btn wheel-shuffle-btn">Shuffle</button>
-            </div>
-            <div class="wheel-action-row-main">
-              <span id="wheel-only-controls" class="wheel-only-controls">
-                <button type="button" id="wheel-spin-btn" class="wheel-action-btn wheel-spin-btn">Spin</button>
-                <button type="button" id="wheel-reset-btn" class="plinko-restart-btn" title="Reset wheel">&#8635;</button>
-              </span>
-              <span id="roulette-only-controls" class="wheel-only-controls">
-                <button type="button" id="roulette-drop-btn" class="wheel-action-btn wheel-spin-btn">Drop Ball</button>
-                <button type="button" id="roulette-reset-btn" class="plinko-restart-btn" title="Reset roulette">&#8635;</button>
-              </span>
-            </div>
+            <button type="button" id="wheel-shuffle-btn" class="wheel-accessory-btn">Shuffle</button>
+            <button type="button" id="wheel-clear-btn" class="wheel-accessory-btn">Clear All</button>
           </div>
           <div class="rotation-panel wheel-edit-panel" id="wheel-edit-panel">
             <div class="wheel-preset-actions">
@@ -320,6 +307,12 @@
             </form>
             <div id="wheel-item-list" class="wheel-item-list"></div>
           </div>
+          <div class="wheel-spin-bar">
+            <span id="wheel-only-controls" class="wheel-only-controls">
+              <button type="button" id="wheel-spin-btn" class="wheel-spin-btn">Spin</button>
+              <button type="button" id="wheel-reset-btn" class="wheel-reset-btn" title="Reset wheel">&#8635;</button>
+            </span>
+          </div>
         </div>
         <div class="plinko-board" id="plinko-board">
           <canvas id="plinko-canvas"></canvas>
@@ -332,13 +325,6 @@
           </div>
           <div class="wheel-confetti" id="wheel-confetti"></div>
           <div class="wheel-result" id="wheel-result"></div>
-        </div>
-        <div class="plinko-board wheel-board" id="roulette-board">
-          <div class="wheel-canvas-wrap" id="roulette-canvas-wrap">
-            <canvas id="roulette-canvas"></canvas>
-          </div>
-          <div class="wheel-confetti" id="roulette-confetti"></div>
-          <div class="wheel-result" id="roulette-result"></div>
         </div>
         <div class="resize-grip" id="plinko-board-grip" title="Drag to resize"></div>
         <div id="plinko-restaurant-legend" class="rotation-panel"></div>
@@ -360,8 +346,8 @@
 
 </div>
 <script src="config.js?v=1.9.1"></script>
-<script src="plinko-comments.v1.10.0.js"></script>
-<script src="app.v1.10.0.js"></script>
+<script src="plinko-comments.v1.11.0.js"></script>
+<script src="app.v1.11.0.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="traffic-widget.js"></script>
