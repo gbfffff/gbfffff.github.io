@@ -930,7 +930,7 @@
 
     #order-btn:hover,
     #order-complete-btn:hover,
-    #rating-submit-btn:hover,
+    .rating-submit-btn:hover,
     #gate-submit:hover,
     #reopen-round-btn:hover {
       color: #000;
@@ -1233,6 +1233,8 @@
 
     /* ── Rate Your Order ── */
     .rating-names-table { margin-bottom: 1rem; }
+    .rating-name-block:last-child .rating-name-row { border-bottom: none; }
+    .rating-name-block.active .rating-name-row { border-bottom: none; }
     .rating-name-row {
       display: flex;
       align-items: center;
@@ -1241,7 +1243,6 @@
       border-bottom: 1px solid #000;
       cursor: pointer;
     }
-    .rating-name-row:last-child { border-bottom: none; }
     .rating-name-row:hover { background: color-mix(in srgb, var(--accent) 60%, transparent); }
     .rating-name-row.active { background: #000; }
     .rating-name-row.active .rating-name,
@@ -1254,6 +1255,19 @@
       padding: 0.35rem 0.9rem;
       font-size: 0.7rem;
       flex-shrink: 0;
+    }
+    .rating-name-content {
+      padding: 0.85rem 0.75rem 1rem;
+      border-bottom: 1px solid #000;
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+    }
+    .rating-name-block:last-child .rating-name-content { border-bottom: none; }
+    .rating-name-content .btn-primary { width: 100%; margin-top: 0.75rem; }
+    .rating-status {
+      margin-top: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-align: center;
     }
 
     .rating-date-group { margin-bottom: 0.5rem; }
@@ -2241,7 +2255,7 @@
     body.dark .btn-primary { background: var(--ink); color: var(--bg); }
     body.dark #order-btn:hover,
     body.dark #order-complete-btn:hover,
-    body.dark #rating-submit-btn:hover,
+    body.dark .rating-submit-btn:hover,
     body.dark #gate-submit:hover {
       color: var(--ink);
       background-color: var(--bg);
@@ -2286,6 +2300,7 @@
     body.dark .rating-name-row.active { background: var(--ink); }
     body.dark .rating-name-row.active .rating-name,
     body.dark .rating-name-row.active .rating-name-status { color: var(--bg); }
+    body.dark .rating-name-content { border-bottom-color: var(--ink); }
     body.dark .rating-item-input-wrap input[type="range"] { accent-color: var(--ink); }
     body.dark .oi-link { color: var(--ink); border-color: var(--ink); }
     body.dark .oi-link:hover { background: var(--ink); color: var(--bg); }

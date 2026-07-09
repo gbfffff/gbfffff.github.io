@@ -30,8 +30,12 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // Shown in the footer on QA/localhost only (see DEBUG_MODE above). Bump
 // APP_VERSION and add an entry here whenever a meaningful batch of changes
 // ships -- newest entry first.
-const APP_VERSION = "1.9.0";
+const APP_VERSION = "1.9.1";
 const CHANGELOG = [
+  { version: "1.9.1", date: "2026-07-09", notes: [
+    "Rate Your Order: an item is now marked rated on the History sheet itself (Rated/RatedAt columns) once anyone who ordered it rates it, instead of relying only on per-browser localStorage -- fixes rating prompts reappearing on other devices",
+    "Rate Your Order: each name is now its own collapsible row -- rating happens right under the name you clicked (and clicking it again collapses it), instead of one shared list at the bottom",
+  ]},
   { version: "1.9.0", date: "2026-07-08", notes: [
     "New Item Stats trend view: click any item in the Order History & Ratings report to see its rating history as a line chart, plus times-ordered/price/avg-rating stats",
     "Anonymous voting: ratings no longer store who submitted them -- the Ratings sheet drops the Name column entirely, even in the raw sheet",
@@ -1596,6 +1600,10 @@ function pendingCountFor(name) {
 }
 
 let _selectedRatingName = "";
+// Set right before a re-render so the confirmation message survives the
+// rebuild of the (same, still-open) person's block; cleared whenever a
+// name is opened/closed so it never leaks into a different person's view.
+let _ratingStatusMsg = "";
 
 function renderRatingCard() {
   const card = document.getElementById("rating-card");
@@ -1617,50 +1625,50 @@ function renderRatingCard() {
 
   if (!names.some(n => n.name === _selectedRatingName)) _selectedRatingName = "";
 
+  // Each name is its own accordion row -- clicking it opens/rates right
+  // underneath that row, and clicking the same (already open) name again
+  // collapses it back, instead of a single shared list at the bottom.
   const tableEl = document.getElementById("rating-names-table");
   tableEl.innerHTML = names.map(({ name: n, pending }) => {
     const active = n === _selectedRatingName;
-    return `<div class="rating-name-row${active ? " active" : ""}" data-name="${escAttr(n)}">
-      <span class="rating-name">${esc(n)}</span>
-      <span class="rating-name-status">${pending} to rate</span>
-      <button type="button" class="btn-secondary rating-name-btn">Rate</button>
+    return `<div class="rating-name-block${active ? " active" : ""}">
+      <div class="rating-name-row${active ? " active" : ""}" data-name="${escAttr(n)}">
+        <span class="rating-name">${esc(n)}</span>
+        <span class="rating-name-status">${pending} to rate</span>
+        <button type="button" class="btn-secondary rating-name-btn">${active ? "Close" : "Rate"}</button>
+      </div>
+      ${active ? renderRatingItemsHtml(n) : ""}
     </div>`;
   }).join("");
 
   tableEl.querySelectorAll(".rating-name-row").forEach(row => {
     row.addEventListener("click", () => {
-      _selectedRatingName = row.dataset.name;
+      const clicked = row.dataset.name;
+      _selectedRatingName = clicked === _selectedRatingName ? "" : clicked;
       _ratingTouched.clear();
+      _ratingStatusMsg = "";
       renderRatingCard();
     });
   });
 
-  renderRatingItems();
+  bindRatingItemEvents();
 }
 
-function renderRatingItems() {
-  const listEl   = document.getElementById("rating-items-list");
-  const submitBtn = document.getElementById("rating-submit-btn");
-  const name = _selectedRatingName;
-
-  if (!name) {
-    listEl.innerHTML = `<div class="placeholder">Pick your name above to rate items from any past order.</div>`;
-    submitBtn.style.display = "none";
-    return;
-  }
-
+function renderRatingItemsHtml(name) {
   const groups = getPendingRatings(name);
+  const statusHtml = _ratingStatusMsg
+    ? `<div class="rating-status">${esc(_ratingStatusMsg)}</div>` : "";
 
   // Rated items disappear entirely -- the data lives in the Ratings sheet
   // and surfaces only through the Rotation & Data restaurant reports.
   if (!groups.length) {
-    submitBtn.style.display = "none";
-    listEl.innerHTML = `<div class="placeholder">${esc(name)} is all caught up &mdash; nothing to rate.</div>`;
-    return;
+    return `<div class="rating-name-content">
+      <div class="placeholder">${esc(name)} is all caught up &mdash; nothing to rate.</div>
+      ${statusHtml}
+    </div>`;
   }
 
-  submitBtn.style.display = "flex";
-  listEl.innerHTML = groups.map(([groupKey, items]) => {
+  const groupsHtml = groups.map(([groupKey, items]) => {
     const [date, restaurant] = groupKey.split("|");
     const rows = items.slice().sort((a, b) => a.localeCompare(b)).map(item => {
       const key = `${groupKey}|${item.toLowerCase()}`;
@@ -1678,26 +1686,34 @@ function renderRatingItems() {
     </div>`;
   }).join("");
 
-  listEl.querySelectorAll(".rating-item-slider").forEach(slider => {
+  return `<div class="rating-name-content">
+    <div class="rating-items-list">${groupsHtml}</div>
+    <button type="button" class="btn btn-primary rating-submit-btn">Submit Ratings</button>
+    ${statusHtml}
+  </div>`;
+}
+
+function bindRatingItemEvents() {
+  const tableEl = document.getElementById("rating-names-table");
+
+  tableEl.querySelectorAll(".rating-item-slider").forEach(slider => {
     slider.addEventListener("input", () => {
       _ratingTouched.add(slider.dataset.key);
       slider.nextElementSibling.textContent = slider.value;
     });
   });
+
+  const submitBtn = tableEl.querySelector(".rating-submit-btn");
+  submitBtn?.addEventListener("click", () => submitRatings(submitBtn));
 }
 
-document.getElementById("rating-submit-btn")?.addEventListener("click", async () => {
+async function submitRatings(btn) {
   const name = _selectedRatingName;
-  const status = document.getElementById("rating-status");
-  status.style.display = "none";
+  const block = btn.closest(".rating-name-content");
 
-  if (!name) {
-    status.style.display = "block";
-    status.textContent = "Pick your name first.";
-    return;
-  }
+  if (!name) return;
 
-  const rows = [...document.querySelectorAll(".rating-item-row[data-item]")];
+  const rows = [...block.querySelectorAll(".rating-item-row[data-item]")];
   const toSubmit = rows
     .map(row => ({
       date: row.dataset.date,
@@ -1708,12 +1724,11 @@ document.getElementById("rating-submit-btn")?.addEventListener("click", async ()
     .filter(r => _ratingTouched.has(r.slider.dataset.key));
 
   if (!toSubmit.length) {
-    status.style.display = "block";
-    status.textContent = "Move a slider for at least one item first.";
+    _ratingStatusMsg = "Move a slider for at least one item first.";
+    renderRatingCard();
     return;
   }
 
-  const btn = document.getElementById("rating-submit-btn");
   btn.disabled = true;
   btn.textContent = "Submitting…";
 
@@ -1750,18 +1765,14 @@ document.getElementById("rating-submit-btn")?.addEventListener("click", async ()
     // (Apps Script write + CSV export can lag a few minutes).
     markLocallyRated(toSubmit.map(r => ratedKey(r.date, r.restaurant, r.item)));
     _ratingTouched.clear();
-    status.style.display = "block";
-    status.textContent = `Submitted ${toSubmit.length} rating${toSubmit.length === 1 ? "" : "s"}. Thank you!`;
+    _ratingStatusMsg = `Submitted ${toSubmit.length} rating${toSubmit.length === 1 ? "" : "s"}. Thank you!`;
     renderRatingCard();
     setTimeout(loadRatings, 2000);
   } catch (err) {
-    status.style.display = "block";
-    status.textContent = "Could not submit — " + err.message;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Submit Ratings";
+    _ratingStatusMsg = "Could not submit — " + err.message;
+    renderRatingCard();
   }
-});
+}
 
 function findMenuItem(name, menu) {
   menu = menu || allMenuItems;
