@@ -54,11 +54,11 @@ function doGet(e) {
     if (data.type === "history") {
       const sheet = getOrCreateSheet(ss, HISTORY_SHEET);
       if (sheet.getLastRow() === 0) {
-        sheet.appendRow(["Timestamp", "Date", "Restaurant", "Item", "Qty", "Names"]);
+        sheet.appendRow(["Timestamp", "Date", "Restaurant", "Item", "Qty", "Names", "Rated", "RatedAt"]);
       }
       const items = JSON.parse(data.items || "[]");
       items.forEach(function(it) {
-        sheet.appendRow([now, data.date, data.restaurant, it.name, it.qty, (it.names || []).join(", ")]);
+        sheet.appendRow([now, data.date, data.restaurant, it.name, it.qty, (it.names || []).join(", "), 0, ""]);
       });
     }
 
@@ -73,6 +73,13 @@ function doGet(e) {
         sheet.appendRow(["Timestamp", "Date", "Restaurant", "Item", "Rating"]);
       }
       sheet.appendRow([now, data.date, data.restaurant, data.item, data.rating]);
+
+      // Flip the matching History row's Rated flag so "Rate Your Order"
+      // stops asking for this dish once ANYONE who ordered it has rated it.
+      // History rows are already aggregated across everyone who ordered
+      // that dish that week, so there's no per-person flag to set here --
+      // ratings stay anonymous either way.
+      markHistoryRowRated(ss, data.date, data.restaurant, data.item, now);
     }
 
     // Manual restaurant-rotation override (e.g. an unpredictable event
@@ -99,4 +106,55 @@ function doGet(e) {
 
 function getOrCreateSheet(ss, name) {
   return ss.getSheetByName(name) || ss.insertSheet(name);
+}
+
+// Finds the History row for this date+restaurant+item and sets its Rated
+// flag to 1 and RatedAt to the given timestamp. Columns 7/8 (Rated/RatedAt)
+// may not exist yet on a sheet created before this feature -- backfill the
+// header in that case so the row write below lands in the right columns.
+function markHistoryRowRated(ss, date, restaurant, item, now) {
+  const sheet = getOrCreateSheet(ss, HISTORY_SHEET);
+  if (sheet.getLastRow() === 0) return;
+
+  const headerRange = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 8));
+  const header = headerRange.getValues()[0];
+  if (header[6] !== "Rated" || header[7] !== "RatedAt") {
+    sheet.getRange(1, 7, 1, 2).setValues([["Rated", "RatedAt"]]);
+  }
+
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    if (sameDate(row[1], date) && row[2] === restaurant && row[3] === item) {
+      sheet.getRange(i + 1, 7, 1, 2).setValues([[1, now]]);
+      break;
+    }
+  }
+}
+
+// The Date column holds plain "YYYY-MM-DD" strings when written, but Sheets
+// silently auto-converts text that LOOKS like a date into a real Date cell
+// -- reading it back then gives a JS Date object, not the original string.
+// Comparing exact strings is fragile in the other direction too: the client
+// builds its date string from whatever Google's CSV export happens to
+// render that same Date-typed cell as (which can be a locale format like
+// "7/4/2026", not necessarily "yyyy-MM-dd"), so reformatting to one fixed
+// string and comparing can still mismatch. Parse both sides down to
+// year/month/day and compare those instead -- immune to which string
+// format either side used.
+function dateParts(value) {
+  if (Object.prototype.toString.call(value) === "[object Date]") {
+    return [value.getFullYear(), value.getMonth() + 1, value.getDate()];
+  }
+  const s = String(value).trim();
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); // yyyy-MM-dd (ISO)
+  if (m) return [Number(m[1]), Number(m[2]), Number(m[3])];
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); // M/D/yyyy (US locale)
+  if (m) return [Number(m[3]), Number(m[1]), Number(m[2])];
+  return null;
+}
+function sameDate(a, b) {
+  const pa = dateParts(a), pb = dateParts(b);
+  if (!pa || !pb) return String(a) === String(b);
+  return pa[0] === pb[0] && pa[1] === pb[1] && pa[2] === pb[2];
 }

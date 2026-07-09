@@ -1385,7 +1385,7 @@ async function loadHistory() {
   if (!HISTORY_GID) { weekComplete = false; renderRatingCard(); applyOrderFreezeState(); return; }
   try {
     const csv  = await fetchCSV(HISTORY_GID);
-    const rows = parseCSV(csv).slice(1); // Timestamp, Date, Restaurant, Item, Qty, Names
+    const rows = parseCSV(csv).slice(1); // Timestamp, Date, Restaurant, Item, Qty, Names, Rated, RatedAt
     _historyRows = rows;
     weekComplete = computeWeekComplete();
   } catch {
@@ -1528,14 +1528,16 @@ function refreshMenuInsights() {
   buildMenuPanel(currentRestaurantObj.menu || [], currentRestaurantObj.name, currentRestaurantObj.menuUrl || "", imgs, favSet, dislikeMap, controversialMap);
 }
 
-// The Ratings sheet has no Name column (kept anonymous even in the raw
-// sheet), so "have I already rated this" can't be looked up from the
-// shared data anymore -- it's tracked per-browser in localStorage instead.
-// A rating task is keyed by date+restaurant+item+name -- the same dish name
-// can legitimately appear across different weeks (or twice in one week, if
-// a round was reopened), so all four fields go into the key.
-function ratedKey(date, restaurant, item, name) {
-  return `${date}|${restaurant.trim().toLowerCase()}|${item.toLowerCase()}|${name.trim().toLowerCase()}`;
+// The History sheet's Rated column (index 6) is the source of truth: once
+// anyone who ordered a dish rates it, that row flips to 1 and the prompt
+// stops for everyone who ordered it that week -- ratings stay anonymous
+// either way since nothing there is tied to a name. A rating task is keyed
+// by date+restaurant+item, not by name, to match that per-dish semantics.
+// The History CSV export can lag behind a just-submitted rating by a few
+// minutes though, so a local optimistic overlay in localStorage covers that
+// gap until the next refetch confirms it server-side.
+function ratedKey(date, restaurant, item) {
+  return `${date}|${restaurant.trim().toLowerCase()}|${item.toLowerCase()}`;
 }
 function getLocallyRatedKeys() {
   try { return new Set(JSON.parse(localStorage.getItem("ratedItemKeys") || "[]")); }
@@ -1546,8 +1548,13 @@ function markLocallyRated(keys) {
   keys.forEach(k => set.add(k));
   localStorage.setItem("ratedItemKeys", JSON.stringify([...set]));
 }
-function isRated(date, restaurant, item, name) {
-  return getLocallyRatedKeys().has(ratedKey(date, restaurant, item, name));
+function isRated(date, restaurant, item) {
+  return getLocallyRatedKeys().has(ratedKey(date, restaurant, item));
+}
+// History row's Rated column (index 6), tolerant of "1"/"TRUE"/1/true.
+function isHistoryRowRated(r) {
+  const v = (r[6] ?? "").toString().trim().toLowerCase();
+  return v === "1" || v === "true";
 }
 
 // Pending ratings for a person, across all-time History (not just the
@@ -1563,7 +1570,9 @@ function getPendingRatings(name) {
     const item       = (r[3] || "").trim();
     const names      = (r[5] || "").split(",").map(n => n.trim().toLowerCase());
     if (!date || !item || item.startsWith("Sauce: ") || !names.includes(lname)) return;
-    if (isRated(date, restaurant, item, name)) return;
+    // Server-confirmed (Rated column) or optimistically-just-submitted
+    // (localStorage, ahead of the History CSV catching up) both count.
+    if (isHistoryRowRated(r) || isRated(date, restaurant, item)) return;
     const key = `${date}|${restaurant}`;
     // Same item can appear in multiple History rows for the same date+
     // restaurant (e.g. a reopened round re-logging the same dish) -- only
@@ -1711,7 +1720,11 @@ document.getElementById("rating-submit-btn")?.addEventListener("click", async ()
   try {
     const now = new Date().toISOString();
     if (MOCK_MODE) {
-      toSubmit.forEach(r => _mockRatings.push([now, r.date, r.restaurant, r.item, r.slider.value]));
+      toSubmit.forEach(r => {
+        _mockRatings.push([now, r.date, r.restaurant, r.item, r.slider.value]);
+        const histRow = _mockHistory.find(h => h[1] === r.date && h[2] === r.restaurant && h[3] === r.item);
+        if (histRow) { histRow[6] = 1; histRow[7] = now; }
+      });
     } else {
       if (!APPS_SCRIPT_URL) throw new Error("APPS_SCRIPT_URL not configured");
       await Promise.all(toSubmit.map(r => {
@@ -1733,9 +1746,9 @@ document.getElementById("rating-submit-btn")?.addEventListener("click", async ()
         _optimisticRatings.push(row);
       });
     }
-    // "Already rated" is tracked per-browser now that the sheet has no name
-    // column to check against.
-    markLocallyRated(toSubmit.map(r => ratedKey(r.date, r.restaurant, r.item, name)));
+    // Optimistic overlay until the History sheet's Rated column catches up
+    // (Apps Script write + CSV export can lag a few minutes).
+    markLocallyRated(toSubmit.map(r => ratedKey(r.date, r.restaurant, r.item)));
     _ratingTouched.clear();
     status.style.display = "block";
     status.textContent = `Submitted ${toSubmit.length} rating${toSubmit.length === 1 ? "" : "s"}. Thank you!`;
@@ -2601,7 +2614,7 @@ document.getElementById("order-complete-btn").addEventListener("click", async ()
   try {
     if (MOCK_MODE) {
       const now = new Date().toISOString();
-      items.forEach(it => _mockHistory.push([now, currentFriday, restaurant, it.name, it.qty, it.names.join(", ")]));
+      items.forEach(it => _mockHistory.push([now, currentFriday, restaurant, it.name, it.qty, it.names.join(", "), 0, ""]));
     } else {
       if (!APPS_SCRIPT_URL) throw new Error("APPS_SCRIPT_URL not configured");
       const params = new URLSearchParams({

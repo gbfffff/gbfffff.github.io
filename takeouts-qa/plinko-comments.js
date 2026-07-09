@@ -28,10 +28,9 @@ const PLINKO_COMMENTS = [
 const PLINKO_WIN_COMMENTS = [
   "Jackpot! This round on me!",
   "NEW CAR IN THE BAG!",
-  "GOOOOOOOOOAAAAALLLLLL",
+  "GOOOAAAALLLL!",
   "PAYYYYYY-DAY! PAYDAY! PAYDAY! PAYDAY! PAYDAY! PAYDAY! PAYDAY!",
-  "WINNER",
-  "Out of nothing!",
+  "YOU ARE A WINNER",
   "It's a HIT!",
   "Winner winner, (Maryland) Chicken dinner!",
   "MAKE$ IT RAIN!$",
