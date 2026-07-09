@@ -26,12 +26,12 @@ const PLINKO_COMMENTS = [
 // Shown after the gold-ball shower finishes landing (i.e. you hit a
 // colored slot). Same deal -- add your own lines below.
 const PLINKO_WIN_COMMENTS = [
-  "Jackpot! More free rounds!",
+  "Jackpot! This round on me!",
   "NEW CAR IN THE BAG!",
   "GOOOOOOOOOAAAAALLLLLL",
   "PAYYYYYY-DAY! PAYDAY! PAYDAY! PAYDAY! PAYDAY! PAYDAY! PAYDAY!",
-  "You broke the records, lucky bastard!",
-  "Running out of yellow balls now!",
+  "WINNER",
+  "Out of nothing!",
   "It's a HIT!",
   "Winner winner, (Maryland) Chicken dinner!",
   "MAKE$ IT RAIN!$",

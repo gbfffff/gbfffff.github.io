@@ -30,8 +30,17 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // Shown in the footer on QA/localhost only (see DEBUG_MODE above). Bump
 // APP_VERSION and add an entry here whenever a meaningful batch of changes
 // ships -- newest entry first.
-const APP_VERSION = "1.8.0";
+const APP_VERSION = "1.9.0";
 const CHANGELOG = [
+  { version: "1.9.0", date: "2026-07-08", notes: [
+    "New Item Stats trend view: click any item in the Order History & Ratings report to see its rating history as a line chart, plus times-ordered/price/avg-rating stats",
+    "Anonymous voting: ratings no longer store who submitted them -- the Ratings sheet drops the Name column entirely, even in the raw sheet",
+    "Drop Game reward: landing a ball in a colored slot pays out real gold balls (scaled by board height) that fall through the same pegs; win/lose comment overlays styled like the menu's category labels, loaded from an editable plinko-comments.js",
+    "Restaurant Picker mode is now a pure number picker, fully separate from the colors/reward/comment layer",
+    "\"GBF Dislikes\" renamed to \"GBF Hates\"; new \"GBF Controversies\" section for items ordered 3+ weeks with a below-average rating",
+    "Wider site (860px -> 1200px) with proportionally larger headings; wider report modal with a proper name/item/price grid",
+    "Theme picker: swapped Cyan for Tiffany Blue, added Emerald Green and Juicy Yellow; fixed a mobile fixed-position bug and a flex-wrap bug that made the closed picker balloon to 10 rows tall",
+  ]},
   { version: "1.8.0", date: "2026-07-08", notes: [
     "Drop Game: resizable Plinko board above the footer -- drag-and-release ball physics, ball-ball collisions, multi-ball drops, colored winning-slot sliders, bounceable divider tips",
     "Full menus for Ah'Haan, Sardis, and Mi La Cay, including priced protein/size pickers and pick-N-sides combos",
@@ -2438,15 +2447,14 @@ function startCountdown() {
 startCountdown();
 init();
 
-// Version tag shows everywhere (prod included) so you can cross-check which
-// build is live where. The Changelog slidedown next to it stays QA/localhost
-// only, gated by DEBUG_MODE like the rest of the debug tooling.
+// Version tag and Changelog slidedown both show everywhere, prod included,
+// so anyone can see what shipped and when.
 {
   const versionEl = document.getElementById("build-version");
   if (versionEl) versionEl.textContent = `v${APP_VERSION}`;
 }
 
-if (DEBUG_MODE) {
+{
   const toggleBtn = document.getElementById("changelog-toggle-btn");
   const clPanel   = document.getElementById("changelog-panel");
   if (toggleBtn && clPanel) {
