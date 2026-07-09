@@ -2083,6 +2083,7 @@
     /* ── Mobile layout ── */
     @media (max-width: 600px) {
       body { padding: 1rem 0.5rem 3rem; }
+      .wheel-spin-btn { flex: 1 1 100%; }
 
       /* Single column menu items */
       .mpi-grid { grid-template-columns: 1fr !important; }
@@ -2213,6 +2214,26 @@
     body.dark .plinko-clock { color: var(--ink); }
     body.dark .plinko-legend-row { border-color: var(--ink); }
     body.dark .plinko-legend-num { background: var(--ink); color: var(--bg); }
+    body.dark .game-mode-toggle-btn { border-color: var(--ink); color: var(--ink); }
+    body.dark .game-mode-toggle-btn:hover { background: var(--ink); color: var(--bg); }
+    body.dark .wheel-controls { border-color: var(--ink); }
+    body.dark .wheel-preset-select { border-color: var(--ink); }
+    body.dark .wheel-edit-panel.open {
+      background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 24px, var(--bg) 24px, var(--bg) 48px);
+    }
+    body.dark .wheel-controls button:not(.plinko-restart-btn) {
+      border-color: var(--ink);
+      color: var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+    body.dark .wheel-controls button:not(.plinko-restart-btn):hover:not(:disabled) {
+      background: var(--ink);
+      color: var(--bg);
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+    body.dark .wheel-item-form input[type="text"] { border-color: var(--ink); }
+    body.dark .wheel-item-chip { border-color: var(--ink); }
+    body.dark .wheel-item-chip-remove { background: var(--ink); color: var(--bg); }
     body.dark .rotation-row { border-bottom-color: var(--ink); }
     body.dark .rotation-row:hover { background: var(--ink); color: var(--bg); }
     body.dark .rotation-row:hover .rotation-cuisine { border-color: var(--bg); }
@@ -2260,6 +2281,14 @@
       color: var(--ink);
       background-color: var(--bg);
       background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 6px, var(--bg) 6px, var(--bg) 14px);
+    }
+    /* !important since the base .wheel-spin-btn:hover rule also needs it
+       (to beat the generic .wheel-controls button:hover rule), and among
+       competing !important declarations the higher-specificity one wins. */
+    body.dark .wheel-spin-btn:hover:not(:disabled) {
+      color: var(--ink) !important;
+      background-color: var(--bg) !important;
+      background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 6px, var(--bg) 6px, var(--bg) 14px) !important;
     }
     body.dark .btn-secondary { border-color: var(--ink); color: var(--ink); }
     body.dark .btn-secondary:hover { background: var(--ink); color: var(--bg); }
@@ -2586,21 +2615,75 @@
       width: 100%;
       padding: 0.25rem 0.85rem;
     }
-    .plinko-toggle-btn .rotation-toggle-arrow { font-size: 1.4em; }
+    /* Magical glowing arrow -- hue-rotate continuously cycles the color of
+       a fixed colorful text-shadow glow through the spectrum. Only glows
+       while closed (drawing the eye to open it); stops once opened. */
+    .plinko-toggle-btn .rotation-toggle-arrow { font-size: 1.4em; display: inline-block; }
+    .plinko-toggle-btn:not(.open) .rotation-toggle-arrow {
+      text-shadow: 0 0 6px #ff2ec4, 0 0 12px #ff2ec4, 0 0 18px #7a5cff;
+      animation: plinko-toggle-glow 3s linear infinite;
+    }
+    @keyframes plinko-toggle-glow {
+      0%   { filter: hue-rotate(0deg) brightness(1.3); }
+      50%  { filter: hue-rotate(180deg) brightness(1.6); }
+      100% { filter: hue-rotate(360deg) brightness(1.3); }
+    }
     .plinko-controls {
       display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.85rem;
+      border-bottom: 2px solid #000;
+    }
+    .plinko-mode-controls {
+      display: flex;
+      flex: 1;
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
       gap: 0.5rem 1.25rem;
-      padding: 0.6rem 0.85rem;
-      border-bottom: 2px solid #000;
+      min-width: 0;
     }
     .plinko-control-group {
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
+    .game-mode-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 1.9rem;
+      height: 1.9rem;
+      background: none;
+      border: 2px solid #000;
+      border-radius: 999px;
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.1s, background 0.1s, color 0.1s, transform 0.2s ease;
+      font-family: inherit;
+    }
+    .game-mode-toggle-btn:hover { opacity: 1; background: #000; color: var(--accent); }
+    /* Three modes share the same card -- [data-mode] on the card picks
+       which board/control set is visible. Wheel and Roulette share the
+       same item-editing controls (#wheel-controls) since they spin the
+       same picks, just with a different action button each. */
+    #plinko-card[data-mode="plinko"] #wheel-controls,
+    #plinko-card[data-mode="plinko"] #wheel-board,
+    #plinko-card[data-mode="plinko"] #roulette-board { display: none; }
+    #plinko-card:not([data-mode="plinko"]) #plinko-mode-controls,
+    #plinko-card:not([data-mode="plinko"]) #plinko-board,
+    #plinko-card:not([data-mode="plinko"]) #plinko-restaurant-legend { display: none; }
+    #wheel-only-controls, #roulette-only-controls { display: inline-flex; align-items: stretch; gap: 0.6rem; flex: 1; }
+    #plinko-card:not([data-mode="wheel"]) #wheel-board,
+    #plinko-card:not([data-mode="wheel"]) #wheel-only-controls { display: none; }
+    #plinko-card:not([data-mode="roulette"]) #roulette-board,
+    #plinko-card:not([data-mode="roulette"]) #roulette-only-controls { display: none; }
     .plinko-controls-label {
       font-size: 0.7rem;
       font-weight: 900;
@@ -2689,16 +2772,24 @@
       font-variant-numeric: tabular-nums;
       color: var(--text-muted);
     }
-    #plinko-restaurant-legend.rotation-panel.open { padding: 0.7rem 0.85rem; }
-    .plinko-legend-row {
+    /* Compact, horizontal chip row (wraps as needed) sitting right under
+       the board, instead of a tall one-per-line list. */
+    #plinko-restaurant-legend.rotation-panel.open {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 0.6rem;
-      padding: 0.3rem 0;
-      font-size: 0.82rem;
-      border-bottom: 1px solid var(--border);
+      gap: 0.4rem;
+      padding: 0.5rem 0.6rem;
     }
-    .plinko-legend-row:last-child { border-bottom: none; }
+    .plinko-legend-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.78rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+    }
     .plinko-legend-num {
       display: inline-flex;
       align-items: center;
@@ -2710,6 +2801,339 @@
       color: var(--accent);
       font-weight: 900;
       font-size: 0.8rem;
+    }
+    /* ── Wheel of Fortune ── */
+    .wheel-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.6rem 0.85rem;
+      border-bottom: 2px solid #000;
+    }
+    /* Same pill + offset-shadow "pressable" look as the menu's category
+       shortcut buttons (.menu-shortcut-btn), for every button in this row
+       except the small circular restart icons (shared with the Drop Game,
+       out of scope here). */
+    .wheel-controls select, .wheel-controls input[type="text"] {
+      border-radius: 8px;
+    }
+    .wheel-controls button:not(.plinko-restart-btn) {
+      position: relative;
+      background: var(--bg);
+      border: 2px solid #000;
+      border-radius: 999px;
+      color: #000;
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: "EB Garamond", Garamond, Georgia, serif;
+      letter-spacing: 0.02em;
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #000;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.1s, color 0.1s;
+    }
+    .wheel-controls button:not(.plinko-restart-btn):hover:not(:disabled) {
+      background: #000;
+      color: var(--accent);
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 #000;
+    }
+    .wheel-controls button:not(.plinko-restart-btn):disabled {
+      opacity: 0.4;
+      cursor: default;
+      box-shadow: 2px 2px 0 #000;
+    }
+    /* Preset picker + Edit Items stack on the left; the action-button
+       group (Clear All/Shuffle/Spin) sits beside them, not below. */
+    .wheel-top-row {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+    .wheel-edit-toggle-btn {
+      width: 100%;
+      border: 2px solid #000 !important;
+      border-radius: 999px;
+    }
+    .wheel-edit-panel { width: 100%; flex-basis: 100%; order: 3; }
+    .wheel-edit-panel.open {
+      padding: 0.6rem 0.5rem;
+      background-image: repeating-linear-gradient(45deg, #000 0px, #000 24px, var(--accent) 24px, var(--accent) 48px);
+    }
+    .wheel-preset-actions { display: flex; gap: 0.5rem; margin-bottom: 0.6rem; }
+    .wheel-preset-select {
+      width: 9rem;
+      padding: 0.4rem 0.5rem;
+      border: 2px solid #000;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .wheel-item-form { display: flex; align-items: center; gap: 0.5rem; }
+    .wheel-item-form input[type="text"] {
+      width: 12rem;
+      max-width: 40vw;
+      padding: 0.4rem 0.6rem;
+      border: 2px solid #000;
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.82rem;
+    }
+    .wheel-item-list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      flex: 1;
+      min-width: 0;
+      margin-top: 0.75rem;
+    }
+    .wheel-item-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.3rem 0.25rem 0.7rem;
+      border: 2px solid #000;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: #d3d3d3;
+      color: #000;
+    }
+    .wheel-item-text {
+      outline: none;
+      min-width: 0.6rem;
+      cursor: text;
+    }
+    .wheel-item-text:focus { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+    .wheel-item-chip-remove {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.1rem;
+      height: 1.1rem;
+      border: none;
+      border-radius: 50%;
+      background: #000;
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    /* Clear All (top) and Shuffle (below it) form a narrow stack on the
+       left; Spin/Drop Ball sits beside that stack and stretches to match
+       its full combined height. */
+    .wheel-action-row {
+      display: flex;
+      align-items: stretch;
+      gap: 0.5rem;
+      min-width: 16rem;
+      flex: 1;
+    }
+    .wheel-action-stack { display: flex; flex-direction: column; gap: 0.5rem; flex-shrink: 0; width: 8rem; }
+    .wheel-action-row-main { flex: 1; display: flex; align-items: stretch; gap: 0.6rem; }
+    .wheel-action-row-main .plinko-restart-btn { align-self: center; }
+    /* Filled by default (not just on hover, unlike the preset-management
+       buttons above) -- these read as the primary actions in this row.
+       Hover is a color swap only, no lift/movement. */
+    .wheel-action-btn {
+      box-shadow: 3px 3px 0 #000;
+    }
+    /* Plain background + border, square-ish corners -- only Spin gets the
+       pill treatment. */
+    .wheel-clear-btn, .wheel-shuffle-btn {
+      font-size: 0.75rem;
+      padding: 0.5rem 0.8rem;
+      text-align: center;
+      background: var(--bg) !important;
+      border-color: #000 !important;
+      color: #000 !important;
+      border-radius: 6px !important;
+    }
+    .wheel-clear-btn:hover:not(:disabled), .wheel-shuffle-btn:hover:not(:disabled) {
+      background: #000 !important;
+      color: var(--accent) !important;
+      transform: none !important;
+    }
+    /* Spin/Drop Ball: much wider, stretches to the stack's full height,
+       rounded corners (the only button here that keeps the pill shape).
+       Same "stamped" text treatment as the Drop Game's winning comment
+       (.plinko-comment.win) -- gold fill, thick black stroke, drop-shadow
+       stack -- instead of just a bigger font-size. Stroke/shadow kept
+       modest relative to the font size so it reads as crisp lettering,
+       not a smeared block. */
+    .wheel-spin-btn {
+      flex: 0 1 50%;
+      padding: 1.6rem 1.5rem;
+      background: #000 !important;
+      border-radius: 999px !important;
+      color: #ffc400 !important;
+      font-weight: 900;
+      font-size: 1.6rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      -webkit-text-stroke: 2px #000;
+      paint-order: stroke fill;
+      text-shadow:
+        3px 3px 0 #000,
+        4px 3px 0 #000,
+        3px 4px 0 #000,
+        4px 4px 0 #000;
+    }
+    /* Same diagonal-stripe hover as the site's other submit buttons
+       (#order-btn, #gate-submit, etc.), not a color-only swap. White fill
+       (not black) -- the stroke/shadow stay black from the base rule, and
+       black text on the black stripe segments would otherwise vanish.
+       Every property here needs !important: the general
+       .wheel-controls button:hover rule above uses the `background`
+       SHORTHAND, which silently resets background-image to none (and
+       adds an unwanted lift via transform) for any property here that
+       isn't also marked important. */
+    .wheel-spin-btn:hover:not(:disabled) {
+      color: #fff !important;
+      background-color: var(--accent) !important;
+      background-image: repeating-linear-gradient(
+        45deg,
+        #000 0px, #000 6px,
+        var(--accent) 6px, var(--accent) 14px
+      ) !important;
+      transform: none !important;
+    }
+    /* #wheel-board (ID) so this beats .plinko-board's display:block --
+       same specificity as a class, but .plinko-board is declared later in
+       this file and would otherwise win and silently break centering. */
+    #wheel-board, #roulette-board {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wheel-canvas-wrap { position: relative; line-height: 0; }
+    .wheel-canvas-wrap canvas { display: block; max-width: 100%; max-height: 100%; }
+    /* A hinged flipper, not a flat triangle -- pivots at the top (its
+       transform-origin) and flicks down/back via .flick whenever the spin
+       animation carries a rim pin past it, like a real wheel's clicker.
+       Tip only grazes the rim (a couple px) rather than poking deep into
+       the wheel; pivot sits clear above it. */
+    /* Tip lands at y=2px (top + height), matching the pins' own radius
+       (r-2, drawn in drawPockets) -- so the flapper's contact point sits
+       right where the pins physically are, not deeper into the wheel. */
+    .wheel-pointer {
+      position: absolute;
+      top: -66px;
+      left: 50%;
+      width: 22px;
+      height: 68px;
+      transform: translateX(-50%);
+      transform-origin: 50% 6%;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .wheel-pointer::before {
+      content: "";
+      position: absolute;
+      inset: 8px 0 0 0;
+      background: linear-gradient(165deg, #ff4d4d, #b30000 65%);
+      clip-path: polygon(50% 100%, 6% 10%, 94% 10%);
+      border-radius: 2px 2px 6px 6px;
+      box-shadow: 0 3px 3px rgba(0, 0, 0, 0.5);
+    }
+    .wheel-pointer::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #b30000;
+      border: 2px solid #000;
+    }
+    @keyframes wheel-pointer-flick {
+      0%   { transform: translateX(-50%) rotate(0deg); }
+      35%  { transform: translateX(-50%) rotate(-24deg); }
+      100% { transform: translateX(-50%) rotate(0deg); }
+    }
+    .wheel-pointer.flick { animation: wheel-pointer-flick 0.15s ease-out; }
+    /* Same "stamped" look as the Drop Game's winning comment (gold fill,
+       thick black stroke + drop-shadow stack) -- no background box needed,
+       reads fine over any wedge color. */
+    .wheel-result {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      width: 96%;
+      max-width: 96%;
+      box-sizing: border-box;
+      padding: 0 1.5rem;
+      color: #ffc400;
+      font-weight: 900;
+      font-size: min(4rem, 12cqh, 24cqw);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1.3;
+      text-align: center;
+      -webkit-text-stroke: 6px #000;
+      paint-order: stroke fill;
+      text-shadow:
+        12px 12px 0 #000,
+        18px 12px 0 #000,
+        12px 18px 0 #000,
+        18px 18px 0 #000,
+        6px 12px 0 #000,
+        12px 6px 0 #000,
+        6px 6px 0 #000,
+        18px 6px 0 #000,
+        6px 18px 0 #000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 20;
+    }
+    .wheel-result.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .wheel-confetti {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 15;
+    }
+    /* Named apart from the pre-existing .confetti-piece easter egg (used
+       in the header box, animated via Web Animations JS, not CSS) so the
+       two features never collide. */
+    .wheel-confetti-piece {
+      position: absolute;
+      top: -20px;
+      width: 8px;
+      height: 14px;
+      opacity: 1;
+      animation-name: wheel-confetti-fall;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+    /* A dashed perforation line near one edge, like a movie ticket stub. */
+    .wheel-confetti-piece::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 30%;
+      border-left: 1px dashed rgba(0, 0, 0, 0.45);
+    }
+    @keyframes wheel-confetti-fall {
+      0%   { transform: translate(0, 0) rotate(0deg); }
+      100% { transform: translate(var(--confetti-drift), var(--confetti-fall)) rotate(var(--confetti-spin)); }
     }
     .plinko-board {
       position: relative;
@@ -2742,6 +3166,7 @@
       text-transform: uppercase;
       line-height: 1.3;
       text-align: center;
+      white-space: pre-line;
       -webkit-text-stroke: 4px #000;
       paint-order: stroke fill;
       text-shadow:

@@ -39,8 +39,15 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.9.1";
+const APP_VERSION = "1.10.0";
 const CHANGELOG = [
+  { version: "1.10.0", date: "2026-07-09", notes: [
+    "New Wheel of Fortune and Roulette game modes for the Drop Game -- same arrow toggle now cycles Drop Game -> Wheel -> Roulette; both spin the same hand-typed (or preset) picks",
+    "Wheel/Roulette presets: Restaurant Picker, Food (Popular Picks / Meat Types), Event, and Names, each editable and save-able as your own named presets",
+    "Wheel/Roulette items are editable in place, with a collapsible \"Edit Items\" panel for adding/saving/deleting so the always-visible controls stay uncluttered",
+    "Confetti + the Drop Game's stamped win-comment style now show on a Wheel/Roulette result",
+    "Plinko Restaurant Picker now names the winning restaurant in that same stamped win style instead of just a slot number",
+  ]},
   { version: "1.9.1", date: "2026-07-09", notes: [
     "Rate Your Order: an item is now marked rated on the History sheet itself (Rated/RatedAt columns, one row per person per item) once that specific person rates it, instead of relying only on per-browser localStorage -- fixes rating prompts reappearing on other devices",
     "Rate Your Order: each name is now its own collapsible row -- rating happens right under the name you clicked (and clicking it again collapses it), instead of one shared list at the bottom",
@@ -2230,6 +2237,10 @@ function makeManualResizable(el, grip, minH, maxH) {
 }
 makeManualResizable(document.getElementById("menu-panel"), document.getElementById("menu-panel-grip"), 160, 2000);
 makeManualResizable(document.getElementById("plinko-board"), document.getElementById("plinko-board-grip"), 290, 3000);
+// Same grip also resizes the Wheel and Roulette boards (only one of the
+// three is ever visible at once) so switching modes doesn't reset size.
+makeManualResizable(document.getElementById("wheel-board"), document.getElementById("plinko-board-grip"), 290, 3000);
+makeManualResizable(document.getElementById("roulette-board"), document.getElementById("plinko-board-grip"), 290, 3000);
 
 function esc(s) {
   return String(s)
@@ -2457,6 +2468,7 @@ function startCountdown() {
     localStorage.setItem("theme", theme);
     switcher.classList.remove("open");
     syncThemeColorMeta();
+    document.dispatchEvent(new CustomEvent("themechange"));
   }
 
   function applyDark(on) {
@@ -2464,6 +2476,7 @@ function startCountdown() {
     darkBtn.textContent = on ? "☀" : "☾";
     localStorage.setItem("darkMode", on ? "1" : "0");
     syncThemeColorMeta();
+    document.dispatchEvent(new CustomEvent("themechange"));
   }
 
   const themeNames = Object.keys(SWATCH_COLORS);
@@ -2835,6 +2848,11 @@ function openMenuReport(restaurantName) {
 
   refreshReportModal();
   modal.classList.add("open");
+
+  // Item Stats opens expanded by default now, instead of requiring a click
+  // every time the report is opened.
+  document.getElementById("report-stats-toggle-btn")?.classList.add("open");
+  document.getElementById("report-stats-panel")?.classList.add("open");
 }
 
 function refreshReportModal() {
@@ -3259,7 +3277,20 @@ scheduleStripeToggle();
   const SLOT_H    = 70;   // height reserved for the slot area at the bottom
   const GRAVITY   = 0.32;
   const RESTITUTION = 0.62;
-  const MIN_COLORED = 0, MAX_COLORED = 6, MAX_BALLS = 12;
+  const MIN_COLORED = 1, MAX_COLORED = 6, MAX_BALLS = 12;
+  // On a narrow (mobile-width) board the auto-fit peg grid only produces
+  // ~12 slots, each too thin to tell many colors apart or fit several
+  // balls falling at once -- cap both harder at that width.
+  const MOBILE_SLOT_THRESHOLD = 12;
+  const MOBILE_MAX_BALLS = 2;
+  const MOBILE_MAX_COLORED = 3;
+  function maxBallsForSlots() {
+    return slotCount > 0 && slotCount <= MOBILE_SLOT_THRESHOLD ? MOBILE_MAX_BALLS : MAX_BALLS;
+  }
+  function maxColoredForSlots() {
+    const cap = slotCount > 0 && slotCount <= MOBILE_SLOT_THRESHOLD ? MOBILE_MAX_COLORED : MAX_COLORED;
+    return Math.min(cap, slotCount);
+  }
 
   function shuffled(arr) {
     const a = arr.slice();
@@ -3362,8 +3393,9 @@ scheduleStripeToggle();
     // instead of being forced into whichever slot half it's nominally over.
     for (let i = 0; i <= slotCount; i++) pegs.push({ x: i * slotW, y: pegsBottomY });
     if (coloredSlots === null) coloredSlots = 2 + Math.floor(Math.random() * 3); // 2-4
-    coloredSlots = Math.min(coloredSlots, MAX_COLORED, slotCount);
+    coloredSlots = Math.max(MIN_COLORED, Math.min(coloredSlots, maxColoredForSlots()));
     coloredSlotIndices = pickColoredIndices(coloredSlots);
+    ballCount = Math.min(ballCount, maxBallsForSlots());
 
     if (restaurantMode && restaurantNames.length) {
       // Randomize which restaurant sits behind which number every time --
@@ -3379,14 +3411,14 @@ scheduleStripeToggle();
 
   function setColoredSlots(n) {
     if (!slotCount) return;
-    coloredSlots = Math.max(MIN_COLORED, Math.min(MAX_COLORED, slotCount, n));
+    coloredSlots = Math.max(MIN_COLORED, Math.min(maxColoredForSlots(), n));
     coloredSlotIndices = pickColoredIndices(coloredSlots);
     updateControlLabels();
     draw();
   }
 
   function setBallCount(n) {
-    ballCount = Math.max(1, Math.min(MAX_BALLS, n));
+    ballCount = Math.max(1, Math.min(maxBallsForSlots(), n));
     updateControlLabels();
   }
 
@@ -3395,13 +3427,16 @@ scheduleStripeToggle();
     if (colorsLabel) colorsLabel.textContent = coloredSlots;
     const colorsSlider = document.getElementById("plinko-colors-slider");
     if (colorsSlider) {
-      colorsSlider.max = Math.min(MAX_COLORED, slotCount);
+      colorsSlider.max = maxColoredForSlots();
       colorsSlider.value = coloredSlots;
     }
     const ballsLabel = document.getElementById("plinko-ball-count");
     if (ballsLabel) ballsLabel.textContent = ballCount;
     const ballsSlider = document.getElementById("plinko-balls-slider");
-    if (ballsSlider) ballsSlider.value = ballCount;
+    if (ballsSlider) {
+      ballsSlider.max = maxBallsForSlots();
+      ballsSlider.value = ballCount;
+    }
   }
 
   function resetBalls() {
@@ -3477,10 +3512,16 @@ scheduleStripeToggle();
   // again -- that second pass is where the winning comment shows, once the
   // whole shower has actually landed.
   function evaluateOutcome() {
-    // Restaurant Picker is just a number picker -- no colors, no reward,
-    // no commentary. The board just stays put with the result showing
-    // until restart is clicked.
-    if (restaurantMode) return;
+    // Restaurant Picker: no colors/reward, but the winning restaurant's
+    // name shows in the same stamped gold "win" style as a real win,
+    // instead of leaving you to go look the number up in the legend.
+    if (restaurantMode) {
+      const settled = balls.find(b => b.slotIndex != null) || balls[0];
+      const idx = settled?.slotIndex ?? Math.max(0, Math.min(slotCount - 1, Math.floor((settled?.x || 0) / slotW)));
+      const name = restaurantAssignment[idx] || "Other";
+      showCommentFrom([name], true);
+      return;
+    }
     if (balls.some(b => b.isReward)) { showWinComment(); return; }
     // Use the slot each ball was frozen into the instant it first touched
     // down (not its current x), so later jostling from more balls piling
@@ -3935,4 +3976,741 @@ scheduleStripeToggle();
       el.textContent = `${m}:${String(s).padStart(2, "0")}`;
     }, 1000);
   }
+})();
+
+// ── Game mode toggle (Drop Game -> Wheel of Fortune -> Roulette) ────────
+// All three boards/control sets live in the DOM together; only one shows
+// at a time, picked by [data-mode] on the card. Kept as its own tiny IIFE
+// since it only needs to know about the arrow button and the card, not
+// any of the three games' internals.
+(function() {
+  const card = document.getElementById("plinko-card");
+  const btn  = document.getElementById("game-mode-toggle-btn");
+  if (!card || !btn) return;
+
+  const MODES = ["plinko", "wheel", "roulette"];
+  const NEXT_LABEL = { plinko: "Wheel", wheel: "Roulette", roulette: "Drop Game" };
+  card.dataset.mode = "plinko";
+
+  btn.addEventListener("click", () => {
+    const i = MODES.indexOf(card.dataset.mode);
+    const mode = MODES[(i + 1) % MODES.length];
+    card.dataset.mode = mode;
+    btn.title = NEXT_LABEL[mode];
+    // Home (Drop Game) points forward, into Wheel/Roulette; anywhere else
+    // points back, signaling the cycle leads back to Drop Game.
+    btn.innerHTML = mode === "plinko" ? "&#8594;" : "&#8592;";
+    document.dispatchEvent(new CustomEvent("gamemodechange", { detail: { mode } }));
+  });
+})();
+
+// ── Wheel of Fortune ─────────────────────────────────────────────────────
+// A canvas wheel divided into equal wedges, one per user-typed item.
+// Items are hand-entered (no menu/history tie-in, unlike the Drop Game),
+// so they're kept in localStorage per-browser -- there's no shared sheet
+// for this, it's just a spin-the-wheel toy.
+(function() {
+  const board     = document.getElementById("wheel-board");
+  const canvasWrap= document.getElementById("wheel-canvas-wrap");
+  const canvas    = document.getElementById("wheel-canvas");
+  const pointerEl = board?.querySelector(".wheel-pointer");
+  const form      = document.getElementById("wheel-item-form");
+  const input     = document.getElementById("wheel-item-input");
+  const listEl    = document.getElementById("wheel-item-list");
+  const spinBtn   = document.getElementById("wheel-spin-btn");
+  const resetBtn  = document.getElementById("wheel-reset-btn");
+  const clearBtn  = document.getElementById("wheel-clear-btn");
+  const shuffleBtn= document.getElementById("wheel-shuffle-btn");
+  const resultEl  = document.getElementById("wheel-result");
+  const confettiEl = document.getElementById("wheel-confetti");
+  const presetSelect = document.getElementById("wheel-preset-select");
+  const savePresetBtn = document.getElementById("wheel-save-preset-btn");
+  const saveNewPresetBtn = document.getElementById("wheel-save-new-preset-btn");
+  const deletePresetBtn = document.getElementById("wheel-delete-preset-btn");
+  const customPresetGroup = document.getElementById("wheel-preset-custom-group");
+  const editToggleBtn = document.getElementById("wheel-edit-toggle-btn");
+  const editPanel = document.getElementById("wheel-edit-panel");
+  if (!board || !canvasWrap || !canvas || !form || !input || !listEl || !spinBtn || !resultEl) return;
+
+  // Save/Save As New/Delete + the Add-item form + the item list all live in
+  // a collapsible slidedown -- same open/close pattern as the site's other
+  // rotation-panel toggles. Everything else in .wheel-controls (preset
+  // picker, Clear All/Shuffle/Spin/Reset) stays visible without expanding.
+  editToggleBtn?.addEventListener("click", () => {
+    const open = !editToggleBtn.classList.contains("open");
+    editToggleBtn.classList.toggle("open", open);
+    editPanel?.classList.toggle("open", open);
+  });
+
+  const ctx = canvas.getContext("2d");
+  const DPR = window.devicePixelRatio || 1;
+  const DEFAULT_ITEMS = ["Item 1", "Item 2", "Item 3", "Item 4"];
+
+  function loadItems() {
+    try {
+      const saved = JSON.parse(localStorage.getItem("wheelItems") || "null");
+      if (Array.isArray(saved) && saved.length) return saved;
+    } catch { /* fall through to defaults */ }
+    return DEFAULT_ITEMS.slice();
+  }
+  let items = loadItems();
+  function saveItems() { localStorage.setItem("wheelItems", JSON.stringify(items)); }
+
+  // ── Presets ──────────────────────────────────────────────────────────
+  // Each preset has a built-in default list; "Save Preset" persists your
+  // own edited version per-browser (localStorage), which then takes over
+  // from the built-in default whenever that preset is picked again.
+  const MEAT_TYPES = ["Chicken", "Beef", "Pork", "Shrimp", "Duck", "Lamb", "Fish", "Veg"];
+  const EVENT_ITEMS = ["Hiking", "Movie", "BBQ", "Mahjong", "Boating/Kayak", "Gun Shooting", "Boardgames", "Eat & Chill"];
+  const NAME_ITEMS = ["Clive", "Cynthia", "Edward", "Ben", "Landen", "Luis", "Samson"];
+
+  function getAllRestaurantNames() {
+    return [...new Set((_restaurantsConfig?.restaurants || []).map(r => r.name).filter(Boolean))];
+  }
+
+  // Aggregates History+Ratings across every restaurant (not just whichever
+  // one is on screen) to find items worth spinning for when you can't
+  // decide what to eat -- same "popular" (2+ separate weeks) and
+  // "controversial" (3+ weeks, split opinion) thresholds buildMenuPanel
+  // already uses per-restaurant, just without the restaurant filter.
+  function computeGlobalFoodPicks() {
+    const stats = new Map(); // item lower -> { label, weeksOrdered, ratingSum, ratingCount }
+    function entryFor(label) {
+      const key = label.toLowerCase();
+      if (!stats.has(key)) stats.set(key, { label, weeksOrdered: new Set(), ratingSum: 0, ratingCount: 0 });
+      return stats.get(key);
+    }
+    (_historyRows || []).forEach(r => {
+      const item = (r[3] || "").trim();
+      if (!item || item.startsWith("Sauce: ")) return;
+      const week = (r[1] || "").trim();
+      const e = entryFor(item);
+      if (week) e.weeksOrdered.add(`${week}|${(r[2] || "").trim().toLowerCase()}`);
+    });
+    (_allRatingRows || []).forEach(r => {
+      const item = (r[3] || "").trim();
+      const rating = Number(r[r.length - 1]);
+      if (!item || isNaN(rating)) return;
+      const e = entryFor(item);
+      e.ratingSum += rating;
+      e.ratingCount += 1;
+    });
+    const picks = [];
+    stats.forEach(s => {
+      const avg = s.ratingCount > 0 ? s.ratingSum / s.ratingCount : null;
+      const popular = s.weeksOrdered.size >= 2;
+      const controversial = s.weeksOrdered.size > 2 && avg !== null && avg < 5;
+      if (popular || controversial) picks.push(s.label);
+    });
+    return picks.length ? picks : MEAT_TYPES.slice();
+  }
+
+  const PRESETS = {
+    restaurants: { label: "Restaurant Picker", build: getAllRestaurantNames },
+    foodPopular: { label: "Food: Popular Picks", build: computeGlobalFoodPicks },
+    foodMeat:    { label: "Food: Meat Types", build: () => MEAT_TYPES.slice() },
+    event:       { label: "Event", build: () => EVENT_ITEMS.slice() },
+    names:       { label: "Names", build: () => NAME_ITEMS.slice() },
+  };
+
+  function loadPresetOverrides() {
+    try { return JSON.parse(localStorage.getItem("wheelPresetOverrides") || "{}"); }
+    catch { return {}; }
+  }
+  // Custom, user-named presets (as many as you like) -- separate from the
+  // 4 built-ins above, which can only be overwritten, not multiplied.
+  function loadCustomPresets() {
+    try { return JSON.parse(localStorage.getItem("wheelCustomPresets") || "{}"); }
+    catch { return {}; }
+  }
+  function saveCustomPresets(obj) { localStorage.setItem("wheelCustomPresets", JSON.stringify(obj)); }
+
+  function presetItems(key) {
+    if (key.startsWith("custom:")) {
+      const customs = loadCustomPresets();
+      const found = customs[key.slice(7)];
+      return Array.isArray(found) && found.length ? found.slice() : DEFAULT_ITEMS.slice();
+    }
+    const overrides = loadPresetOverrides();
+    if (Array.isArray(overrides[key]) && overrides[key].length) return overrides[key].slice();
+    const built = PRESETS[key]?.build() || [];
+    return built.length ? built : DEFAULT_ITEMS.slice();
+  }
+
+  function renderCustomPresetOptions() {
+    if (!customPresetGroup) return;
+    const customs = loadCustomPresets();
+    const names = Object.keys(customs).sort((a, b) => a.localeCompare(b));
+    const selected = presetSelect?.value;
+    customPresetGroup.innerHTML = names.map(n =>
+      `<option value="custom:${escAttr(n)}">${esc(n)}</option>`
+    ).join("");
+    if (selected && presetSelect) presetSelect.value = selected;
+  }
+
+  function updatePresetButtons() {
+    const key = presetSelect?.value || "";
+    if (savePresetBtn) savePresetBtn.disabled = !key;
+    if (deletePresetBtn) deletePresetBtn.disabled = !key.startsWith("custom:");
+  }
+
+  presetSelect?.addEventListener("change", () => {
+    const key = presetSelect.value;
+    updatePresetButtons();
+    if (!key) return;
+    items = presetItems(key);
+    saveItems();
+    renderItemList();
+    rotation = 0;
+    hideResult();
+    drawWheel();
+  });
+
+  // Overwrites whichever preset (built-in or custom) is currently selected
+  // with the current items -- does NOT create a new one.
+  savePresetBtn?.addEventListener("click", () => {
+    const key = presetSelect?.value;
+    if (!key) return;
+    if (key.startsWith("custom:")) {
+      const customs = loadCustomPresets();
+      customs[key.slice(7)] = items.slice();
+      saveCustomPresets(customs);
+    } else {
+      const overrides = loadPresetOverrides();
+      overrides[key] = items.slice();
+      localStorage.setItem("wheelPresetOverrides", JSON.stringify(overrides));
+    }
+    savePresetBtn.textContent = "Saved!";
+    setTimeout(() => { savePresetBtn.textContent = "Save"; }, 1200);
+  });
+
+  // Saves the CURRENT items as a brand-new named preset, separate from the
+  // 4 built-ins -- as many of these as you want.
+  saveNewPresetBtn?.addEventListener("click", () => {
+    if (!items.length) return;
+    const name = (prompt("Name this preset:") || "").trim();
+    if (!name) return;
+    const customs = loadCustomPresets();
+    customs[name] = items.slice();
+    saveCustomPresets(customs);
+    renderCustomPresetOptions();
+    if (presetSelect) presetSelect.value = `custom:${name}`;
+    updatePresetButtons();
+  });
+
+  deletePresetBtn?.addEventListener("click", () => {
+    const key = presetSelect?.value || "";
+    if (!key.startsWith("custom:")) return;
+    const customs = loadCustomPresets();
+    delete customs[key.slice(7)];
+    saveCustomPresets(customs);
+    renderCustomPresetOptions();
+    if (presetSelect) presetSelect.value = "";
+    updatePresetButtons();
+  });
+
+  renderCustomPresetOptions();
+
+  function shuffleArrayInPlace(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  let cssSize = 0;
+  let rotation = 0; // radians, current wheel orientation
+  let spinning = false;
+  let lastPinIndex = 0; // which rim pin last passed the pointer, for the flick effect
+
+  function renderItemList() {
+    listEl.innerHTML = items.map((it, i) => `
+      <span class="wheel-item-chip">
+        <span class="wheel-item-text" contenteditable="true" spellcheck="false" data-i="${i}">${esc(it)}</span>
+        <button type="button" class="wheel-item-chip-remove" data-i="${i}" aria-label="Remove ${escAttr(it)}">&times;</button>
+      </span>
+    `).join("");
+    listEl.querySelectorAll(".wheel-item-chip-remove").forEach(b => {
+      b.addEventListener("click", () => {
+        items.splice(Number(b.dataset.i), 1);
+        saveItems();
+        renderItemList();
+        drawWheel();
+      });
+    });
+    listEl.querySelectorAll(".wheel-item-text").forEach(t => {
+      t.addEventListener("keydown", e => {
+        if (e.key === "Enter") { e.preventDefault(); t.blur(); }
+      });
+      t.addEventListener("blur", () => {
+        const i = Number(t.dataset.i);
+        const v = t.textContent.trim();
+        if (!v) { t.textContent = items[i]; return; } // no blanking out an item this way
+        if (v !== items[i]) {
+          items[i] = v;
+          saveItems();
+          drawWheel();
+        }
+      });
+    });
+    spinBtn.disabled = items.length < 2;
+    const dropBtnEl = document.getElementById("roulette-drop-btn");
+    if (dropBtnEl) dropBtnEl.disabled = items.length < 2;
+  }
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const v = input.value.trim();
+    if (!v) return;
+    items.push(v);
+    input.value = "";
+    saveItems();
+    renderItemList();
+    drawWheel();
+  });
+
+  clearBtn?.addEventListener("click", () => {
+    items = [];
+    saveItems();
+    renderItemList();
+    rotation = 0;
+    hideResult();
+    drawWheel();
+  });
+
+  shuffleBtn?.addEventListener("click", () => {
+    if (spinning) return;
+    shuffleArrayInPlace(items);
+    saveItems();
+    renderItemList();
+    drawWheel();
+  });
+
+  resetBtn?.addEventListener("click", () => {
+    if (spinning) return;
+    rotation = 0;
+    lastPinIndex = 0;
+    hideResult();
+    drawWheel();
+  });
+
+  function layout() {
+    const w = board.clientWidth, h = board.clientHeight;
+    if (w <= 0 || h <= 0) return;
+    // Reserve enough top/bottom margin that the pointer's pivot (which
+    // sits well above the canvas now that the flapper is 3x longer) never
+    // gets clipped by the board's own edge, and so the whole wheel+pointer
+    // assembly reads as centered with visible breathing room, not flush
+    // against the top/bottom.
+    cssSize = Math.max(60, Math.min(w, h) - 140);
+    canvasWrap.style.width  = `${cssSize}px`;
+    canvasWrap.style.height = `${cssSize}px`;
+    canvas.width  = Math.round(cssSize * DPR);
+    canvas.height = Math.round(cssSize * DPR);
+    canvas.style.width  = `${cssSize}px`;
+    canvas.style.height = `${cssSize}px`;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    drawWheel();
+  }
+
+  // Canvas's `font` setter needs a REAL font-family -- "inherit" isn't one
+  // (it's a CSS cascade keyword, not a <family-name>), so that assignment
+  // was silently rejected and the canvas kept falling back to its default
+  // 10px font no matter how big fontSize was computed. Match the site's
+  // actual body font stack instead.
+  const CANVAS_FONT_FAMILY = '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+
+  function hexToHsl(hex) {
+    let r = parseInt(hex.slice(1, 3), 16) / 255;
+    let g = parseInt(hex.slice(3, 5), 16) / 255;
+    let b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0, l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        default: h = (r - g) / d + 4;
+      }
+      h *= 60;
+    }
+    return [h, s * 100, l * 100];
+  }
+  function hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    const toHex = x => Math.round(x * 255).toString(16).padStart(2, "0");
+    return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
+  }
+
+  // Wedges pull from the current theme's own accent color: itself, a
+  // lighter tint, a darker shade, and its color-wheel complement -- a mix
+  // of related and contrasting tones instead of a fixed hardcoded palette.
+  function themeWedgeColors() {
+    const accent = getComputedStyle(document.body).getPropertyValue("--accent").trim() || "#fcf811";
+    const [h, s, l] = hexToHsl(accent);
+    // A pale/desaturated theme accent (e.g. a light pastel) produced a tint
+    // barely distinguishable from the page background -- force a minimum
+    // saturation and a wider lightness spread so all four wedges stay
+    // clearly readable against each other and the surrounding page.
+    const sat = Math.max(s, 55);
+    return [
+      accent,
+      hslToHex(h, sat, Math.min(88, l + 32)),
+      hslToHex(h, sat, Math.max(16, l - 32)),
+      hslToHex((h + 180) % 360, sat, l),
+    ];
+  }
+  // Shared by the Wheel-of-Fortune view and the Roulette view -- same
+  // picks, same wedge/pin rendering, just drawn onto whichever canvas
+  // context is passed in with whichever rotation (Roulette's wheel never
+  // rotates, so it always passes 0).
+  function drawPockets(pctx, size, extraRotation) {
+    const n = items.length;
+    const r = size / 2;
+    pctx.clearRect(0, 0, size, size);
+    if (!n) return r;
+
+    const colors = themeWedgeColors();
+    const slice = (Math.PI * 2) / n;
+    // Starting point for how big the text COULD be, given wedge width and
+    // radius -- longer labels shrink from here on a per-item basis (see
+    // fitLabel below), so a few long names don't drag every other wedge's
+    // font size down with them.
+    const baseFontSize = Math.max(12, Math.min(r * 0.26, (r * 1.15) / n));
+    const minFontSize = 9;
+    const availableLen = r - 26; // radial room for the text, rim to hub
+
+    // Cap at 3 words first (reads better truncated at a word boundary than
+    // mid-word, e.g. a long restaurant name), then shrink the font until
+    // what's left actually fits the wedge; only chops mid-word as a last
+    // resort if it's still too wide even at the smallest readable size.
+    function fitLabel(text) {
+      const words = text.trim().split(/\s+/);
+      let label = words.length > 3 ? words.slice(0, 3).join(" ") + "…" : text;
+
+      let fsize = baseFontSize;
+      pctx.font = `900 ${fsize}px ${CANVAS_FONT_FAMILY}`;
+      let w = pctx.measureText(label).width;
+      if (w > availableLen) {
+        fsize = Math.max(minFontSize, fsize * (availableLen / w));
+        pctx.font = `900 ${fsize}px ${CANVAS_FONT_FAMILY}`;
+        w = pctx.measureText(label).width;
+      }
+      while (w > availableLen && label.length > 4) {
+        label = label.slice(0, -2).trimEnd() + "…";
+        w = pctx.measureText(label).width;
+      }
+      return { label, size: fsize };
+    }
+
+    pctx.save();
+    pctx.translate(r, r);
+    pctx.rotate(extraRotation);
+    for (let i = 0; i < n; i++) {
+      const start = i * slice, end = start + slice;
+      const wedgeColor = colors[i % colors.length];
+      pctx.beginPath();
+      pctx.moveTo(0, 0);
+      pctx.arc(0, 0, r - 3, start, end);
+      pctx.closePath();
+      pctx.fillStyle = wedgeColor;
+      pctx.fill();
+      pctx.lineWidth = 1.25;
+      pctx.strokeStyle = "#000";
+      pctx.stroke();
+
+      const { label, size: fsize } = fitLabel(items[i]);
+      pctx.save();
+      pctx.rotate(start + slice / 2);
+      pctx.textAlign = "right";
+      pctx.textBaseline = "middle";
+      pctx.fillStyle = "#000"; // always black -- auto contrast (white on light/yellow) wasn't reliable
+      pctx.font = `900 ${fsize}px ${CANVAS_FONT_FAMILY}`;
+      pctx.fillText(label, r - 14, 0);
+      pctx.restore();
+    }
+    // Pins at each wedge boundary, on the rim -- rotate along with the
+    // wheel (drawn inside the same rotated context) since they're
+    // physically part of the wheel, unlike the fixed pointer above it.
+    const pinR = Math.max(3, r * 0.02);
+    for (let i = 0; i < n; i++) {
+      const angle = i * slice;
+      const px = Math.cos(angle) * (r - 2);
+      const py = Math.sin(angle) * (r - 2);
+      pctx.beginPath();
+      pctx.arc(px, py, pinR, 0, Math.PI * 2);
+      pctx.fillStyle = "#ffc400";
+      pctx.fill();
+      pctx.lineWidth = Math.max(1, pinR * 0.35);
+      pctx.strokeStyle = "#5c3a1e";
+      pctx.stroke();
+    }
+    pctx.restore();
+
+    pctx.beginPath();
+    pctx.arc(r, r, Math.max(8, r * 0.06), 0, Math.PI * 2);
+    pctx.fillStyle = "#000";
+    pctx.fill();
+    return r;
+  }
+
+  function drawWheel() {
+    if (!cssSize) return;
+    drawPockets(ctx, cssSize, rotation);
+  }
+
+  // The pointer is fixed at the top (12 o'clock); work out which wedge is
+  // currently under it given the wheel's current rotation.
+  function indexAtPointer() {
+    const n = items.length;
+    if (!n) return -1;
+    const slice = (Math.PI * 2) / n;
+    const twoPi = Math.PI * 2;
+    const norm = ((-Math.PI / 2 - rotation) % twoPi + twoPi) % twoPi;
+    return Math.floor(norm / slice) % n;
+  }
+
+  // Re-triggers the flick animation by forcing a reflow -- toggling the
+  // class alone wouldn't restart an already-running/just-finished one.
+  function flickPointer() {
+    if (!pointerEl) return;
+    pointerEl.classList.remove("flick");
+    void pointerEl.offsetWidth;
+    pointerEl.classList.add("flick");
+  }
+
+  // Shared by both the Wheel and Roulette result overlays. Named apart
+  // from the pre-existing header-box confetti easter egg (.confetti-piece)
+  // so the two never collide.
+  const CONFETTI_COLORS = ["#ffc400", "#ff5a5f", "#00c2a8", "#7a5cff", "#ff8fd0", "#4ea1ff", "#8bd450", "#ff9f45"];
+  function spawnConfettiPiece(container, fallSeconds) {
+    const el = document.createElement("div");
+    el.className = "wheel-confetti-piece";
+    el.style.left = `${Math.random() * 100}%`;
+    el.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+    el.style.setProperty("--confetti-drift", `${Math.round((Math.random() - 0.5) * 160)}px`);
+    // Falls well past the board's own height so it drops fully out of view
+    // ("below the table") instead of visibly stopping/landing anywhere.
+    const fallDist = container.clientHeight + 150 + Math.random() * 100;
+    el.style.setProperty("--confetti-fall", `${Math.round(fallDist)}px`);
+    el.style.setProperty("--confetti-spin", `${Math.round((Math.random() < 0.5 ? -1 : 1) * (360 + Math.random() * 540))}deg`);
+    el.style.animationDuration = `${fallSeconds}s`;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), fallSeconds * 1000 + 100);
+  }
+
+  // Keeps spawning new pieces for a full 3s (a continuous rain, not one
+  // single burst) -- each piece then falls on its own for fallSeconds and
+  // disappears off the bottom.
+  function launchConfetti(container) {
+    if (!container) return;
+    const spawnWindow = 2000;
+    const fallSeconds = 1.4;
+    const startTime = performance.now();
+
+    function tick() {
+      if (performance.now() - startTime >= spawnWindow) return;
+      for (let i = 0; i < 5; i++) spawnConfettiPiece(container, fallSeconds);
+      setTimeout(tick, 60);
+    }
+    tick();
+  }
+
+  function hideResult() { resultEl.classList.remove("show"); }
+  function showResult(text) {
+    resultEl.textContent = text;
+    resultEl.classList.add("show");
+    launchConfetti(confettiEl);
+  }
+
+  function spin() {
+    if (spinning || items.length < 2) return;
+    spinning = true;
+    hideResult();
+    spinBtn.disabled = true;
+
+    const n = items.length;
+    const slice = (Math.PI * 2) / n;
+    // A pin is drawn at wheel-local angle i*slice, so in canvas space it
+    // sits at (i*slice + rotation). The pointer is fixed at canvas angle
+    // -PI/2 (top), not 0 -- so "a pin is at the pointer" happens when
+    // (rotation + PI/2) crosses a multiple of slice, not when rotation
+    // itself does. Using plain rotation/slice (no +PI/2) only happened to
+    // line up for exactly 4 items; for any other count the flick fired a
+    // fraction of a turn early/late relative to the pin actually being at
+    // the pointer.
+    const pointerPhase = Math.PI / 2;
+    lastPinIndex = Math.floor((rotation + pointerPhase) / slice);
+
+    const extraSpins = 6 + Math.random() * 3;
+    const target = rotation + extraSpins * Math.PI * 2 + Math.random() * Math.PI * 2;
+    const duration = 5800; // spins a bit longer than before
+    const startRot = rotation;
+    const startTime = performance.now();
+    // Quintic (not cubic) ease-out -- a longer, smoother glide into the
+    // stop instead of an abrupt-feeling deceleration ("some grease").
+    const easeOutQuint = t => 1 - Math.pow(1 - t, 5);
+
+    function step(now) {
+      const t = Math.min(1, (now - startTime) / duration);
+      rotation = startRot + (target - startRot) * easeOutQuint(t);
+      drawWheel();
+
+      // Every rim pin that's swept past the fixed pointer since last frame
+      // triggers a click/flick, same as a real wheel's flapper.
+      const pinIndex = Math.floor((rotation + pointerPhase) / slice);
+      if (pinIndex !== lastPinIndex) {
+        lastPinIndex = pinIndex;
+        flickPointer();
+      }
+
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        spinning = false;
+        spinBtn.disabled = items.length < 2;
+        const idx = indexAtPointer();
+        if (idx >= 0) showResult(items[idx]);
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  spinBtn.addEventListener("click", spin);
+
+  // Board is display:none until Wheel mode is opened, so clientWidth/Height
+  // read 0 until then -- lay out the instant mode switches, then keep in
+  // sync with manual resize-grip drags via ResizeObserver.
+  document.addEventListener("gamemodechange", e => { if (e.detail.mode === "wheel") layout(); });
+  // Wedge colors are derived from --accent, but neither theme swatches nor
+  // dark mode fired any event before now -- nothing ever told the wheel to
+  // redraw, so it stayed stuck on whatever theme was active when it was
+  // last drawn.
+  document.addEventListener("themechange", () => drawWheel());
+  if (typeof ResizeObserver !== "undefined") {
+    new ResizeObserver(() => { if (board.offsetParent) layout(); }).observe(board);
+  }
+
+  // ── Roulette view ────────────────────────────────────────────────────
+  // Same picks/pockets as the Wheel above (drawPockets is shared), but the
+  // wheel itself stays put -- a ball orbits the rim, decelerates, and
+  // spirals inward to settle in whichever pocket it ends up over. No
+  // separate pointer needed since the ball's own resting position IS the
+  // result.
+  const rBoard     = document.getElementById("roulette-board");
+  const rCanvasWrap= document.getElementById("roulette-canvas-wrap");
+  const rCanvas    = document.getElementById("roulette-canvas");
+  const dropBtn    = document.getElementById("roulette-drop-btn");
+  const rResetBtn  = document.getElementById("roulette-reset-btn");
+  const rResultEl  = document.getElementById("roulette-result");
+
+  if (rBoard && rCanvasWrap && rCanvas && dropBtn && rResultEl) {
+    const rCtx = rCanvas.getContext("2d");
+    let rCssSize = 0;
+    let ballAngle = -Math.PI / 2; // start at the top, purely cosmetic
+    let ballOrbitR = 0;
+    let ballDropping = false;
+
+    function rLayout() {
+      const w = rBoard.clientWidth, h = rBoard.clientHeight;
+      if (w <= 0 || h <= 0) return;
+      rCssSize = Math.max(60, Math.min(w, h) - 40);
+      rCanvasWrap.style.width  = `${rCssSize}px`;
+      rCanvasWrap.style.height = `${rCssSize}px`;
+      rCanvas.width  = Math.round(rCssSize * DPR);
+      rCanvas.height = Math.round(rCssSize * DPR);
+      rCanvas.style.width  = `${rCssSize}px`;
+      rCanvas.style.height = `${rCssSize}px`;
+      rCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      if (!ballOrbitR) ballOrbitR = (rCssSize / 2) - 6;
+      drawRoulette();
+    }
+
+    function drawRoulette() {
+      if (!rCssSize) return;
+      const r = drawPockets(rCtx, rCssSize, 0);
+      if (!items.length) return;
+      const bx = r + Math.cos(ballAngle) * ballOrbitR;
+      const by = r + Math.sin(ballAngle) * ballOrbitR;
+      rCtx.beginPath();
+      rCtx.arc(bx, by, Math.max(4, r * 0.035), 0, Math.PI * 2);
+      rCtx.fillStyle = "#eee";
+      rCtx.fill();
+      rCtx.lineWidth = 1.5;
+      rCtx.strokeStyle = "#000";
+      rCtx.stroke();
+    }
+
+    function normalizeAngle(a) {
+      const twoPi = Math.PI * 2;
+      return ((a % twoPi) + twoPi) % twoPi;
+    }
+    function pocketAtBall() {
+      const n = items.length;
+      if (!n) return -1;
+      const slice = (Math.PI * 2) / n;
+      return Math.floor(normalizeAngle(ballAngle) / slice) % n;
+    }
+
+    function hideRResult() { rResultEl.classList.remove("show"); }
+    function showRResult(text) {
+      rResultEl.textContent = text;
+      rResultEl.classList.add("show");
+    }
+
+    function dropBall() {
+      if (ballDropping || items.length < 2) return;
+      ballDropping = true;
+      hideRResult();
+      dropBtn.disabled = true;
+
+      const outerR = (rCssSize / 2) - 6;
+      const innerR = (rCssSize / 2) * 0.68;
+      const extraOrbits = 6 + Math.random() * 3;
+      const startAngle = ballAngle;
+      const targetAngle = startAngle + extraOrbits * Math.PI * 2 + Math.random() * Math.PI * 2;
+      const duration = 5800;
+      const startTime = performance.now();
+      const easeOutQuint = t => 1 - Math.pow(1 - t, 5);
+
+      function step(now) {
+        const t = Math.min(1, (now - startTime) / duration);
+        const e = easeOutQuint(t);
+        ballAngle = startAngle + (targetAngle - startAngle) * e;
+        ballOrbitR = outerR - (outerR - innerR) * e;
+        drawRoulette();
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else {
+          ballDropping = false;
+          dropBtn.disabled = items.length < 2;
+          const idx = pocketAtBall();
+          if (idx >= 0) showRResult(items[idx]);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    dropBtn.addEventListener("click", dropBall);
+    rResetBtn?.addEventListener("click", () => {
+      if (ballDropping) return;
+      ballAngle = -Math.PI / 2;
+      ballOrbitR = (rCssSize / 2) - 6;
+      hideRResult();
+      drawRoulette();
+    });
+
+    document.addEventListener("gamemodechange", e => { if (e.detail.mode === "roulette") rLayout(); });
+    document.addEventListener("themechange", () => drawRoulette());
+    if (typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(() => { if (rBoard.offsetParent) rLayout(); }).observe(rBoard);
+    }
+  }
+
+  renderItemList();
 })();

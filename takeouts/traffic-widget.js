@@ -13,12 +13,13 @@
     return;
   }
 
-  // Upper Capital Beltway (495) arc, I-270 corridor up toward Shady Grove
-  // (roughly exit 12), and I-95 near College Park.
-  const BBOX = { north: 39.14, south: 38.96, west: -77.20, east: -76.90 };
-  // Centered near White Oak, MD -- view shows the northern Beltway up to
-  // Gaithersburg (270) and east to College Park (95).
-  const MAP_CENTER = [39.065, -77.027];
+  // Just a little over the 495 ring itself -- hugs the upper Beltway arc
+  // this app actually cares about (270 spur through Silver Spring to
+  // College Park, per GAUGE_POINTS below), not the full loop and nowhere
+  // near Dulles/Annapolis. Kept tight on purpose: every degree wider here
+  // is more TomTom map tiles loaded on every page view.
+  const BBOX = { north: 39.77, south: 38.77, west: -77.85, east: -76.18 };
+  const MAP_CENTER = [39.02, -77.02];
 
   // Traces the actual route from the restaurant rotation's home turf (270
   // corridor, Rockville/Gaithersburg -- geocoded from each restaurant's own
@@ -144,13 +145,13 @@
     map = L.map("traffic-map", {
       center: MAP_CENTER,
       zoom: 11,
-      minZoom: 9,
+      // Matches the initial fit-to-BBOX zoom -- zooming out further would
+      // just load more surrounding tiles for no reason, since maxBounds
+      // already caps how far you can pan.
+      minZoom: 11,
       maxZoom: 16,
-      // Padded well beyond BBOX so the whole 495 loop -- including the
-      // southern arc near Alexandria/National Harbor -- can be panned/
-      // zoomed into, plus ~20mi (~0.37 deg lon at this latitude) further
-      // west and east than the corridor itself.
-      maxBounds: [[BBOX.south - 0.25, BBOX.west - 0.45], [BBOX.north + 0.05, BBOX.east + 0.45]],
+      // Only a small pad beyond the now-tight BBOX.
+      maxBounds: [[BBOX.south - 0.03, BBOX.west - 0.03], [BBOX.north + 0.03, BBOX.east + 0.03]],
       maxBoundsViscosity: 1.0,
     });
 
