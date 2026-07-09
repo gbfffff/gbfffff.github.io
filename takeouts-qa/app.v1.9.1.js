@@ -30,10 +30,19 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // Shown in the footer on QA/localhost only (see DEBUG_MODE above). Bump
 // APP_VERSION and add an entry here whenever a meaningful batch of changes
 // ships -- newest entry first.
+//
+// Cache-busting: app.js/gate.js/plinko-comments.js/styles.css are renamed
+// with the version baked into the filename (e.g. app.v1.9.1.js) rather than
+// a "?v=" query param, so a stale browser cache can't serve old code under
+// any circumstance. Bumping the version means: rename all four files (in
+// BOTH takeouts/ and takeouts-qa/) to the new version, then update the
+// <script>/<link> tags in both index.html files to match. config.js is
+// exempt -- it's regenerated fresh by the deploy workflow every push, so it
+// stays on the simpler "?v=" query-param scheme.
 const APP_VERSION = "1.9.1";
 const CHANGELOG = [
   { version: "1.9.1", date: "2026-07-09", notes: [
-    "Rate Your Order: an item is now marked rated on the History sheet itself (Rated/RatedAt columns) once anyone who ordered it rates it, instead of relying only on per-browser localStorage -- fixes rating prompts reappearing on other devices",
+    "Rate Your Order: an item is now marked rated on the History sheet itself (Rated/RatedAt columns, one row per person per item) once that specific person rates it, instead of relying only on per-browser localStorage -- fixes rating prompts reappearing on other devices",
     "Rate Your Order: each name is now its own collapsible row -- rating happens right under the name you clicked (and clicking it again collapses it), instead of one shared list at the bottom",
   ]},
   { version: "1.9.0", date: "2026-07-08", notes: [
@@ -1532,16 +1541,18 @@ function refreshMenuInsights() {
   buildMenuPanel(currentRestaurantObj.menu || [], currentRestaurantObj.name, currentRestaurantObj.menuUrl || "", imgs, favSet, dislikeMap, controversialMap);
 }
 
-// The History sheet's Rated column (index 6) is the source of truth: once
-// anyone who ordered a dish rates it, that row flips to 1 and the prompt
-// stops for everyone who ordered it that week -- ratings stay anonymous
-// either way since nothing there is tied to a name. A rating task is keyed
-// by date+restaurant+item, not by name, to match that per-dish semantics.
-// The History CSV export can lag behind a just-submitted rating by a few
-// minutes though, so a local optimistic overlay in localStorage covers that
-// gap until the next refetch confirms it server-side.
-function ratedKey(date, restaurant, item) {
-  return `${date}|${restaurant.trim().toLowerCase()}|${item.toLowerCase()}`;
+// The History sheet's Rated column (index 6) is the source of truth --
+// History rows are per-orderer (one row per person per item, not
+// aggregated), so a rating only flips ITS rater's own row, and the prompt
+// keeps asking anyone else who separately ordered the same dish. A rating
+// task is keyed by date+restaurant+item+name to match that per-person
+// semantics (this key never touches the Ratings sheet itself, which stays
+// anonymous). The History CSV export can lag behind a just-submitted
+// rating by a few minutes though, so a local optimistic overlay in
+// localStorage covers that gap until the next refetch confirms it
+// server-side.
+function ratedKey(date, restaurant, item, name) {
+  return `${date}|${restaurant.trim().toLowerCase()}|${item.toLowerCase()}|${name.trim().toLowerCase()}`;
 }
 function getLocallyRatedKeys() {
   try { return new Set(JSON.parse(localStorage.getItem("ratedItemKeys") || "[]")); }
@@ -1552,8 +1563,8 @@ function markLocallyRated(keys) {
   keys.forEach(k => set.add(k));
   localStorage.setItem("ratedItemKeys", JSON.stringify([...set]));
 }
-function isRated(date, restaurant, item) {
-  return getLocallyRatedKeys().has(ratedKey(date, restaurant, item));
+function isRated(date, restaurant, item, name) {
+  return getLocallyRatedKeys().has(ratedKey(date, restaurant, item, name));
 }
 // History row's Rated column (index 6), tolerant of "1"/"TRUE"/1/true.
 function isHistoryRowRated(r) {
@@ -1576,7 +1587,7 @@ function getPendingRatings(name) {
     if (!date || !item || item.startsWith("Sauce: ") || !names.includes(lname)) return;
     // Server-confirmed (Rated column) or optimistically-just-submitted
     // (localStorage, ahead of the History CSV catching up) both count.
-    if (isHistoryRowRated(r) || isRated(date, restaurant, item)) return;
+    if (isHistoryRowRated(r) || isRated(date, restaurant, item, name)) return;
     const key = `${date}|${restaurant}`;
     // Same item can appear in multiple History rows for the same date+
     // restaurant (e.g. a reopened round re-logging the same dish) -- only
@@ -1737,7 +1748,10 @@ async function submitRatings(btn) {
     if (MOCK_MODE) {
       toSubmit.forEach(r => {
         _mockRatings.push([now, r.date, r.restaurant, r.item, r.slider.value]);
-        const histRow = _mockHistory.find(h => h[1] === r.date && h[2] === r.restaurant && h[3] === r.item);
+        const lname = name.trim().toLowerCase();
+        const histRow = _mockHistory.find(h =>
+          h[1] === r.date && h[2] === r.restaurant && h[3] === r.item &&
+          (h[5] || "").split(",").map(n => n.trim().toLowerCase()).includes(lname));
         if (histRow) { histRow[6] = 1; histRow[7] = now; }
       });
     } else {
@@ -1749,6 +1763,10 @@ async function submitRatings(btn) {
           restaurant: r.restaurant,
           item: r.item,
           rating: r.slider.value,
+          // Only used server-side to find which History row to mark rated
+          // (one row per person per item) -- never written to the Ratings
+          // sheet itself, so ratings stay anonymous there.
+          raterName: name,
         });
         return fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { mode: "no-cors" });
       }));
@@ -1763,7 +1781,7 @@ async function submitRatings(btn) {
     }
     // Optimistic overlay until the History sheet's Rated column catches up
     // (Apps Script write + CSV export can lag a few minutes).
-    markLocallyRated(toSubmit.map(r => ratedKey(r.date, r.restaurant, r.item)));
+    markLocallyRated(toSubmit.map(r => ratedKey(r.date, r.restaurant, r.item, name)));
     _ratingTouched.clear();
     _ratingStatusMsg = `Submitted ${toSubmit.length} rating${toSubmit.length === 1 ? "" : "s"}. Thank you!`;
     renderRatingCard();

@@ -75,11 +75,12 @@ function doGet(e) {
       sheet.appendRow([now, data.date, data.restaurant, data.item, data.rating]);
 
       // Flip the matching History row's Rated flag so "Rate Your Order"
-      // stops asking for this dish once ANYONE who ordered it has rated it.
-      // History rows are already aggregated across everyone who ordered
-      // that dish that week, so there's no per-person flag to set here --
-      // ratings stay anonymous either way.
-      markHistoryRowRated(ss, data.date, data.restaurant, data.item, now);
+      // stops asking for this specific person for this dish. History rows
+      // are per-orderer (one row per person per item, not aggregated), so
+      // the match has to include the name -- data.raterName is only used
+      // to find the right row here, and is never written to the Ratings
+      // sheet itself, so ratings stay anonymous there either way.
+      markHistoryRowRated(ss, data.date, data.restaurant, data.item, data.raterName, now);
     }
 
     // Manual restaurant-rotation override (e.g. an unpredictable event
@@ -108,11 +109,15 @@ function getOrCreateSheet(ss, name) {
   return ss.getSheetByName(name) || ss.insertSheet(name);
 }
 
-// Finds the History row for this date+restaurant+item and sets its Rated
-// flag to 1 and RatedAt to the given timestamp. Columns 7/8 (Rated/RatedAt)
-// may not exist yet on a sheet created before this feature -- backfill the
-// header in that case so the row write below lands in the right columns.
-function markHistoryRowRated(ss, date, restaurant, item, now) {
+// Finds the History row for this date+restaurant+item+person and sets its
+// Rated flag to 1 and RatedAt to the given timestamp. History rows are
+// per-orderer (one row per person per item, not aggregated across
+// everyone who ordered it) -- so the match MUST include the rater's name,
+// or it can flip a completely different person's row instead of theirs.
+// Columns 7/8 (Rated/RatedAt) may not exist yet on a sheet created before
+// this feature -- backfill the header in that case so the row write below
+// lands in the right columns.
+function markHistoryRowRated(ss, date, restaurant, item, raterName, now) {
   const sheet = getOrCreateSheet(ss, HISTORY_SHEET);
   if (sheet.getLastRow() === 0) return;
 
@@ -122,10 +127,24 @@ function markHistoryRowRated(ss, date, restaurant, item, now) {
     sheet.getRange(1, 7, 1, 2).setValues([["Rated", "RatedAt"]]);
   }
 
+  // The client trims restaurant/item before echoing them back on submit
+  // (getPendingRatings builds its keys with .trim()), but the raw sheet
+  // cell can carry incidental whitespace (e.g. the restaurant name is
+  // originally written from a DOM badge's textContent) -- trim both sides
+  // so that whitespace alone can't make an otherwise-correct match fail.
+  const wantRestaurant = String(restaurant).trim();
+  const wantItem = String(item).trim();
+  const wantName = String(raterName || "").trim().toLowerCase();
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
-    if (sameDate(row[1], date) && row[2] === restaurant && row[3] === item) {
+    // Names column: one name per row on legacy data, but tolerate a
+    // comma-joined list too in case a row ever aggregates multiple people.
+    const names = String(row[5] || "").split(",").map(n => n.trim().toLowerCase());
+    if (sameDate(row[1], date) &&
+        String(row[2]).trim() === wantRestaurant &&
+        String(row[3]).trim() === wantItem &&
+        names.includes(wantName)) {
       sheet.getRange(i + 1, 7, 1, 2).setValues([[1, now]]);
       break;
     }
