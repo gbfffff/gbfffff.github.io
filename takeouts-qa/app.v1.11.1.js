@@ -3338,6 +3338,20 @@ scheduleStripeToggle();
   // frame budget.
   const DPR = Math.min(2, window.devicePixelRatio || 1);
 
+  // getComputedStyle() forces a style recalc -- calling it every single
+  // animation frame (as draw() used to) is one of the more expensive
+  // things a mobile browser can be asked to do 60x/sec for values that
+  // only ever change on an explicit theme switch. Cache them instead and
+  // only recompute on the "themechange" event (and once up front).
+  let cachedInkColor = "#000", cachedAccentColor = "#fcf811";
+  function refreshThemeColors() {
+    const bodyStyle = getComputedStyle(document.body);
+    cachedInkColor = bodyStyle.getPropertyValue("--ink").trim() || "#000";
+    cachedAccentColor = bodyStyle.getPropertyValue("--accent").trim() || "#fcf811";
+  }
+  refreshThemeColors();
+  document.addEventListener("themechange", () => { refreshThemeColors(); draw(); });
+
   const BALL_R    = 9;
   const PEG_R     = 4;
   const COL_SPACE = 34;   // target horizontal spacing between peg columns
@@ -3921,12 +3935,27 @@ scheduleStripeToggle();
     return hexToRgba(hex, alpha);
   }
 
+  // Hoisted out of draw() -- this array and closure used to get allocated
+  // fresh every single frame for no reason, since none of it changes
+  // frame to frame.
+  const TRAY_TEXT_FONT = '900 15px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  const TRAY_TEXT_SHADOW_OFFSETS = [
+    [-1, -1], [1, -1],
+    [-1, 1],  [1, 1],
+  ];
+  function fillTrayText(text, x, y, align) {
+    ctx.textAlign = align;
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    TRAY_TEXT_SHADOW_OFFSETS.forEach(([dx, dy]) => ctx.fillText(text, x + dx, y + dy));
+    ctx.fillStyle = "#ffd400";
+    ctx.fillText(text, x, y);
+  }
+
   function draw() {
     ctx.clearRect(0, 0, cssW, cssH);
 
-    const bodyStyle = getComputedStyle(document.body);
-    const inkColor  = bodyStyle.getPropertyValue("--ink").trim() || "#000";
-    const accentColor = bodyStyle.getPropertyValue("--accent").trim() || "#fcf811";
+    const inkColor = cachedInkColor;
+    const accentColor = cachedAccentColor;
 
     // gold tray -- an open holding pen below the slots where reward balls
     // collect and stay visible; drawn first so slots/balls sit on top.
@@ -3999,15 +4028,21 @@ scheduleStripeToggle();
     // mode) with an accent-colored outline so they never blend into the
     // board background regardless of theme (some themes use the same
     // color for --accent and --bg, which would otherwise wash things out).
+    // Every peg used to be its own beginPath+fill+stroke (2 draw calls
+    // each, so 60-200+ separate GPU commands every frame just for the peg
+    // field) -- batched into ONE path so it's one fill + one stroke total,
+    // since they all share the same style anyway.
     ctx.fillStyle = inkColor;
     ctx.strokeStyle = accentColor;
     ctx.lineWidth = 1.5;
+    ctx.beginPath();
     pegs.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r || PEG_R, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
+      const pr = p.r || PEG_R;
+      ctx.moveTo(p.x + pr, p.y);
+      ctx.arc(p.x, p.y, pr, 0, Math.PI * 2);
     });
+    ctx.fill();
+    ctx.stroke();
 
     // drag lane hint + staging marker, only while no round is in flight
     // (gold held in the tray doesn't block the next drop)
@@ -4035,15 +4070,24 @@ scheduleStripeToggle();
     // in themes where --accent and --bg are the same color. Reward balls
     // (from landing in a colored slot) render gold instead so they read as
     // a distinct payout, even though they're falling through the same pegs.
-    balls.forEach(b => {
-      ctx.beginPath();
-      ctx.fillStyle = b.isReward ? "#ffc400" : inkColor;
-      ctx.arc(b.x, b.y, b.r || BALL_R, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.lineWidth = b.isReward ? 1 : 2;
-      ctx.strokeStyle = b.isReward ? "#000" : accentColor;
-      ctx.stroke();
-    });
+    // Batched by color group instead of a fill+stroke pair per ball (which
+    // meant up to ~800 separate draw calls once a big reward payout was
+    // sitting in the tray) -- one path, one fill, one stroke per group.
+    ctx.fillStyle = inkColor;
+    ctx.beginPath();
+    balls.forEach(b => { if (!b.isReward) { const r = b.r || BALL_R; ctx.moveTo(b.x + r, b.y); ctx.arc(b.x, b.y, r, 0, Math.PI * 2); } });
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = accentColor;
+    ctx.stroke();
+
+    ctx.fillStyle = "#ffc400";
+    ctx.beginPath();
+    balls.forEach(b => { if (b.isReward) { const r = b.r || BALL_R; ctx.moveTo(b.x + r, b.y); ctx.arc(b.x, b.y, r, 0, Math.PI * 2); } });
+    ctx.fill();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#000";
+    ctx.stroke();
 
     // Bag tally + live tray fill -- pinned to the TOP of the tray strip
     // (not the bottom) since the pile fills bottom-up and was burying this
@@ -4051,19 +4095,8 @@ scheduleStripeToggle();
     // win/lose comment's outline, just much thinner/softer) so it stays
     // legible sitting right over the gold pile without reading as a heavy
     // black blob.
-    ctx.font = '900 15px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.font = TRAY_TEXT_FONT;
     ctx.textBaseline = "alphabetic";
-    const trayTextShadowOffsets = [
-      [-1, -1], [1, -1],
-      [-1, 1],  [1, 1],
-    ];
-    function fillTrayText(text, x, y, align) {
-      ctx.textAlign = align;
-      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-      trayTextShadowOffsets.forEach(([dx, dy]) => ctx.fillText(text, x + dx, y + dy));
-      ctx.fillStyle = "#ffd400";
-      ctx.fillText(text, x, y);
-    }
     fillTrayText(`\u{1F4B0} ×${goldBags}`, 8, floorY + 28, "left");
     // Live tray fill -- the physics pile is capped for stability (see
     // bagUpTray), so this is the real running total toward the next bag.
@@ -4577,7 +4610,9 @@ scheduleStripeToggle();
   });
 
   const ctx = canvas.getContext("2d");
-  const DPR = window.devicePixelRatio || 1;
+  // Same cap as the Drop Game's canvas -- a 3x phone gets no visible
+  // benefit from rendering 2.25x the pixels of a 2x cap on a static wheel.
+  const DPR = Math.min(2, window.devicePixelRatio || 1);
   const DEFAULT_ITEMS = ["Item 1", "Item 2", "Item 3", "Item 4"];
 
   function loadItems() {

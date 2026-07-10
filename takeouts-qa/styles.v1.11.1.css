@@ -2089,8 +2089,8 @@
 
       /* Smaller cap on narrow boards -- combined with overflow-wrap above,
          this keeps long comments/results from overrunning the board. */
-      .plinko-comment { font-size: min(1.6rem, 6.75cqh, 13cqw); }
-      .plinko-comment.win { font-size: min(2.4rem, 12cqh, 18cqw); }
+      .plinko-comment { font-size: min(1.36rem, 5.74cqh, 11.05cqw); }
+      .plinko-comment.win { font-size: min(2.04rem, 10.2cqh, 15.3cqw); }
       .wheel-result { font-size: min(2.4rem, 12cqh, 18cqw); }
 
       /* Single column menu items */
@@ -3129,7 +3129,7 @@
        so it renders bigger out of the box, without anyone having to drag
        the resize grip first. Still just the starting height -- the same
        grip still resizes it same as Drop Game's board. */
-    #wheel-board { height: 580px; }
+    #wheel-board { height: 600px; }
     /* Same hollow-stroke-with-drop-shadow-backing technique as the menu's
        category labels (.mpi-section-label) -- readable on any background
        without needing its own box. Lose uses the theme's own accent color;
