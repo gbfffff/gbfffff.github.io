@@ -21,6 +21,8 @@ const PLINKO_COMMENTS = [
   "With friends like these\n who needs animes?",
   "Your vibe your tribe.",
   "You have won, but at what cost?",
+  "You are non-fungible.",
+  "If life is a soup, you are a fork.",
   "I am gonna start charging you for this.",
   "By playing this continuously, you are contributing to wasting Microsoft's cloud resources."
 ];
@@ -34,7 +36,7 @@ const PLINKO_WIN_COMMENTS = [
   "PAYYYYYY-DAY! PAYDAY! PAYDAY! PAYDAY! PAYDAY! PAYDAY! PAYDAY!",
   "YOU ARE A WINNER",
   "It's a HIT!",
-  "Winner winner, (Maryland) Chicken dinner!",
+  "Winner winner, Chicken Mama!",
   "MAKE$ IT RAIN!$",
   "PAAA-CHINN-KOOOO",
   "FREEDOM! PEW PEW PEW!"

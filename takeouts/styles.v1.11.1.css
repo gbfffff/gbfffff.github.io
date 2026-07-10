@@ -2626,19 +2626,19 @@
       width: 100%;
       padding: 0.25rem 0.85rem;
     }
-    /* Magical glowing arrow -- hue-rotate continuously cycles the color of
-       a fixed colorful text-shadow glow through the spectrum. Only glows
-       while closed (drawing the eye to open it); stops once opened. */
-    .plinko-toggle-btn .rotation-toggle-arrow { font-size: 1.4em; display: inline-block; }
-    .plinko-toggle-btn:not(.open) .rotation-toggle-arrow {
-      text-shadow: 0 0 6px #ff2ec4, 0 0 12px #ff2ec4, 0 0 18px #7a5cff;
-      animation: plinko-toggle-glow 3s linear infinite;
+    /* Plain downward triangle, no glow, no badge -- filled with a darker,
+       same-hue tone of the theme's accent (--accent is literally identical
+       to --bg for every theme, so the raw accent color is invisible here;
+       --theme-arrow, computed in app.js, keeps the tone but pulls it into
+       a contrasting range). */
+    .plinko-toggle-btn .rotation-toggle-arrow {
+      font-size: 1.4em;
+      display: inline-block;
+      color: var(--theme-arrow, var(--accent));
     }
-    @keyframes plinko-toggle-glow {
-      0%   { filter: hue-rotate(0deg) brightness(1.3); }
-      50%  { filter: hue-rotate(180deg) brightness(1.6); }
-      100% { filter: hue-rotate(360deg) brightness(1.3); }
-    }
+    /* Light blue (cyan) theme's computed tone still read a bit flat --
+       this hand-picked darker teal is what was actually asked for. */
+    [data-theme="cyan"] .plinko-toggle-btn .rotation-toggle-arrow { color: #3f9bab; }
     .plinko-controls {
       display: flex;
       align-items: center;
@@ -3004,10 +3004,13 @@
        physically are. */
     .wheel-pointer {
       position: absolute;
-      top: -66px;
+      top: -40px;
       left: 50%;
       width: 22px;
-      height: 86px;
+      /* top + height must land at 20px -- that's where the pins actually
+         are (pieR = r - 20 in drawPockets), so the tip reaches the rim
+         instead of stopping short in mid-air. */
+      height: 60px;
       transform: translateX(-50%);
       transform-origin: 50% 6%;
       z-index: 5;
@@ -3017,10 +3020,21 @@
       content: "";
       position: absolute;
       inset: 8px 0 0 0;
-      background: linear-gradient(165deg, #ff4d4d, #b30000 65%);
+      /* The glow lives IN the fill itself, not radiating off the shape --
+         a bright core blooming out into a darker edge, plus an inset
+         highlight so the surface itself reads as lit up rather than the
+         triangle having a colored shadow behind/around it. The three stops
+         are set as custom properties by updatePointerGlow() (JS) -- always
+         the current theme accent's color-wheel complement, not a fixed
+         hardcoded red, with a sane fallback if JS hasn't run yet. */
+      background: radial-gradient(circle at 50% 30%,
+        var(--pointer-core, #fff2b0) 0%,
+        var(--pointer-mid, #ff8a3d) 35%,
+        var(--pointer-mid, #ff4d4d) 60%,
+        var(--pointer-edge, #b30000) 100%);
+      box-shadow: inset 0 0 10px 2px color-mix(in srgb, var(--pointer-core, #fff2b0) 70%, white);
       clip-path: polygon(50% 100%, 6% 10%, 94% 10%);
       border-radius: 2px 2px 6px 6px;
-      box-shadow: 0 3px 3px rgba(0, 0, 0, 0.5);
     }
     .wheel-pointer::after {
       content: "";

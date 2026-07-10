@@ -39,8 +39,16 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.11.0";
+const APP_VERSION = "1.11.1";
 const CHANGELOG = [
+  { version: "1.11.1", date: "2026-07-09", notes: [
+    "Drop Game gold tray: the floor bar now fully retracts (whole floor drops open) instead of a narrow one-corner ramp, and stays open a several-second beat longer before closing",
+    "Gold no longer jams or freezes mid-fall in the tray -- it overlaps freely instead of fighting for space, and the win comment now waits for every gold ball to actually settle before showing",
+    "Live tray-fill counter (e.g. 40 / 150) next to the bag tally, so you can see progress toward the next bag",
+    "Wheel of Fortune is bigger on mobile (no longer shrunk by a vertical-only margin), has a shorter pointer flapper, and its glow now lives in the pointer's own fill -- tinted to the current theme's complementary color instead of a fixed red",
+    "Wheel wedge labels stay clear of the hub instead of crowding the center on longer names",
+    "Drop Game win/lose comment now centers on the peg + slot area only, not pulled down by the tray strip below it",
+  ]},
   { version: "1.11.0", date: "2026-07-09", notes: [
     "Drop Game: removed Roulette (Wheel of Fortune stays); UI overhaul with a compact accessory row (preset/Edit Items/Shuffle/Clear All) and a big Spin bar docked against the wheel",
     "Drop Game gold reward overhauled: difficulty-scaled payout (fewer slots/balls/colors = bigger prize), a session gold-ball counter, and a real gold tray with a hinged floor bar that opens a ramp for the shower and closes once it settles",
@@ -2542,6 +2550,16 @@ function startCountdown() {
     const [h, s, l] = hexToHsl(accent);
     const complement = hslToHex((h + 180) % 360, Math.max(s, 55), l);
     document.documentElement.style.setProperty("--theme-complement", complement);
+
+    // Every theme sets --accent equal to --bg, so anything colored with
+    // --accent directly (like the secret-game toggle arrow) is literally
+    // invisible against the page background. This keeps the SAME hue --
+    // it's meant to read as "the theme color, just visible" -- but pulls
+    // saturation down and pins lightness to a mid-range band so it always
+    // contrasts against a bg that could be anywhere from pastel-light to
+    // neon-bright.
+    const darkerTone = hslToHex(h, Math.max(35, s * 0.5), Math.min(48, Math.max(35, l)));
+    document.documentElement.style.setProperty("--theme-arrow", darkerTone);
   }
   document.addEventListener("themechange", updateThemeComplement);
   updateThemeComplement();
@@ -3328,8 +3346,6 @@ scheduleStripeToggle();
   const SLOT_H    = 70;   // height reserved for the slot area at the bottom
   const TRAY_H    = 80;   // gold-ball tray below the slots -- rewards collect here, visibly held
   const BAR_H     = 10;   // the slot baseline is a real bar (a hinged plate), not a hairline
-  const RAMP_TILT = 30;   // how far the bar's free end swings down when it opens
-  const RAMP_GAP  = 50;   // opening at the swung-down end that gold drops through
   const TRAY_CAPACITY = 150; // tray holds this many gold balls before they're bagged
   const GRAVITY   = 0.32;
   const RESTITUTION = 0.62;
@@ -3392,25 +3408,28 @@ scheduleStripeToggle();
   // open: one side swings down into a ramp and its free end pulls back
   // from the wall, opening a gap the gold rolls down through into the
   // tray. Once every gold ball is down, it swings shut again.
-  let rampProgress = 0;      // 0 = shut flat, 1 = fully open
+  let rampProgress = 0;      // 0 = shut (flat bar in place), 1 = fully open (bar retracted)
   let rampTarget = 0;
-  let rampSide = "right";    // which side swings down (re-rolled per shower)
   let goldShowerActive = false; // a shower is in progress this round
   let showerStartedAt = 0;   // watchdog reference for a shower that never finishes
   let roundOver = false;     // outcome already shown for this round
 
+  // The bar is a flat plate that simply retracts out of the way rather than
+  // tilting open -- so its resting surface is always just floorY; only
+  // inRampGap (below) changes as it opens.
   function rampYAt(x) {
-    if (rampProgress <= 0) return floorY;
-    const t = rampSide === "right" ? x / cssW : 1 - x / cssW;
-    return floorY + rampProgress * RAMP_TILT * t;
+    return floorY;
   }
   function inRampGap(x) {
-    if (rampProgress < 0.6) return false;
-    return rampSide === "right" ? x > cssW - RAMP_GAP : x < RAMP_GAP;
+    // Once the bar's swung mostly open, the WHOLE floor drops away -- gold
+    // falls straight through wherever it happens to be instead of having to
+    // slide all the way to one narrow corner first (that single-file
+    // bottleneck was reading as "stuck").
+    return rampProgress >= 0.6;
   }
-  // Regular balls always rest on the bar (flat or tilted). Gold rests on
-  // the bar too while it's rolling toward the opening -- but through the
-  // gap, or once it's below the bar, its floor is the tray's.
+  // Regular balls always rest on the bar. Gold rests on the bar too while
+  // it's shut -- but through the gap, or once it's below the bar, its
+  // floor is the tray's.
   function floorFor(b) {
     if (!b.isReward) return rampYAt(b.x);
     const br = b.r || BALL_R;
@@ -3465,6 +3484,13 @@ scheduleStripeToggle();
 
     trayFloorY = cssH;
     floorY = cssH - TRAY_H;
+
+    // The win/lose comment centers on just the peg field + slots, not the
+    // tray strip below them -- otherwise the tray's height would drag the
+    // apparent center down, off the actual play area. floorY is exactly
+    // the boundary between the two, so half of it is that region's center.
+    const commentEl = document.getElementById("plinko-comment");
+    if (commentEl) commentEl.style.top = `${floorY / 2}px`;
 
     // The peg field always uses the same dense, auto-fit grid regardless of
     // mode -- Restaurant Picker doesn't touch ball/peg size or row spacing
@@ -3558,14 +3584,10 @@ scheduleStripeToggle();
   function resetBalls() {
     // The tray's gold survives a reset -- it's the player's stash, held
     // until it fills up and gets bagged. Only the round's black balls (and
-    // any stray unsettled gold) are cleared. Kept gold is re-seated inside
-    // the (possibly resized) tray bounds.
+    // any stray unsettled gold) are cleared. Kept gold gets re-packed into
+    // the (possibly resized) tray via layoutTrayPile() below.
     balls = balls.filter(b => b.isReward && !b.moving);
-    balls.forEach(b => {
-      const br = b.r || BALL_R;
-      b.x = Math.min(Math.max(b.x, br), cssW - br);
-      b.y = Math.min(Math.max(b.y, floorY + BAR_H + br), trayFloorY - br);
-    });
+    layoutTrayPile();
     dragBall = { x: cssW / 2, y: TOP_MARGIN / 2 };
     allPastLineSince = null;
     spawningGold = false;
@@ -3605,18 +3627,67 @@ scheduleStripeToggle();
   // Bags: once the tray holds TRAY_CAPACITY gold balls, they're swept into
   // a bag -- the bag tally (persisted per-browser) is painted in the tray
   // corner as the money-bag sign.
+  //
+  // trayGoldCount is the real, persisted running total, kept alongside the
+  // physical ball objects in `balls` (every gold ball dropped is also
+  // simulated -- now that gold overlaps and skips collision with other
+  // gold, there's no packing/jam risk from letting all of them actually
+  // fall). It's what gates bagging and what's shown in the live readout.
   let goldBags = Number(localStorage.getItem("plinkoGoldBags")) || 0;
+  let trayGoldCount = Number(localStorage.getItem("plinkoTrayGoldCount")) || 0;
+  function saveTrayGoldCount() {
+    localStorage.setItem("plinkoTrayGoldCount", String(trayGoldCount));
+  }
   function bagUpTray() {
-    const trayCount = balls.reduce((n, b) => n + (b.isReward ? 1 : 0), 0);
-    if (trayCount < TRAY_CAPACITY) return;
-    const bagsGained = Math.floor(trayCount / TRAY_CAPACITY);
+    if (trayGoldCount < TRAY_CAPACITY) return;
+    const bagsGained = Math.floor(trayGoldCount / TRAY_CAPACITY);
     goldBags += bagsGained;
     localStorage.setItem("plinkoGoldBags", String(goldBags));
+    trayGoldCount -= bagsGained * TRAY_CAPACITY;
+    saveTrayGoldCount();
+    // Swept into the bag -- remove exactly as many physical gold balls as
+    // just got bagged, leaving any remainder still visibly sitting in the
+    // tray (matching the remaining trayGoldCount).
     let toRemove = bagsGained * TRAY_CAPACITY;
     balls = balls.filter(b => {
       if (b.isReward && toRemove > 0) { toRemove--; return false; }
       return true;
     });
+    layoutTrayPile(); // close up the gap left by whatever just got bagged
+  }
+
+  // Once gold stops moving, its final resting spot isn't physics-simulated
+  // any more -- it's calculated directly: pack every tray ball into a
+  // simple bottom-up grid sized off its own diameter, so any number of
+  // balls just fills up the tray row by row with zero overlap and zero
+  // per-ball movement, instead of relying on collision response to spread
+  // them out (which is what kept jamming all session).
+  function layoutTrayPile() {
+    const d = GOLD_R * 2;
+    const cols = Math.max(1, Math.floor(cssW / d));
+    const maxRows = Math.max(1, Math.floor(TRAY_H / d));
+    const capacity = cols * maxRows;
+
+    const nonReward = balls.filter(b => !b.isReward);
+    let trayBalls = balls.filter(b => b.isReward);
+    // More gold than physically fits the tray box even packed edge-to-edge
+    // just isn't individually rendered -- trayGoldCount (the live X/150
+    // readout) still tracks the true total regardless.
+    if (trayBalls.length > capacity) trayBalls = trayBalls.slice(0, capacity);
+
+    trayBalls.forEach((b, i) => {
+      const row = Math.floor(i / cols);
+      const rowStart = row * cols;
+      const ballsInRow = Math.min(cols, trayBalls.length - rowStart);
+      const col = i - rowStart;
+      const rowW = ballsInRow * d;
+      const xOffset = (cssW - rowW) / 2;
+      b.x = xOffset + col * d + GOLD_R;
+      b.y = trayFloorY - GOLD_R - row * d;
+      b.vx = 0; b.vy = 0; b.moving = false;
+    });
+
+    balls = nonReward.concat(trayBalls);
   }
 
   // The reward balls actually drop through the machine like real balls
@@ -3625,12 +3696,14 @@ scheduleStripeToggle();
   // the whole field) and trickle in one at a time with a slight random
   // stagger, then fall and settle like anything else.
   function spawnGoldBalls(count) {
-    // Swing the floor bar open (random side each shower) so the gold has
-    // somewhere to roll down into the tray; wake the settled black balls
-    // so they ride the tilting bar instead of hanging in the air.
+    trayGoldCount += count;
+    saveTrayGoldCount();
+
+    // Retract the floor bar so the gold has somewhere to drop into the
+    // tray; wake the settled black balls so they fall along with it
+    // instead of hanging in the air.
     goldShowerActive = true;
     showerStartedAt = performance.now();
-    rampSide = Math.random() < 0.5 ? "left" : "right";
     rampTarget = 1;
     balls.forEach(b => { if (!b.isReward) b.moving = true; });
     startPhysics();
@@ -3700,14 +3773,19 @@ scheduleStripeToggle();
       return;
     }
     // Shower finished: every gold ball is down in the tray. Bag the tray
-    // if it's full, swing the bar shut, and show the win.
+    // if it's full and show the win right away, but hold the bar open a
+    // few seconds longer before swinging it shut instead of slamming it
+    // closed the instant the last coin lands.
     if (goldShowerActive) {
-      goldShowerActive = false;
-      rampTarget = 0;
+      layoutTrayPile(); // pack this shower's new arrivals in with the rest
       bagUpTray();
       showWinComment();
       roundOver = true;
-      startPhysics(); // keep frames coming for the bar-shut animation
+      setTimeout(() => {
+        goldShowerActive = false;
+        rampTarget = 0;
+        startPhysics(); // keep frames coming for the bar-shut animation
+      }, 6000 + Math.random() * 3000);
       return;
     }
     // Use the slot each ball was frozen into the instant it first touched
@@ -3840,12 +3918,11 @@ scheduleStripeToggle();
     ctx.globalAlpha = 1;
 
     // The floor bar itself: a solid hinged plate, drawn as a thick slab so
-    // it reads as a real mechanism. When open, it stops short of the low
-    // wall -- that missing stretch IS the hatch the gold drops through.
-    {
-      const gapOpen = rampProgress >= 0.6;
-      const x0 = (gapOpen && rampSide === "left") ? RAMP_GAP : 0;
-      const x1 = (gapOpen && rampSide === "right") ? cssW - RAMP_GAP : cssW;
+    // it reads as a real mechanism. Once it's swung most of the way open,
+    // the whole thing retracts out of view -- the entire floor is the
+    // hatch the gold drops through, not just a sliver at one corner.
+    if (rampProgress < 0.6) {
+      const x0 = 0, x1 = cssW;
       ctx.beginPath();
       ctx.moveTo(x0, rampYAt(x0));
       ctx.lineTo(x1, rampYAt(x1));
@@ -3921,13 +3998,27 @@ scheduleStripeToggle();
       ctx.stroke();
     });
 
-    // Bag tally -- painted in the tray corner, on top of the pile, so you
-    // can always see how many full trays you've bagged.
-    ctx.font = '900 15px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-    ctx.textAlign = "left";
+    // Bag tally + live tray fill -- pinned to the TOP of the tray strip
+    // (not the bottom) since the pile fills bottom-up and was burying this
+    // text; small font + a text shadow so it stays legible sitting right
+    // over the gold pile either way.
+    ctx.font = '900 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
     ctx.textBaseline = "alphabetic";
-    ctx.fillStyle = "#a07800";
-    ctx.fillText(`\u{1F4B0} ×${goldBags}`, 8, trayFloorY - 8);
+    ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 1;
+    ctx.fillStyle = "#ffd400";
+    ctx.textAlign = "left";
+    ctx.fillText(`\u{1F4B0} ×${goldBags}`, 8, floorY + 24);
+    // Live tray fill -- the physics pile is capped for stability (see
+    // bagUpTray), so this is the real running total toward the next bag.
+    ctx.textAlign = "right";
+    ctx.fillText(`${trayGoldCount} / ${TRAY_CAPACITY}`, cssW - 8, floorY + 24);
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.textAlign = "left";
   }
 
   // Is this ball meaningfully embedded in an already-settled ball? (A
@@ -4039,12 +4130,14 @@ scheduleStripeToggle();
     const settleY = floorFor(b);
     if (b.y + br >= settleY) {
       if (b.isReward && settleY < trayFloorY - 0.5) {
-        // Gold resting on the tilted bar doesn't settle -- it rolls toward
-        // the opening, picking up a downhill push each frame.
+        // Gold resting on the still-shut bar never truly settles (stays
+        // "moving") -- it just waits flat, with no need to roll anywhere
+        // now that the whole floor drops away at once. Staying in the
+        // moving state is what lets it notice and fall through the instant
+        // the bar retracts; a fully settled ball would never wake back up.
         b.y = settleY - br;
+        b.vx = 0;
         b.vy = 0;
-        b.vx += (rampSide === "right" ? 0.35 : -0.35) * Math.max(0.3, rampProgress);
-        b.vx *= 0.98;
       } else if (b.vy > 1.5) {
         // A real bounce on impact instead of dead-stopping on first touch
         // (which read as the floor being sticky) -- the ball only settles
@@ -4059,10 +4152,12 @@ scheduleStripeToggle();
         b.y = settleY - br;
         b.vy = 0;
         b.vx *= 0.965;
-      } else if (overlapsSettledBall(b)) {
+      } else if (!b.isReward && overlapsSettledBall(b)) {
         // Came to rest INSIDE the pile -- pop it up gently and let the
         // collision pass walk it to a free spot, so settled balls take up
-        // real space instead of stacking into each other.
+        // real space instead of stacking into each other. Gold is exempt --
+        // it's allowed to pile up overlapping (a simple, never-jams stand-in
+        // for a mound of coins) instead of needing real packing physics.
         b.y = settleY - br;
         b.vy = -1.4;
         b.vx += (Math.random() - 0.5) * 0.8;
@@ -4094,9 +4189,12 @@ scheduleStripeToggle();
         // what matters once ~100 gold balls have piled up in the tray.
         if (!a.moving && !b.moving) continue;
         // Gold passes THROUGH regular balls (otherwise it would pile on
-        // top of the black balls in the slots and never reach the tray);
-        // gold still stacks against gold once it's down there.
-        if (a.isReward !== b.isReward) continue;
+        // top of the black balls in the slots and never reach the tray) --
+        // and now also passes through OTHER gold once it's down there. The
+        // tray pile is allowed to overlap freely (a simple coin-mound look)
+        // instead of needing real non-overlap packing physics, which is
+        // what kept jamming once the pile got crowded.
+        if (a.isReward || b.isReward) continue;
         const dx = b.x - a.x, dy = b.y - a.y;
         const minDist = (a.r || BALL_R) + (b.r || BALL_R);
         // Cheap axis reject before any sqrt.
@@ -4208,11 +4306,13 @@ scheduleStripeToggle();
       balls.forEach(b => {
         if (!b.moving) return;
         const br = b.r || BALL_R;
-        // Gold still riding the open bar (or falling above it) is exempt --
-        // it settles when it reaches the tray, not where the timer catches
-        // it. Gold already down IN the tray region is fair game: after the
-        // grace period it freezes wherever the pile jiggling left it.
-        if (b.isReward && goldShowerActive && b.y + br <= rampYAt(b.x) + 2) return;
+        // While a gold shower is in progress, no gold ball -- on the bar,
+        // mid-air, or already past the gate and still bouncing in the tray
+        // -- gets force-frozen by this timer. Freezing it wherever it
+        // happened to be mid-bounce is exactly what read as it "cutting
+        // off." The 12s shower watchdog (showerStartedAt, elsewhere) is
+        // the only backstop that still applies during a shower.
+        if (b.isReward && goldShowerActive) return;
         b.y = Math.min(b.y, floorFor(b) - br);
         b.vx = 0; b.vy = 0;
         b.moving = false;
@@ -4680,12 +4780,18 @@ scheduleStripeToggle();
   function layout() {
     const w = board.clientWidth, h = board.clientHeight;
     if (w <= 0 || h <= 0) return;
-    // Reserve enough top/bottom margin that the pointer's pivot (which
-    // sits well above the canvas now that the flapper is 3x longer) never
-    // gets clipped by the board's own edge, and so the whole wheel+pointer
-    // assembly reads as centered with visible breathing room, not flush
-    // against the top/bottom.
-    cssSize = Math.max(60, Math.min(w, h) - 140);
+    // Only the vertical axis needs the big reserve -- it's clearance for
+    // the pointer's pivot (which sits ~40px above the canvas) plus a real
+    // gap above THAT (about a pin-circle's width) so it never reads as
+    // flush against the board's own edge. The width doesn't need nearly as
+    // much margin; computing the two limits separately (instead of
+    // reserving the same amount out of whichever of w/h is smaller) means
+    // a narrow mobile board -- where width, not height, is what's actually
+    // tight -- lets the wheel use almost the full width instead of being
+    // shrunk by a vertical-only reserve it doesn't need sideways.
+    const maxByWidth  = w - 24;
+    const maxByHeight = h - 140;
+    cssSize = Math.max(60, Math.min(maxByWidth, maxByHeight));
     canvasWrap.style.width  = `${cssSize}px`;
     canvasWrap.style.height = `${cssSize}px`;
     canvas.width  = Math.round(cssSize * DPR);
@@ -4748,6 +4854,23 @@ scheduleStripeToggle();
       hslToHex((h + 180) % 360, sat, l),
     ];
   }
+  // The pointer's glow isn't canvas -- it's a plain DOM element, so it
+  // can't pull from --accent directly the way the wedges do. Instead, the
+  // same hue-rotate-180 trick used for the wedges' complement color drives
+  // three CSS custom properties (a light core, the true complement, and a
+  // dark edge) that the pointer's CSS gradient/glow reads -- so the flapper
+  // always glows in whatever color contrasts with the current theme,
+  // instead of a fixed hardcoded red.
+  function updatePointerGlow() {
+    if (!pointerEl) return;
+    const accent = getComputedStyle(document.body).getPropertyValue("--accent").trim() || "#fcf811";
+    const [h] = hexToHsl(accent);
+    const compH = (h + 180) % 360;
+    pointerEl.style.setProperty("--pointer-core", hslToHex(compH, 90, 88));
+    pointerEl.style.setProperty("--pointer-mid",  hslToHex(compH, 85, 62));
+    pointerEl.style.setProperty("--pointer-edge", hslToHex(compH, 80, 36));
+  }
+
   // Shared by the Wheel-of-Fortune view and the Roulette view -- same
   // picks, same wedge/pin rendering, just drawn onto whichever canvas
   // context is passed in with whichever rotation (Roulette's wheel never
@@ -4797,15 +4920,19 @@ scheduleStripeToggle();
     // font size down with them.
     const baseFontSize = Math.max(12, Math.min(r * 0.26, (r * 1.15) / n));
     const minFontSize = 9;
-    const availableLen = pieR - 24; // radial room for the text, rim to hub
+    // Radial room for the text -- kept well short of the hub (not just
+    // rim-to-hub) so labels stay out in the wedge's outer band instead of
+    // crowding together near the center once they're long enough to reach
+    // that far in.
+    const availableLen = pieR * 0.55;
 
-    // Cap at 3 words first (reads better truncated at a word boundary than
+    // Cap at 2 words first (reads better truncated at a word boundary than
     // mid-word, e.g. a long restaurant name), then shrink the font until
     // what's left actually fits the wedge; only chops mid-word as a last
     // resort if it's still too wide even at the smallest readable size.
     function fitLabel(text) {
       const words = text.trim().split(/\s+/);
-      let label = words.length > 3 ? words.slice(0, 3).join(" ") + "…" : text;
+      let label = words.length > 2 ? words.slice(0, 2).join(" ") + "…" : text;
 
       let fsize = baseFontSize;
       pctx.font = `900 ${fsize}px ${CANVAS_FONT_FAMILY}`;
@@ -5005,7 +5132,8 @@ scheduleStripeToggle();
   // dark mode fired any event before now -- nothing ever told the wheel to
   // redraw, so it stayed stuck on whatever theme was active when it was
   // last drawn.
-  document.addEventListener("themechange", () => drawWheel());
+  document.addEventListener("themechange", () => { drawWheel(); updatePointerGlow(); });
+  updatePointerGlow();
   if (typeof ResizeObserver !== "undefined") {
     new ResizeObserver(() => { if (board.offsetParent) layout(); }).observe(board);
   }
