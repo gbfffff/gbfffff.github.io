@@ -9,6 +9,7 @@ const ORDERS_GID      = _cfg.ORDERS_GID       || "0";
 const HISTORY_GID     = _cfg.HISTORY_GID      || "";
 const RATINGS_GID     = _cfg.RATINGS_GID      || "";
 const OVERRIDES_GID   = _cfg.OVERRIDES_GID    || "";
+const PLINKO_SCORES_GID = _cfg.PLINKO_SCORES_GID || "";
 
 // Local-only demo mode: when testing on localhost with no real Sheet
 // configured yet, run the whole order/history/rating flow on fake
@@ -470,13 +471,23 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
 
   panel.innerHTML = imgHtml + favsSection + dislikesSection + controversialSection + bodyHtml;
 
-  shortcuts.innerHTML = shortcutSections.length > 1
+  // Random Pick always shows (even with just one/no category) -- it's a
+  // standalone tool, not a category jump link, so it doesn't depend on
+  // there being multiple sections to jump between.
+  const randomBtnHtml = `<button type="button" id="menu-random-pick-btn" class="menu-shortcut-btn menu-random-btn">Random Pick</button>`;
+  const categoryBtnsHtml = shortcutSections.length > 1
     ? shortcutSections.map((s, i) =>
         `<button type="button" class="menu-shortcut-btn" style="z-index:${i + 1}" data-target="${escAttr(s.id)}">${esc(s.label)}</button>`
       ).join("")
     : "";
+  shortcuts.innerHTML = categoryBtnsHtml + randomBtnHtml;
 
   shortcuts.onclick = e => {
+    if (e.target.closest("#menu-random-pick-btn")) {
+      // Today's restaurant's own menu only -- never the wider rotation.
+      openRandomPickLightbox(items);
+      return;
+    }
     const btn = e.target.closest(".menu-shortcut-btn");
     if (!btn) return;
     document.getElementById(btn.dataset.target)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -3215,6 +3226,138 @@ function closeLightbox() {
 }
 function lbPrev() { _lbIndex = (_lbIndex - 1 + _lbImages.length) % _lbImages.length; _renderLightbox(); }
 function lbNext() { _lbIndex = (_lbIndex + 1) % _lbImages.length; _renderLightbox(); }
+
+// ── Random Pick lightbox ─────────────────────────────────────────────
+// Slot-machine-style picker scoped to whatever menu it was opened with --
+// always today's restaurant (buildMenuPanel passes its own `items`), never
+// the wider rotation.
+let _randomPickAllItems = []; // everything on today's menu, unfiltered
+let _randomPickItems = [];    // the working set the spin actually draws from
+let _randomPickChosen = null;
+let _randomPickTimer = null;
+
+function openRandomPickLightbox(items) {
+  _randomPickAllItems = (items || []).filter(i => i?.item);
+  _randomPickItems = _randomPickAllItems;
+  if (!_randomPickItems.length) return;
+
+  // Narrowing to a category is optional -- defaults to "All Categories" so
+  // picking one is never required, it just rolls with the whole menu until
+  // you do. Skipped entirely if nothing on the menu even has a category.
+  const categorySelect = document.getElementById("random-pick-category");
+  const categories = [...new Set(_randomPickAllItems.map(i => i.category).filter(Boolean))];
+  if (categories.length) {
+    categorySelect.innerHTML = `<option value="">All Categories</option>` +
+      categories.map(c => `<option value="${escAttr(c)}">${esc(c)}</option>`).join("");
+    categorySelect.value = "";
+    categorySelect.style.display = "";
+  } else {
+    categorySelect.innerHTML = "";
+    categorySelect.style.display = "none";
+  }
+
+  const nameEl = document.getElementById("random-pick-name");
+  const labelEl = document.getElementById("random-pick-label");
+  const actionsEl = document.getElementById("random-pick-actions");
+  actionsEl.style.display = "none";
+  labelEl.textContent = "Picking something for you…";
+  nameEl.classList.remove("settled");
+  document.getElementById("random-pick-lightbox").classList.add("open");
+
+  _runRandomPickSpin();
+}
+
+// Re-rolls from just the chosen category (or the whole menu again for "All
+// Categories") -- changing the dropdown re-spins immediately rather than
+// waiting for another click.
+function randomPickCategoryChanged() {
+  const selected = document.getElementById("random-pick-category").value;
+  _randomPickItems = selected
+    ? _randomPickAllItems.filter(i => i.category === selected)
+    : _randomPickAllItems;
+  if (!_randomPickItems.length) _randomPickItems = _randomPickAllItems;
+  _runRandomPickSpin();
+}
+
+function _runRandomPickSpin() {
+  clearTimeout(_randomPickTimer);
+  const nameEl = document.getElementById("random-pick-name");
+  const labelEl = document.getElementById("random-pick-label");
+  const actionsEl = document.getElementById("random-pick-actions");
+  nameEl.classList.remove("settled");
+  labelEl.textContent = "Picking something for you…";
+  actionsEl.style.display = "none";
+  document.getElementById("random-pick-stats-link").style.display = "none";
+
+  // Picks the real final answer up front, then just spends the animation
+  // cycling through random names before landing on it -- the deceleration
+  // is purely cosmetic, every item has an equal chance from the start.
+  const items = _randomPickItems;
+  _randomPickChosen = items[Math.floor(Math.random() * items.length)];
+
+  // While cycling, long names made the box keep flashing/resizing as it
+  // rotated through wildly different lengths -- truncated during the spin
+  // only, then the real full name is what it actually settles on.
+  const RANDOM_PICK_SPIN_MAX_LEN = 24;
+  function spinLabel(name) {
+    return name.length > RANDOM_PICK_SPIN_MAX_LEN
+      ? name.slice(0, RANDOM_PICK_SPIN_MAX_LEN - 1).trimEnd() + "…"
+      : name;
+  }
+
+  const totalSteps = 30 + Math.floor(Math.random() * 7);
+  let step = 0;
+  function tick() {
+    const isLast = step >= totalSteps;
+    nameEl.textContent = isLast
+      ? _randomPickChosen.item
+      : spinLabel(items[Math.floor(Math.random() * items.length)].item);
+    if (isLast) {
+      labelEl.textContent = "Tonight's pick:";
+      nameEl.classList.add("settled");
+      actionsEl.style.display = "flex";
+      document.getElementById("random-pick-stats-link").style.display = "block";
+      return;
+    }
+    step++;
+    // Deceleration curve: starts fast (~50ms) and stretches out toward
+    // ~700ms by the last few steps -- a longer, more dramatic wind-down
+    // than a quick flick, reading as a wheel slowing to a stop.
+    const delay = 50 + Math.pow(step / totalSteps, 2) * 650;
+    _randomPickTimer = setTimeout(tick, delay);
+  }
+  tick();
+}
+
+function closeRandomPickLightbox() {
+  clearTimeout(_randomPickTimer);
+  document.getElementById("random-pick-lightbox").classList.remove("open");
+}
+
+// Wired via inline onclick (not addEventListener) -- this script tag loads
+// before the lightbox markup further down the page, so looking these
+// buttons up by ID at parse time would silently find nothing.
+function randomPickAdd() {
+  if (!_randomPickChosen) return;
+  addItem(_randomPickChosen.item);
+  closeRandomPickLightbox();
+  document.getElementById("order-name")?.focus();
+}
+
+// Item Stats (the rating-trend chart) is its own modal at a lower z-index
+// than this lightbox -- close this one first so it isn't hidden behind it.
+function randomPickViewStats() {
+  if (!_randomPickChosen || !currentRestaurantObj?.name) return;
+  const item = _randomPickChosen.item;
+  closeRandomPickLightbox();
+  _reportMenu = currentRestaurantObj.menu || allMenuItems;
+  openItemDetail(currentRestaurantObj.name, item);
+}
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && document.getElementById("random-pick-lightbox").classList.contains("open")) {
+    closeRandomPickLightbox();
+  }
+});
 document.addEventListener("keydown", e => {
   if (!document.getElementById("lightbox").classList.contains("open")) return;
   if (e.key === "Escape")     closeLightbox();
@@ -3358,9 +3501,9 @@ scheduleStripeToggle();
   const BASE_ROW_SPACE = 30; // vertical spacing between peg rows
   const TOP_MARGIN = 40;  // gap above first peg row (the ball's drag lane)
   const SLOT_H    = 70;   // height reserved for the slot area at the bottom
-  const TRAY_H    = 80;   // gold-ball tray below the slots -- rewards collect here, visibly held
+  const TRAY_H    = 60;   // gold-ball tray below the slots -- rewards collect here, visibly held
   const BAR_H     = 10;   // the slot baseline is a real bar (a hinged plate), not a hairline
-  const TRAY_CAPACITY = 150; // tray holds this many gold balls before they're bagged
+  const TRAY_CAPACITY = 50; // tray holds this many gold balls before they're bagged
   const GRAVITY   = 0.32;
   const RESTITUTION = 0.62;
   const MIN_COLORED = 1, MAX_COLORED = 6, MAX_BALLS = 12;
@@ -3651,6 +3794,25 @@ scheduleStripeToggle();
   const REFERENCE_ROWS = 12; // peg row count at the board's default (unresized) height, tray included
   const GOLD_R = BALL_R * 0.75; // smaller than a regular ball
   const MAX_GOLD_MOBILE = 150, MAX_GOLD_DESKTOP = 400;
+
+  // ── 5-minute round + high score ──────────────────────────────────────
+  // The clock counts DOWN, not up. It starts the moment the first ball
+  // drops (not just from opening the panel) and persists across a refresh
+  // via localStorage -- otherwise reloading the page mid-round would quietly
+  // give a free reset. Once it hits zero the round ends outright: no more
+  // dropping until the player enters their initials (or skips), at which
+  // point everything session-related wipes and the next drop starts a
+  // fresh countdown.
+  const PLINKO_ROUND_MS = 5 * 60 * 1000;
+  let plinkoRoundEndAt = Number(localStorage.getItem("plinkoRoundEndAt")) || null;
+  let plinkoGameOver = false;
+
+  function formatClock(ms) {
+    const secs = Math.max(0, Math.ceil(ms / 1000));
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${String(s).padStart(2, "0")}`;
+  }
 
   // Session total of golden balls won, shown in the top control bar and
   // remembered per-browser.
@@ -4441,6 +4603,9 @@ scheduleStripeToggle();
   }
 
   canvas.addEventListener("pointerdown", e => {
+    // The 5-minute round is over -- no more drops until the high-score
+    // lightbox is dismissed (see endPlinkoRound/closePlinkoGameOver).
+    if (plinkoGameOver) return;
     // Tray gold from earlier rounds doesn't count as an active round --
     // only the black balls do.
     if (balls.some(b => !b.isReward)) {
@@ -4473,6 +4638,11 @@ scheduleStripeToggle();
     canvas.classList.remove("dragging");
     balls = balls.filter(b => b.isReward); // tray stash stays put
     roundOver = false;
+    // Countdown starts on the first drop, not just from opening the panel.
+    if (!plinkoRoundEndAt) {
+      plinkoRoundEndAt = Date.now() + PLINKO_ROUND_MS;
+      localStorage.setItem("plinkoRoundEndAt", String(plinkoRoundEndAt));
+    }
     for (let i = 0; i < ballCount; i++) {
       // Every ball drops near the release point -- not stacked on the exact
       // same pixel, but not scattered across the whole board either.
@@ -4533,17 +4703,97 @@ scheduleStripeToggle();
   // A simple stopwatch, not tied to any round -- starts the moment the
   // panel is first opened and just keeps counting for the rest of the
   // session, even if the panel is later collapsed and reopened.
+  // Counts DOWN from 5:00, not up -- sits at the full duration until the
+  // first drop actually starts plinkoRoundEndAt (see releaseDrag above).
   function startClock() {
     const el = document.getElementById("plinko-clock");
     if (!el) return;
-    const startedAt = Date.now();
-    setInterval(() => {
-      const secs = Math.floor((Date.now() - startedAt) / 1000);
-      const m = Math.floor(secs / 60);
-      const s = secs % 60;
-      el.textContent = `${m}:${String(s).padStart(2, "0")}`;
-    }, 1000);
+    tickPlinkoClock();
+    setInterval(tickPlinkoClock, 1000);
   }
+  function tickPlinkoClock() {
+    const el = document.getElementById("plinko-clock");
+    if (!el) return;
+    if (!plinkoRoundEndAt) { el.textContent = formatClock(PLINKO_ROUND_MS); return; }
+    const remaining = plinkoRoundEndAt - Date.now();
+    el.textContent = formatClock(remaining);
+    if (remaining <= 0 && !plinkoGameOver) endPlinkoRound();
+  }
+
+  // Round's over: lock the board, show the score, and ask for initials
+  // (or let them skip) before anything actually wipes.
+  function endPlinkoRound() {
+    plinkoGameOver = true;
+    dragging = false;
+    canvas.classList.remove("dragging");
+    cancelAnimationFrame(rafId);
+    document.getElementById("plinko-gameover-score").textContent = goldTotal;
+    const initialsInput = document.getElementById("plinko-gameover-initials");
+    initialsInput.value = "";
+    document.getElementById("plinko-gameover-entry").style.display = "block";
+    document.getElementById("plinko-leaderboard").style.display = "none";
+    document.getElementById("plinko-gameover-lightbox").classList.add("open");
+    setTimeout(() => initialsInput.focus(), 50);
+  }
+
+  async function submitPlinkoScore() {
+    const btn = document.getElementById("plinko-gameover-submit-btn");
+    const initials = (document.getElementById("plinko-gameover-initials").value || "").trim().toUpperCase().slice(0, 3) || "???";
+    btn.disabled = true;
+    btn.textContent = "Saving…";
+    try {
+      if (APPS_SCRIPT_URL) {
+        const params = new URLSearchParams({ type: "plinkoScore", name: initials, score: String(goldTotal) });
+        await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { mode: "no-cors" });
+      }
+    } catch (err) {
+      console.warn("[plinko] score submit failed:", err);
+    }
+    btn.disabled = false;
+    btn.textContent = "Submit";
+    showPlinkoLeaderboard();
+  }
+
+  async function showPlinkoLeaderboard() {
+    document.getElementById("plinko-gameover-entry").style.display = "none";
+    const boardEl = document.getElementById("plinko-leaderboard");
+    const listEl = document.getElementById("plinko-leaderboard-list");
+    boardEl.style.display = "block";
+    listEl.innerHTML = `<li class="plinko-leaderboard-loading">Loading…</li>`;
+    try {
+      if (!PLINKO_SCORES_GID || !SHEET_ID) throw new Error("not configured");
+      const rows = parseCSV(await fetchCSV(PLINKO_SCORES_GID)).slice(1); // drop header row
+      const scores = rows
+        .map(r => ({ name: (r[1] || "").trim(), score: Number(r[2]) || 0 }))
+        .filter(r => r.name)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
+      listEl.innerHTML = scores.length
+        ? scores.map(s => `<li><span class="plinko-leaderboard-name">${esc(s.name)}</span><span class="plinko-leaderboard-value">${s.score}</span></li>`).join("")
+        : `<li class="plinko-leaderboard-empty">No scores yet.</li>`;
+    } catch (err) {
+      listEl.innerHTML = `<li class="plinko-leaderboard-empty">High scores aren't hooked up yet.</li>`;
+    }
+  }
+
+  // The actual wipe -- fires whether they submitted, skipped, or just
+  // closed the leaderboard. Nothing session-related survives a round.
+  function closePlinkoGameOver() {
+    document.getElementById("plinko-gameover-lightbox").classList.remove("open");
+    goldTotal = 0;
+    localStorage.setItem("plinkoGoldTotal", "0");
+    goldBags = 0;
+    localStorage.setItem("plinkoGoldBags", "0");
+    trayGoldCount = 0;
+    saveTrayGoldCount();
+    updateGoldCount(0);
+    plinkoRoundEndAt = null;
+    localStorage.removeItem("plinkoRoundEndAt");
+    plinkoGameOver = false;
+    layout(); // fresh board -- next drop starts a brand new countdown
+  }
+  window.submitPlinkoScore = submitPlinkoScore;
+  window.closePlinkoGameOver = closePlinkoGameOver;
 })();
 
 // ── Game mode toggle (Drop Game <-> Wheel of Fortune) ───────────────────

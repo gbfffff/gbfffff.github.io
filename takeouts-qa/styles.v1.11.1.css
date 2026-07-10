@@ -1883,6 +1883,230 @@
       letter-spacing: 0.08em;
     }
 
+    /* ── Random Pick lightbox (reuses .lightbox's dim overlay, but lighter --
+       this one's a small centered card, not a full-bleed photo, so more of
+       the page stays visible behind it) ── */
+    .random-pick-lightbox { background: rgba(0, 0, 0, 0.74); }
+    .random-pick-box {
+      position: relative;
+      background: var(--bg);
+      border: 3px solid #000;
+      border-radius: 10px;
+      box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.6);
+      padding: 3.5rem 3.5rem 3rem;
+      min-width: 420px;
+      max-width: 90vw;
+      text-align: center;
+    }
+    body.dark .random-pick-box { border-color: var(--ink); box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.15); }
+    /* Optional narrowing -- defaults to "All Categories" so picking one is
+       never required, it just rolls with the whole menu until you do.
+       Custom arrow (native ones render inconsistently across browsers) and
+       the same bold-pill/offset-shadow treatment as the other buttons in
+       this box, instead of a bare unstyled <select>. */
+    .random-pick-category {
+      display: block;
+      appearance: none;
+      -webkit-appearance: none;
+      margin: 0 auto 1.1rem;
+      padding: 0.45rem 2.2rem 0.45rem 1rem;
+      border: 2px solid #000;
+      border-radius: 999px;
+      box-shadow: 2px 2px 0 #000;
+      background-color: var(--bg);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23000'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.9rem center;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .random-pick-category:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 #000; }
+    body.dark .random-pick-category {
+      border-color: var(--ink);
+      box-shadow: 2px 2px 0 var(--ink);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23fff'/%3E%3C/svg%3E");
+    }
+    body.dark .random-pick-category:hover { box-shadow: 3px 3px 0 var(--ink); }
+    .random-pick-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin: 0.5rem 0 0.9rem;
+    }
+    .random-pick-name {
+      font-size: 1.3rem;
+      font-weight: 900;
+      font-family: "EB Garamond", Garamond, Georgia, serif;
+      /* --accent is literally identical to --bg for every theme (same
+         issue as the secret-game toggle arrow) -- a plain accent fill on
+         this box's --bg background would be invisible except for its
+         stroke. --theme-arrow (computed in app.js, same hue but pulled
+         into a contrasting range) is a real, visible fill instead. */
+      color: var(--theme-arrow, var(--accent));
+      -webkit-text-stroke: 2.5px #000;
+      paint-order: stroke fill;
+      text-shadow:
+        2px 2px 0 #000,
+        -2px 2px 0 #000,
+        2px -2px 0 #000,
+        -2px -2px 0 #000,
+        3px 0 0 #000,
+        -3px 0 0 #000,
+        0 3px 0 #000,
+        0 -3px 0 #000;
+      min-height: 2.4em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: min(65vw, 34rem);
+      overflow-wrap: break-word;
+    }
+    .random-pick-name.settled { animation: random-pick-pop 0.3s ease; }
+    @keyframes random-pick-pop {
+      0%   { transform: scale(0.85); }
+      60%  { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+    .random-pick-stats-link {
+      display: block;
+      margin: 0.3rem auto 0;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+    }
+    .random-pick-stats-link:hover { color: var(--text); }
+    .random-pick-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+    /* Bigger, bolder than the plain form buttons elsewhere -- this is the
+       payoff moment of a little game, not a routine form action. */
+    .random-pick-actions .btn-primary,
+    .random-pick-actions .btn-secondary {
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 0.65rem 1.3rem;
+      border: 2px solid #000;
+      border-radius: 999px;
+      box-shadow: 3px 3px 0 #000;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .random-pick-actions .btn-primary:hover,
+    .random-pick-actions .btn-secondary:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 #000;
+    }
+    body.dark .random-pick-actions .btn-primary,
+    body.dark .random-pick-actions .btn-secondary {
+      border-color: var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+    body.dark .random-pick-actions .btn-primary:hover,
+    body.dark .random-pick-actions .btn-secondary:hover {
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+
+    /* ── Drop Game round-over / high score lightbox ── */
+    .plinko-gameover-lightbox { background: rgba(0, 0, 0, 0.85); }
+    .plinko-gameover-box {
+      position: relative;
+      background: var(--bg);
+      border: 3px solid #000;
+      border-radius: 10px;
+      box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.6);
+      padding: 2.5rem 3rem;
+      min-width: 320px;
+      max-width: 90vw;
+      text-align: center;
+    }
+    body.dark .plinko-gameover-box { border-color: var(--ink); box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.15); }
+    .plinko-gameover-title {
+      font-size: 2rem;
+      font-weight: 900;
+      font-family: "EB Garamond", Garamond, Georgia, serif;
+      color: var(--theme-arrow, var(--accent));
+      -webkit-text-stroke: 2px #000;
+      paint-order: stroke fill;
+      text-shadow: 2px 2px 0 #000, -2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000;
+      margin-bottom: 0.5rem;
+    }
+    .plinko-gameover-score {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+    .plinko-gameover-score span { color: var(--gold, var(--theme-arrow)); font-size: 1.4rem; }
+    .plinko-gameover-label {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+    /* Old-school arcade high-score entry -- 3 wide, centered, uppercase
+       monospace letters, like a coin-op marquee. */
+    .plinko-gameover-initials {
+      display: block;
+      width: 6rem;
+      margin: 0 auto 1.25rem;
+      padding: 0.5rem;
+      border: 2px solid #000;
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Courier New", monospace;
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: 0.4em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    body.dark .plinko-gameover-initials { border-color: var(--ink); }
+    .plinko-gameover-actions { display: flex; gap: 0.75rem; justify-content: center; }
+    .plinko-leaderboard-title {
+      font-size: 1.1rem;
+      font-weight: 900;
+      margin-bottom: 0.75rem;
+    }
+    #plinko-leaderboard-list {
+      list-style: none;
+      margin: 0 0 1.25rem;
+      padding: 0;
+      min-width: 14rem;
+      text-align: left;
+    }
+    #plinko-leaderboard-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.3rem 0.5rem;
+      font-weight: 700;
+      font-family: "Courier New", monospace;
+      border-bottom: 1px solid var(--border);
+    }
+    #plinko-leaderboard-list li:nth-child(1) { color: var(--theme-arrow, var(--accent)); font-size: 1.05em; }
+    .plinko-leaderboard-name { letter-spacing: 0.2em; }
+    .plinko-leaderboard-empty, .plinko-leaderboard-loading {
+      justify-content: center !important;
+      color: var(--text-muted);
+      font-family: inherit !important;
+      font-weight: 400 !important;
+    }
+
     /* ── Menu panel ── */
     .menu-panel {
       display: block;
@@ -2034,6 +2258,32 @@
       transform: translate(-2px, -2px);
       box-shadow: 5px 5px 0 #000 !important;
       z-index: 99 !important;
+    }
+    /* Random Pick stands out from the plain category shortcuts -- diagonal
+       accent/ink stripes instead of the shared flat white/black look, with
+       the label stamped the same way the Drop Game's win/lose comment is
+       (hollow stroke + tight drop-shadow backing) so it reads as a little
+       game, not just another category jump link. */
+    .menu-random-btn {
+      background-color: var(--accent) !important;
+      background-image: repeating-linear-gradient(45deg,
+        rgba(0,0,0,0.16) 0px, rgba(0,0,0,0.16) 6px,
+        transparent 6px, transparent 14px) !important;
+      color: var(--accent) !important;
+      font-weight: 900;
+      -webkit-text-stroke: 1px #000;
+      paint-order: stroke fill;
+      text-shadow:
+        1.5px 1.5px 0 #000,
+        -1.5px 1.5px 0 #000,
+        1.5px -1.5px 0 #000,
+        -1.5px -1.5px 0 #000;
+    }
+    .menu-random-btn:hover {
+      background-color: #000 !important;
+      background-image: repeating-linear-gradient(45deg,
+        rgba(255,255,255,0.18) 0px, rgba(255,255,255,0.18) 6px,
+        transparent 6px, transparent 14px) !important;
     }
     .mpi-popular-block .mpi { background: var(--accent); }
     .mpi-popular-block .mpi:hover { background: var(--ink); color: var(--accent); }

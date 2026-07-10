@@ -271,7 +271,7 @@
               <input type="checkbox" id="plinko-restaurant-mode">
               Restaurant Picker
             </label>
-            <span class="plinko-clock" id="plinko-clock" title="Time since opening Drop Game">0:00</span>
+            <span class="plinko-clock" id="plinko-clock" title="Time left this round">5:00</span>
             <span class="plinko-gold-count" id="plinko-gold-count" title="Golden balls won this session">&#x1F7E1; 0</span>
           </div>
           <button type="button" id="game-mode-toggle-btn" class="game-mode-toggle-btn" title="Wheel">&#8594;</button>
@@ -449,6 +449,40 @@
   <img src="" alt="" onclick="event.stopPropagation()">
   <button class="lightbox-nav next" onclick="event.stopPropagation();lbNext()" hidden>&#8250;</button>
   <div class="lightbox-counter"></div>
+</div>
+
+<div class="lightbox random-pick-lightbox" id="random-pick-lightbox" onclick="closeRandomPickLightbox()">
+  <div class="random-pick-box" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="closeRandomPickLightbox()">&times;</button>
+    <div class="random-pick-label" id="random-pick-label">Picking something for you…</div>
+    <select id="random-pick-category" class="random-pick-category" onchange="randomPickCategoryChanged()"></select>
+    <div class="random-pick-name" id="random-pick-name">&nbsp;</div>
+    <button type="button" class="random-pick-stats-link" id="random-pick-stats-link" style="display:none" onclick="randomPickViewStats()">View Item Stats &#8594;</button>
+    <div class="random-pick-actions" id="random-pick-actions" style="display:none">
+      <button type="button" class="btn-primary" id="random-pick-add-btn" onclick="randomPickAdd()">Add to Order</button>
+      <button type="button" class="btn-secondary" id="random-pick-again-btn" onclick="_runRandomPickSpin()">Pick Again</button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox plinko-gameover-lightbox" id="plinko-gameover-lightbox">
+  <div class="plinko-gameover-box" onclick="event.stopPropagation()">
+    <div class="plinko-gameover-title">TIME'S UP!</div>
+    <div class="plinko-gameover-score">Score: <span id="plinko-gameover-score">0</span></div>
+    <div id="plinko-gameover-entry">
+      <label class="plinko-gameover-label" for="plinko-gameover-initials">Enter your initials</label>
+      <input type="text" id="plinko-gameover-initials" class="plinko-gameover-initials" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
+      <div class="plinko-gameover-actions">
+        <button type="button" class="btn-primary" id="plinko-gameover-submit-btn" onclick="submitPlinkoScore()">Submit</button>
+        <button type="button" class="btn-secondary" onclick="closePlinkoGameOver()">Skip</button>
+      </div>
+    </div>
+    <div class="plinko-leaderboard" id="plinko-leaderboard" style="display:none">
+      <div class="plinko-leaderboard-title">&#127942; Top 10</div>
+      <ol id="plinko-leaderboard-list"></ol>
+      <button type="button" class="btn-secondary" onclick="closePlinkoGameOver()">Close</button>
+    </div>
+  </div>
 </div>
 </body>
 </html>
