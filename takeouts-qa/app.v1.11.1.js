@@ -3883,14 +3883,15 @@ scheduleStripeToggle();
     return `${m}:${String(s).padStart(2, "0")}`;
   }
 
-  // Session total of golden balls won, shown in the top control bar and
-  // remembered per-browser.
-  let goldTotal = Number(localStorage.getItem("plinkoGoldTotal")) || 0;
+  // Session total of golden balls won, shown in the top control bar --
+  // scoped to THIS page load, not persisted. The countdown itself doesn't
+  // survive a refresh (see plinkoRemainingMs above), so keeping gold/bags
+  // persisted while the clock reset to a fresh 3:00 meant a refresh
+  // mid-round could start a brand new round already sitting on gold/bags
+  // from before. Everything resets together now.
+  let goldTotal = 0;
   function updateGoldCount(add) {
-    if (add) {
-      goldTotal += add;
-      localStorage.setItem("plinkoGoldTotal", String(goldTotal));
-    }
+    if (add) goldTotal += add;
     const el = document.getElementById("plinko-gold-count");
     if (el) el.innerHTML = `&#x1F7E1; ${goldTotal}`;
     if (add) flashGoldAward(add, el);
@@ -3921,24 +3922,23 @@ scheduleStripeToggle();
   updateGoldCount(0);
 
   // Bags: once the tray holds TRAY_CAPACITY gold balls, they're swept into
-  // a bag -- the bag tally (persisted per-browser) is painted in the tray
-  // corner as the money-bag sign.
+  // a bag -- the bag tally is painted in the tray corner as the money-bag
+  // sign. Scoped to this page load, same as goldTotal above -- not
+  // persisted, so a refresh can't leave a fresh 3:00 countdown sitting on
+  // top of gold/bags left over from before.
   //
-  // trayGoldCount is the real, persisted running total, kept alongside the
-  // physical ball objects in `balls` (every gold ball dropped is also
-  // simulated -- now that gold overlaps and skips collision with other
-  // gold, there's no packing/jam risk from letting all of them actually
-  // fall). It's what gates bagging and what's shown in the live readout.
-  let goldBags = Number(localStorage.getItem("plinkoGoldBags")) || 0;
-  let trayGoldCount = Number(localStorage.getItem("plinkoTrayGoldCount")) || 0;
-  function saveTrayGoldCount() {
-    localStorage.setItem("plinkoTrayGoldCount", String(trayGoldCount));
-  }
+  // trayGoldCount is the real running total, kept alongside the physical
+  // ball objects in `balls` (every gold ball dropped is also simulated --
+  // now that gold overlaps and skips collision with other gold, there's no
+  // packing/jam risk from letting all of them actually fall). It's what
+  // gates bagging and what's shown in the live readout.
+  let goldBags = 0;
+  let trayGoldCount = 0;
+  function saveTrayGoldCount() {}
   function bagUpTray() {
     if (trayGoldCount < TRAY_CAPACITY) return;
     const bagsGained = Math.floor(trayGoldCount / TRAY_CAPACITY);
     goldBags += bagsGained;
-    localStorage.setItem("plinkoGoldBags", String(goldBags));
     trayGoldCount -= bagsGained * TRAY_CAPACITY;
     saveTrayGoldCount();
     // Swept into the bag -- remove exactly as many physical gold balls as
@@ -4803,11 +4803,14 @@ scheduleStripeToggle();
     if (!el) return;
     if (plinkoRemainingMs === null) { el.textContent = formatClock(PLINKO_ROUND_MS); return; }
     const now = Date.now();
-    // Frozen while the reward shower is playing out -- winning shouldn't
-    // burn round time while the gold is falling/settling. Resumes counting
-    // (and starts accruing elapsed time again) the instant the shower ends
-    // or the next ball drops, whichever comes first.
-    const paused = spawningGold || goldShowerActive;
+    // Frozen while the reward shower is playing out (winning shouldn't
+    // burn round time while the gold is falling/settling) AND for as long
+    // as any win/lose comment is sitting on screen afterward -- the board
+    // doesn't auto-clear, so that could otherwise be an arbitrarily long
+    // stretch of real time nobody asked to spend. Resumes the instant the
+    // comment is dismissed (restart) and the next ball drops.
+    const commentShowing = document.getElementById("plinko-comment")?.classList.contains("show");
+    const paused = spawningGold || goldShowerActive || commentShowing;
     if (!paused) plinkoRemainingMs -= now - plinkoLastTickAt;
     plinkoLastTickAt = now;
     el.textContent = formatClock(plinkoRemainingMs);
@@ -4884,11 +4887,8 @@ scheduleStripeToggle();
       return;
     }
     goldTotal = 0;
-    localStorage.setItem("plinkoGoldTotal", "0");
     goldBags = 0;
-    localStorage.setItem("plinkoGoldBags", "0");
     trayGoldCount = 0;
-    saveTrayGoldCount();
     updateGoldCount(0);
     plinkoRemainingMs = null;
     plinkoLastTickAt = null;
