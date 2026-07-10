@@ -273,6 +273,7 @@
             </label>
             <span class="plinko-clock" id="plinko-clock" title="Time left this round">3:00</span>
             <span class="plinko-gold-count" id="plinko-gold-count" title="Golden balls won this session">&#x1F7E1; 0</span>
+            <button type="button" class="plinko-trophy-btn" id="plinko-trophy-btn" title="High Scores" onclick="openPlinkoLeaderboard()">&#127942;</button>
           </div>
           <button type="button" id="game-mode-toggle-btn" class="game-mode-toggle-btn" title="Wheel">&#8594;</button>
         </div>
@@ -468,8 +469,8 @@
 <div class="lightbox plinko-gameover-lightbox" id="plinko-gameover-lightbox">
   <div class="plinko-gameover-box" onclick="event.stopPropagation()">
     <button class="lightbox-close" onclick="closePlinkoGameOver()">&times;</button>
-    <div class="plinko-gameover-title">TIME'S UP!</div>
-    <div class="plinko-gameover-score">Score: <span id="plinko-gameover-score">0</span></div>
+    <div class="plinko-gameover-title" id="plinko-gameover-title">TIME'S UP!</div>
+    <div class="plinko-gameover-score" id="plinko-gameover-score-row">Score: <span id="plinko-gameover-score">0</span></div>
     <div id="plinko-gameover-entry">
       <label class="plinko-gameover-label" for="plinko-gameover-initials">Enter your initials</label>
       <input type="text" id="plinko-gameover-initials" class="plinko-gameover-initials" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">

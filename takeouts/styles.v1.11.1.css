@@ -2076,7 +2076,39 @@
       text-transform: uppercase;
     }
     body.dark .plinko-gameover-initials { border-color: var(--ink); }
-    .plinko-gameover-actions { display: flex; gap: 0.75rem; justify-content: center; }
+    .plinko-gameover-actions { display: flex; gap: 0.75rem; justify-content: center; margin-top: 0.5rem; }
+    /* Bigger, bolder than plain form buttons -- same pill/offset-shadow
+       treatment as the Random Pick lightbox's Add/Pick Again, since this
+       is the payoff moment of a full round, not a routine form action. */
+    .plinko-gameover-actions .btn-primary,
+    .plinko-gameover-actions .btn-secondary {
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.7rem 1.5rem;
+      border: 2px solid #000;
+      border-radius: 999px;
+      box-shadow: 3px 3px 0 #000;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .plinko-gameover-actions .btn-primary:hover,
+    .plinko-gameover-actions .btn-secondary:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 #000;
+    }
+    .plinko-gameover-actions .btn-primary:disabled {
+      transform: none;
+      box-shadow: 3px 3px 0 #000;
+      opacity: 0.6;
+    }
+    body.dark .plinko-gameover-actions .btn-primary,
+    body.dark .plinko-gameover-actions .btn-secondary {
+      border-color: var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+    body.dark .plinko-gameover-actions .btn-primary:hover,
+    body.dark .plinko-gameover-actions .btn-secondary:hover {
+      box-shadow: 5px 5px 0 var(--ink);
+    }
     .plinko-leaderboard-title {
       font-size: 1.1rem;
       font-weight: 900;
@@ -3033,6 +3065,18 @@
       font-variant-numeric: tabular-nums;
       color: #a07800;
     }
+    /* High-score lookup, available any time (not just at game-over) --
+       matches the other small icon controls in this row. */
+    .plinko-trophy-btn {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .plinko-trophy-btn:hover { transform: scale(1.15); }
     /* A quick "+42" pop that floats up and fades out right when gold is
        actually awarded -- the badge's own number updating silently was
        easy to miss in the moment. */

@@ -3746,35 +3746,32 @@ scheduleStripeToggle();
   }
 
   function resetBalls() {
-    // The tray's gold survives a reset -- it's the player's stash, held
-    // until it fills up and gets bagged. Only the round's black balls are
-    // cleared. Kept gold gets re-packed into the (possibly resized) tray
-    // via layoutTrayPile() below.
-    //
-    // Any gold still mid-air/mid-shower (moving) gets dropped by this
-    // filter too -- restart can be clicked at any point, including mid
-    // shower -- but trayGoldCount (the persisted, real total) was already
-    // incremented the instant that gold was AWARDED, not when it visually
-    // landed. So restarting mid-shower must never change trayGoldCount
-    // itself, only reconcile how many physical placeholder balls represent
-    // it below (topped up, not just when the tray went fully empty).
-    balls = balls.filter(b => b.isReward && !b.moving);
-    // Bagging normally happens once a shower naturally finishes settling,
-    // inside evaluateOutcome() -- but hitting reset mid-shower skips that
+    // trayGoldCount (persisted) is the single source of truth for how much
+    // gold is in the tray -- the physical ball objects are just a rendering
+    // of that number, rebuilt from scratch every reset rather than
+    // incrementally patched. That's what guarantees a mid-shower interrupt,
+    // the countdown's full wipe, or anything else always shows the right
+    // amount instead of stale ball objects drifting out of sync with the
+    // real count (e.g. old gold visibly left sitting in the tray after a
+    // wipe wants it to read zero).
+    // Clear everything -- black balls AND any old gold placeholders alike.
+    // Gold gets rebuilt from trayGoldCount below; keeping old gold objects
+    // around here would double-count them once the fresh placeholders are
+    // pushed on top.
+    balls = [];
+    // Bagging normally happens once a shower finishes settling, inside
+    // evaluateOutcome() -- but hitting reset mid-shower skips that
     // entirely, so a round that keeps getting interrupted could pile past
     // TRAY_CAPACITY forever and never actually bag. Every reset re-checks
     // this directly so the bag conversion is automatic no matter how (or
     // how many times) the round got cut short.
     bagUpTray();
-    const shown = balls.length;
-    if (shown < trayGoldCount) {
-      const d = GOLD_R * 2;
-      const cols = Math.max(1, Math.floor(cssW / d));
-      const maxRows = Math.max(1, Math.floor(TRAY_H / d));
-      const restoreCount = Math.min(trayGoldCount, cols * maxRows) - shown;
-      for (let i = 0; i < restoreCount; i++) {
-        balls.push({ x: 0, y: 0, vx: 0, vy: 0, moving: false, isReward: true, r: GOLD_R });
-      }
+    const d = GOLD_R * 2;
+    const cols = Math.max(1, Math.floor(cssW / d));
+    const maxRows = Math.max(1, Math.floor(TRAY_H / d));
+    const shownCount = Math.max(0, Math.min(trayGoldCount, cols * maxRows));
+    for (let i = 0; i < shownCount; i++) {
+      balls.push({ x: 0, y: 0, vx: 0, vy: 0, moving: false, isReward: true, r: GOLD_R });
     }
     layoutTrayPile();
     dragBall = { x: cssW / 2, y: TOP_MARGIN / 2 };
@@ -4804,9 +4801,18 @@ scheduleStripeToggle();
   }
 
   // The actual wipe -- fires whether they submitted, skipped, or just
-  // closed the leaderboard. Nothing session-related survives a round.
+  // closed the leaderboard after a real game-over. Nothing session-related
+  // survives a round. Skipped entirely when this lightbox was only opened
+  // to LOOK UP the high scores (via the trophy button) -- the round hasn't
+  // actually ended in that case, so there's nothing to wipe.
   function closePlinkoGameOver() {
     document.getElementById("plinko-gameover-lightbox").classList.remove("open");
+    if (plinkoLeaderboardOnly) {
+      plinkoLeaderboardOnly = false;
+      document.getElementById("plinko-gameover-title").style.display = "";
+      document.getElementById("plinko-gameover-score-row").style.display = "";
+      return;
+    }
     goldTotal = 0;
     localStorage.setItem("plinkoGoldTotal", "0");
     goldBags = 0;
@@ -4819,8 +4825,20 @@ scheduleStripeToggle();
     plinkoGameOver = false;
     layout(); // fresh board -- next drop starts a brand new countdown
   }
+
+  // Trophy button -- look up the high scores any time, without ending or
+  // affecting the current round.
+  let plinkoLeaderboardOnly = false;
+  function openPlinkoLeaderboard() {
+    plinkoLeaderboardOnly = true;
+    document.getElementById("plinko-gameover-title").style.display = "none";
+    document.getElementById("plinko-gameover-score-row").style.display = "none";
+    document.getElementById("plinko-gameover-lightbox").classList.add("open");
+    showPlinkoLeaderboard();
+  }
   window.submitPlinkoScore = submitPlinkoScore;
   window.closePlinkoGameOver = closePlinkoGameOver;
+  window.openPlinkoLeaderboard = openPlinkoLeaderboard;
 })();
 
 // ── Game mode toggle (Drop Game <-> Wheel of Fortune) ───────────────────
