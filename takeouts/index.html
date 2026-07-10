@@ -256,6 +256,10 @@
       <div id="plinko-panel" class="rotation-panel">
         <div class="plinko-controls">
           <div id="plinko-mode-controls" class="plinko-mode-controls">
+            <label class="plinko-restaurant-toggle">
+              <input type="checkbox" id="plinko-restaurant-mode">
+              Restaurant Picker
+            </label>
             <div class="plinko-control-group">
               <span class="plinko-controls-label">Colors</span>
               <input type="range" id="plinko-colors-slider" class="plinko-slider" min="1" max="0" value="0">
@@ -266,14 +270,11 @@
               <input type="range" id="plinko-balls-slider" class="plinko-slider" min="1" max="12" value="1">
               <span id="plinko-ball-count" class="plinko-slot-count"></span>
             </div>
-            <button type="button" id="plinko-restart-btn" class="plinko-restart-btn" title="Restart board">&#8635;</button>
-            <label class="plinko-restaurant-toggle">
-              <input type="checkbox" id="plinko-restaurant-mode">
-              Restaurant Picker
-            </label>
+            <span class="plinko-payout-preview" id="plinko-debug-gold" title="Gold payout for the current Colors/Balls setting"></span>
             <span class="plinko-clock" id="plinko-clock" title="Time left this round">3:00</span>
             <span class="plinko-gold-count" id="plinko-gold-count" title="Golden balls won this session">&#x1F7E1; 0</span>
             <button type="button" class="plinko-trophy-btn" id="plinko-trophy-btn" title="High Scores" onclick="openPlinkoLeaderboard()">&#127942;</button>
+            <button type="button" id="plinko-restart-btn" class="plinko-restart-btn" title="Restart board">&#8635;</button>
           </div>
           <button type="button" id="game-mode-toggle-btn" class="game-mode-toggle-btn" title="Wheel">&#8594;</button>
         </div>
@@ -312,6 +313,7 @@
         <div class="plinko-board" id="plinko-board">
           <canvas id="plinko-canvas"></canvas>
           <div class="plinko-comment" id="plinko-comment"></div>
+          <div class="plinko-gold-flash-board" id="plinko-gold-flash-board"></div>
         </div>
         <div class="plinko-board wheel-board" id="wheel-board">
           <div class="wheel-canvas-wrap" id="wheel-canvas-wrap">

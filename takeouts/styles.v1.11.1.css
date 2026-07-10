@@ -2375,6 +2375,16 @@
       .plinko-comment.win { font-size: min(2.04rem, 10.2cqh, 15.3cqw); }
       .wheel-result { font-size: min(2.4rem, 12cqh, 18cqw); }
 
+      /* Restaurant Picker gets its own full row up top so it can't eat
+         into the space Colors/Balls need to fit side by side below it;
+         Colors + Balls then share one row, and the payout preview gets
+         its own row directly underneath them (flex-basis:100% always
+         starts a new line in this wrapping flex row). */
+      .plinko-restaurant-toggle { flex: 1 0 100%; }
+      .plinko-control-group { flex: 0 1 auto; }
+      .plinko-slider { width: 5rem; }
+      .plinko-payout-preview { flex: 1 0 100%; text-align: center; }
+
       /* Single column menu items */
       .mpi-grid { grid-template-columns: 1fr !important; }
       .mpi-grid .mpi { border-right: none !important; }
@@ -2990,23 +3000,39 @@
     }
     .plinko-step-btn:hover { background: #000; color: var(--accent); }
     .plinko-restart-btn {
-      display: inline-flex;
+      /* Own full-width row, right under the gold count/trophy line above --
+         flex-basis:100% forces a wrap in this wrapping flex row regardless
+         of container width. */
+      flex: 1 0 100%;
+      display: flex;
       align-items: center;
       justify-content: center;
-      width: 1.9rem;
-      height: 1.9rem;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 1.3rem;
+      align-self: flex-end;
+      width: 2.6rem;
+      height: 2.6rem;
+      margin-left: auto;
+      /* Theme-accent background instead of solid black (read as too heavy)
+         -- --accent is literally identical to --bg for every theme though,
+         so the icon needs --theme-arrow (a real, guaranteed-visible tone)
+         rather than plain --accent, or it'd vanish against its own fill. */
+      background: var(--accent);
+      border: 2px solid #000;
+      border-radius: 8px;
+      box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
+      color: var(--theme-arrow, #000);
+      font-size: 1.4rem;
       font-weight: 900;
       line-height: 1;
       cursor: pointer;
-      opacity: 0.7;
-      transition: opacity 0.1s, transform 0.15s ease;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
       font-family: inherit;
     }
-    .plinko-restart-btn:hover { opacity: 1; transform: rotate(90deg); }
+    .plinko-restart-btn:hover {
+      background: #000;
+      color: var(--accent);
+    }
+    body.dark .plinko-restart-btn { border-color: var(--ink); box-shadow: 3px 3px 0 rgba(255, 255, 255, 0.15); }
+    body.dark .plinko-restart-btn:hover { background: var(--ink); color: var(--bg); }
     .plinko-slider {
       -webkit-appearance: none;
       appearance: none;
@@ -3051,7 +3077,7 @@
     }
     .plinko-restaurant-toggle input { accent-color: #000; width: 15px; height: 15px; cursor: pointer; }
     .plinko-clock {
-      font-size: 0.7rem;
+      font-size: 1rem;
       font-weight: 900;
       letter-spacing: 0.04em;
       font-variant-numeric: tabular-nums;
@@ -3059,7 +3085,7 @@
     }
     .plinko-gold-count {
       position: relative;
-      font-size: 0.7rem;
+      font-size: 1rem;
       font-weight: 900;
       letter-spacing: 0.04em;
       font-variant-numeric: tabular-nums;
@@ -3077,6 +3103,18 @@
       transition: transform 0.15s ease;
     }
     .plinko-trophy-btn:hover { transform: scale(1.15); }
+    /* Live preview of the current Colors/Balls payout, shown to everyone
+       for transparency -- how much a hit is actually worth right now. */
+    .plinko-payout-preview {
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: "Courier New", monospace;
+      color: var(--text);
+      border: 1px solid #000;
+      border-radius: 4px;
+      padding: 0.05rem 0.35rem;
+    }
+    body.dark .plinko-payout-preview { border-color: var(--ink); }
     /* A quick "+42" pop that floats up and fades out right when gold is
        actually awarded -- the badge's own number updating silently was
        easy to miss in the moment. */
@@ -3100,6 +3138,35 @@
       30%  { transform: translate(-50%, -6px) scale(1); }
       75%  { opacity: 1; }
       100% { opacity: 0; transform: translate(-50%, -22px) scale(1); }
+    }
+    /* Big version, centered over the peg field itself -- the small badge
+       flash near the controls was too easy to miss (or off-screen) on a
+       wide desktop layout. */
+    .plinko-gold-flash-board {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 15;
+    }
+    .plinko-gold-flash-big {
+      color: #ffc400;
+      font-weight: 900;
+      font-family: "EB Garamond", Garamond, Georgia, serif;
+      font-size: min(4rem, 14cqh, 20cqw);
+      -webkit-text-stroke: 3px #000;
+      paint-order: stroke fill;
+      text-shadow: 3px 3px 0 #000, -3px 3px 0 #000, 3px -3px 0 #000, -3px -3px 0 #000;
+      animation: plinko-gold-flash-board-pop 1.4s ease-out forwards;
+    }
+    @keyframes plinko-gold-flash-board-pop {
+      0%   { opacity: 0; transform: scale(0.6); }
+      15%  { opacity: 1; transform: scale(1.15); }
+      30%  { transform: scale(1); }
+      75%  { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.1) translateY(-30px); }
     }
     /* Compact, horizontal chip row (wraps as needed) sitting right under
        the board, instead of a tall one-per-line list. */

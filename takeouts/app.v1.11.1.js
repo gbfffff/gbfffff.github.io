@@ -3743,6 +3743,15 @@ scheduleStripeToggle();
       ballsSlider.max = maxBallsForSlots();
       ballsSlider.value = ballCount;
     }
+    // Shown to everyone, for transparency -- a live preview of what the
+    // current Colors/Balls setting would actually pay out.
+    const debugEl = document.getElementById("plinko-debug-gold");
+    if (debugEl) {
+      const perHit = computePerHit(slotCount, coloredSlots, ballCount, pegRowCount);
+      const cap = slotCount <= MOBILE_SLOT_THRESHOLD ? MAX_GOLD_MOBILE : MAX_GOLD_DESKTOP;
+      const maxTotal = Math.min(cap, perHit * ballCount);
+      debugEl.textContent = `${perHit}/hit, up to ${maxTotal}`;
+    }
   }
 
   function resetBalls() {
@@ -3790,28 +3799,81 @@ scheduleStripeToggle();
   }
 
   // ── Reward / comment feedback shown after a round settles ──────────────
-  // Difficulty-scaled payout: perHit = GOLD_RATE * (slotCount/coloredSlots)
-  // / ballsDropped * rowFactor. The riskier the setup, the bigger the win:
-  //   - desktop (~25-33 slots), 1 ball, 1 colored slot -> 100-130 balls
-  //   - mobile (~11 slots), 1 ball, 1 colored slot -> ~44 (fewer slots =
-  //     an easier hit, so less than desktop -- but still far above easier
-  //     configs, e.g. mobile with 3 colors + 2 balls pays ~7 per hit)
-  // Total spawn is capped so a jackpot can't melt a phone.
+  // Difficulty-scaled payout: perHit = GOLD_RATE * (effectiveSlots/coloredSlots)
+  // / ballsDropped * rowBonus(pegRows), where effectiveSlots = min(slotCount,
+  // pegRows + 1) -- see the comments at the actual computation below for
+  // why raw slotCount isn't used directly and why tall boards get an
+  // accelerating (not linear) bonus. Fewer colored slots and fewer balls
+  // dropped both raise the per-hit prize; total spawn is capped so a
+  // jackpot can't melt a phone.
   const GOLD_RATE = 4;
-  const REFERENCE_ROWS = 12; // peg row count at the board's default (unresized) height, tray included
+
+  // A real Galton board with N rows of pegs can only ever spread a ball
+  // across N+1 distinct columns, so a wide board with 20 slots but only
+  // 5-7 peg rows doesn't actually have 20 meaningfully-different outcomes,
+  // just a handful. Capping the slot count used here by the board's actual
+  // row depth means a short-but-wide desktop board pays about the same as
+  // a normal mobile-depth board instead of cashing in on slots that were
+  // never really reachable/distinct in the first place. That cap only
+  // applies below ROW_BONUS_THRESHOLD, though -- once a board is actually
+  // deep enough (10+ rows) for row depth itself to matter, a wider desktop
+  // board's real slot count should count in full and keep outpacing a
+  // narrower mobile board at that same row count, not get flattened down
+  // toward it.
+  //
+  // Flat up through 10 rows (that's the "not meaningfully harder than
+  // mobile" range -- mobile boards can often reach into the high single
+  // digits/low teens on row count too, so the bonus needs real headroom
+  // above that before kicking in, or a mobile board ends up getting the
+  // same accelerating multiplier a genuinely deep desktop board was meant
+  // for). Past 10, a real Galton board's odds of landing any one specific
+  // slot don't fall off linearly as it gets taller -- variance spreads out
+  // fast, so a specific hit gets sharply rarer, and each drop also just
+  // takes longer to resolve. So ROW_BONUS_EXPONENT accelerates the payout
+  // curve rather than scaling it straight-line: 10 rows -> 1x, 12 rows ->
+  // ~2x, 14 rows -> ~4x, 16 rows -> ~6x.
+  const ROW_BONUS_THRESHOLD = 10;
+  const ROW_BONUS_EXPONENT = 1.6;
+  function rowBonus(rows) {
+    if (rows <= ROW_BONUS_THRESHOLD) return 1;
+    return 1 + Math.pow((rows - ROW_BONUS_THRESHOLD) / 2, ROW_BONUS_EXPONENT);
+  }
+
+  // Floor of 1 (not a higher number) so dropping fewer balls for a bigger
+  // individual payout stays visible instead of getting clamped to the same
+  // value as dropping more.
+  function computePerHit(slots, colors, ballsDropped, rows) {
+    // Below the threshold: capped by reachable columns (the "wide-but-
+    // shallow shouldn't overpay" fix). At/above it: the real slot count,
+    // uncapped -- a genuinely deep board's wider slot count is a real
+    // difficulty difference worth paying for, not something to flatten
+    // away just because rows also happen to be high.
+    const effectiveSlots = rows >= ROW_BONUS_THRESHOLD ? slots : Math.min(slots, rows + 1);
+    return Math.max(1, Math.round(
+      GOLD_RATE * (effectiveSlots / Math.max(1, colors)) / Math.max(1, ballsDropped) * rowBonus(rows)
+    ));
+  }
+
   const GOLD_R = BALL_R * 0.75; // smaller than a regular ball
   const MAX_GOLD_MOBILE = 150, MAX_GOLD_DESKTOP = 400;
 
   // ── 3-minute round + high score ──────────────────────────────────────
   // The clock counts DOWN, not up. It starts the moment the first ball
-  // drops (not just from opening the panel) and persists across a refresh
-  // via localStorage -- otherwise reloading the page mid-round would quietly
-  // give a free reset. Once it hits zero the round ends outright: no more
-  // dropping until the player enters their initials (or skips), at which
-  // point everything session-related wipes and the next drop starts a
-  // fresh countdown.
+  // drops (not just from opening the panel) -- and does NOT survive a
+  // refresh. The board itself (black balls) was never persisted across a
+  // reload either, so a page that persisted the countdown but not the
+  // board looked completely untouched while a leftover timer from an
+  // earlier visit kept silently ticking in the background -- surprising
+  // whoever's looking at it with a "TIME'S UP" screen they never saw
+  // start. A fresh load now always means a fresh, un-started clock; only
+  // an actual drop in THIS session starts it.
+  // Tracked as remaining time (not a fixed end timestamp) so the reward
+  // shower phase can pause it -- winning shouldn't burn round time while
+  // the gold is falling/settling. Only ticks down while a round is active
+  // AND no shower is in progress; resumes the instant the next ball drops.
   const PLINKO_ROUND_MS = 3 * 60 * 1000;
-  let plinkoRoundEndAt = Number(localStorage.getItem("plinkoRoundEndAt")) || null;
+  let plinkoRemainingMs = null; // null = round hasn't started yet
+  let plinkoLastTickAt = null;
   let plinkoGameOver = false;
 
   function formatClock(ms) {
@@ -3834,15 +3896,27 @@ scheduleStripeToggle();
     if (add) flashGoldAward(add, el);
   }
 
-  // A brief "+N" pop above the badge right when gold is actually awarded --
-  // updating the number alone was easy to miss in the moment.
+  // A brief "+N" pop right when gold is actually awarded -- updating the
+  // number alone was easy to miss in the moment.
   function flashGoldAward(add, anchorEl) {
-    if (!anchorEl) return;
-    const flash = document.createElement("span");
-    flash.className = "plinko-gold-flash";
-    flash.textContent = `+${add}`;
-    anchorEl.appendChild(flash);
-    flash.addEventListener("animationend", () => flash.remove());
+    if (anchorEl) {
+      const flash = document.createElement("span");
+      flash.className = "plinko-gold-flash";
+      flash.textContent = `+${add}`;
+      anchorEl.appendChild(flash);
+      flash.addEventListener("animationend", () => flash.remove());
+    }
+    // Big version centered over the peg field itself -- the small badge
+    // flash above is easy to miss (or entirely off-screen) on a wide
+    // desktop layout where the controls row isn't in your eyeline.
+    const boardFlashHost = document.getElementById("plinko-gold-flash-board");
+    if (boardFlashHost) {
+      const bigFlash = document.createElement("span");
+      bigFlash.className = "plinko-gold-flash-big";
+      bigFlash.textContent = `+${add}`;
+      boardFlashHost.appendChild(bigFlash);
+      bigFlash.addEventListener("animationend", () => bigFlash.remove());
+    }
   }
   updateGoldCount(0);
 
@@ -4022,19 +4096,8 @@ scheduleStripeToggle();
       return coloredSlotIndices.has(idx);
     });
     if (coloredHits.length > 0) {
-      // Difficulty-scaled payout (see GOLD_RATE comment above): more
-      // slots, fewer colored slots, and fewer balls dropped all raise the
-      // per-hit prize; a taller board (more peg rows) still multiplies it.
-      const rowFactor = pegRowCount / REFERENCE_ROWS;
       const originals = Math.max(1, balls.filter(b => !b.isReward).length);
-      // Floor of 1, not 5 -- a floor of 5 was clamping BOTH a 1-ball and a
-      // 2-ball drop to the exact same payout on smaller/mobile boards
-      // (their raw computed values both landed under 5), hiding the /
-      // originals scaling that's the whole point of dropping fewer balls
-      // for a bigger individual payout.
-      const perHit = Math.max(1, Math.round(
-        GOLD_RATE * (slotCount / Math.max(1, coloredSlots)) / originals * rowFactor
-      ));
+      const perHit = computePerHit(slotCount, coloredSlots, originals, pegRowCount);
       // The leftmost/rightmost slots are riskier to land in (edge pegs
       // funnel balls away from them) -- landing a colored hit there pays
       // double, matched by the subtle "×2" drawn on that slot above.
@@ -4663,9 +4726,9 @@ scheduleStripeToggle();
     balls = balls.filter(b => b.isReward); // tray stash stays put
     roundOver = false;
     // Countdown starts on the first drop, not just from opening the panel.
-    if (!plinkoRoundEndAt) {
-      plinkoRoundEndAt = Date.now() + PLINKO_ROUND_MS;
-      localStorage.setItem("plinkoRoundEndAt", String(plinkoRoundEndAt));
+    if (plinkoRemainingMs === null) {
+      plinkoRemainingMs = PLINKO_ROUND_MS;
+      plinkoLastTickAt = Date.now();
     }
     for (let i = 0; i < ballCount; i++) {
       // Every ball drops near the release point -- not stacked on the exact
@@ -4728,7 +4791,7 @@ scheduleStripeToggle();
   // panel is first opened and just keeps counting for the rest of the
   // session, even if the panel is later collapsed and reopened.
   // Counts DOWN from 3:00, not up -- sits at the full duration until the
-  // first drop actually starts plinkoRoundEndAt (see releaseDrag above).
+  // first drop actually starts plinkoRemainingMs (see releaseDrag above).
   function startClock() {
     const el = document.getElementById("plinko-clock");
     if (!el) return;
@@ -4738,10 +4801,17 @@ scheduleStripeToggle();
   function tickPlinkoClock() {
     const el = document.getElementById("plinko-clock");
     if (!el) return;
-    if (!plinkoRoundEndAt) { el.textContent = formatClock(PLINKO_ROUND_MS); return; }
-    const remaining = plinkoRoundEndAt - Date.now();
-    el.textContent = formatClock(remaining);
-    if (remaining <= 0 && !plinkoGameOver) endPlinkoRound();
+    if (plinkoRemainingMs === null) { el.textContent = formatClock(PLINKO_ROUND_MS); return; }
+    const now = Date.now();
+    // Frozen while the reward shower is playing out -- winning shouldn't
+    // burn round time while the gold is falling/settling. Resumes counting
+    // (and starts accruing elapsed time again) the instant the shower ends
+    // or the next ball drops, whichever comes first.
+    const paused = spawningGold || goldShowerActive;
+    if (!paused) plinkoRemainingMs -= now - plinkoLastTickAt;
+    plinkoLastTickAt = now;
+    el.textContent = formatClock(plinkoRemainingMs);
+    if (plinkoRemainingMs <= 0 && !plinkoGameOver) endPlinkoRound();
   }
 
   // Round's over: lock the board, show the score, and ask for initials
@@ -4820,8 +4890,8 @@ scheduleStripeToggle();
     trayGoldCount = 0;
     saveTrayGoldCount();
     updateGoldCount(0);
-    plinkoRoundEndAt = null;
-    localStorage.removeItem("plinkoRoundEndAt");
+    plinkoRemainingMs = null;
+    plinkoLastTickAt = null;
     plinkoGameOver = false;
     layout(); // fresh board -- next drop starts a brand new countdown
   }
