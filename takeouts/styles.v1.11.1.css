@@ -2230,13 +2230,11 @@
     body.dark .wheel-edit-panel.open {
       background-image: repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 24px, var(--bg) 24px, var(--bg) 48px);
     }
-    body.dark .wheel-accessory-btn,
-    body.dark .wheel-reset-btn {
+    body.dark .wheel-accessory-btn {
       border-color: var(--ink);
       color: var(--ink);
     }
-    body.dark .wheel-accessory-btn:hover:not(:disabled),
-    body.dark .wheel-reset-btn:hover {
+    body.dark .wheel-accessory-btn:hover:not(:disabled) {
       background: var(--ink);
       color: var(--bg);
     }
@@ -2683,7 +2681,8 @@
     /* Two modes share the same card -- [data-mode] on the card picks
        which board/control set is visible. */
     #plinko-card[data-mode="plinko"] #wheel-controls,
-    #plinko-card[data-mode="plinko"] #wheel-board { display: none; }
+    #plinko-card[data-mode="plinko"] #wheel-board,
+    #plinko-card[data-mode="plinko"] #wheel-spin-bar { display: none; }
     #plinko-card:not([data-mode="plinko"]) #plinko-mode-controls,
     #plinko-card:not([data-mode="plinko"]) #plinko-board,
     #plinko-card:not([data-mode="plinko"]) #plinko-restaurant-legend { display: none; }
@@ -2822,29 +2821,31 @@
     .wheel-controls {
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
-      padding: 0.7rem 0.85rem;
+      gap: 0.4rem;
+      padding: 0.5rem 0.85rem;
       border-bottom: 2px solid #000;
     }
     .wheel-accessory-row {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
     /* Identical fixed-height boxes, one shared font -- the select is
        OS-rendered, so a hard height is the only reliable way to keep it
-       and the buttons the same size. */
+       and the buttons the same size. Kept compact (not the full-size Spin
+       button) since these are the tucked-away extras, not the primary
+       action. */
     .wheel-preset-select, .wheel-accessory-btn {
-      height: 2.4rem;
+      height: 1.9rem;
       box-sizing: border-box;
-      padding: 0 0.9rem;
+      padding: 0 0.7rem;
       border: 2px solid #000;
       border-radius: 8px;
       background-color: var(--bg);
       color: var(--text);
       font-family: inherit;
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 700;
       cursor: pointer;
     }
@@ -2934,8 +2935,11 @@
       font-family: inherit;
     }
 
-    /* The big Spin bar: full width, last element before the board. */
-    .wheel-spin-bar { display: flex; width: 100%; }
+    /* The big Spin bar now sits BELOW the wheel itself (not above, with the
+       rest of the controls) -- its own padding since it's no longer inside
+       .wheel-controls's padded column. */
+    .wheel-spin-bar { display: flex; width: 100%; padding: 0.6rem 0.85rem; border-top: 2px solid #000; }
+    body.dark .wheel-spin-bar { border-color: var(--ink); }
     .wheel-only-controls { display: flex; flex: 1; align-items: stretch; gap: 0.6rem; }
     .wheel-spin-btn {
       flex: 1;
@@ -2967,22 +2971,6 @@
       );
       text-shadow: 0 0 8px #000, 0 0 3px #000;
     }
-    .wheel-reset-btn {
-      width: 5.5rem;
-      flex-shrink: 0;
-      border: 2px solid #000;
-      border-radius: 999px;
-      background: var(--bg);
-      color: #000;
-      font-size: 1.9rem;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .wheel-reset-btn:hover { background: #000; color: var(--accent); }
     /* #wheel-board (ID) so this beats .plinko-board's display:block --
        same specificity as a class, but .plinko-board is declared later in
        this file and would otherwise win and silently break centering. */
@@ -2992,7 +2980,7 @@
       justify-content: center;
     }
     .wheel-canvas-wrap { position: relative; line-height: 0; }
-    .wheel-canvas-wrap canvas { display: block; max-width: 100%; max-height: 100%; }
+    .wheel-canvas-wrap canvas { display: block; max-width: 100%; max-height: 100%; cursor: pointer; }
     /* A hinged flipper, not a flat triangle -- pivots at the top (its
        transform-origin) and flicks down/back via .flick whenever the spin
        animation carries a rim pin past it, like a real wheel's clicker.
@@ -3137,6 +3125,11 @@
       background: var(--bg);
       container-type: size;
     }
+    /* Wheel gets a taller default board (+50% over the Drop Game's 540px)
+       so it renders bigger out of the box, without anyone having to drag
+       the resize grip first. Still just the starting height -- the same
+       grip still resizes it same as Drop Game's board. */
+    #wheel-board { height: 600px; }
     /* Same hollow-stroke-with-drop-shadow-backing technique as the menu's
        category labels (.mpi-section-label) -- readable on any background
        without needing its own box. Lose uses the theme's own accent color;
@@ -3276,13 +3269,13 @@
       line-height: 1.6;
     }
 
-    /* Wheel/Roulette controls, mobile: accessory buttons share the row
-       space evenly (wrapping as needed); Spin takes the full width with
-       the reset icon wrapping to its own line below. */
+    /* Wheel/Roulette controls, mobile: preset picker + Edit Items share the
+       first row, Shuffle + Clear All get their own row right below (fixed
+       48% each so they always land as a pair together, instead of
+       wrapping wherever they happen to fall based on label width); Spin
+       takes the full width. */
     @media (max-width: 600px) {
-      .wheel-preset-select { width: auto; min-width: 8rem; flex: 1 1 auto; }
-      .wheel-accessory-btn { flex: 1 1 auto; }
-      .wheel-only-controls { flex-wrap: wrap; }
+      .wheel-preset-select, .wheel-edit-toggle-btn { flex: 1 1 48%; width: auto; min-width: 0; }
+      .wheel-shuffle-btn, .wheel-clear-btn { flex: 1 1 48%; }
       .wheel-spin-btn { flex: 1 1 100%; min-height: 4.5rem; }
-      .wheel-reset-btn { flex: 1 1 100%; width: auto; min-height: 2.8rem; margin-top: 0.4rem; }
     }

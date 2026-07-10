@@ -3413,6 +3413,13 @@ scheduleStripeToggle();
   let goldShowerActive = false; // a shower is in progress this round
   let showerStartedAt = 0;   // watchdog reference for a shower that never finishes
   let roundOver = false;     // outcome already shown for this round
+  let barCloseTimer = null; // pending "swing the bar shut" timeout -- must be
+    // cancelled on any reset, otherwise it can fire late and force-clear
+    // goldShowerActive/rampTarget for a LATER, unrelated round (the board
+    // settles well before this delay elapses, so a player can reset and
+    // drop again while the old timer is still pending) -- that stale write
+    // could yank the bar shut and resolve a still-in-progress shower early,
+    // showing its comment before that round actually finished.
 
   // The bar is a flat plate that simply retracts out of the way rather than
   // tilting open -- so its resting surface is always just floorY; only
@@ -3587,6 +3594,21 @@ scheduleStripeToggle();
     // any stray unsettled gold) are cleared. Kept gold gets re-packed into
     // the (possibly resized) tray via layoutTrayPile() below.
     balls = balls.filter(b => b.isReward && !b.moving);
+    // trayGoldCount survives a page refresh via localStorage, but the
+    // actual ball objects don't -- if the persisted count says there
+    // should be gold sitting here and none exists yet, recreate enough
+    // placeholder gold balls (up to whatever the grid can actually show)
+    // so the pile visually comes back instead of the tray looking empty
+    // while the X/150 readout still shows a real number.
+    if (!balls.length && trayGoldCount > 0) {
+      const d = GOLD_R * 2;
+      const cols = Math.max(1, Math.floor(cssW / d));
+      const maxRows = Math.max(1, Math.floor(TRAY_H / d));
+      const restoreCount = Math.min(trayGoldCount, cols * maxRows);
+      for (let i = 0; i < restoreCount; i++) {
+        balls.push({ x: 0, y: 0, vx: 0, vy: 0, moving: false, isReward: true, r: GOLD_R });
+      }
+    }
     layoutTrayPile();
     dragBall = { x: cssW / 2, y: TOP_MARGIN / 2 };
     allPastLineSince = null;
@@ -3596,6 +3618,11 @@ scheduleStripeToggle();
     rampProgress = 0;
     rampTarget = 0;
     hideComment();
+    // Cancel any still-pending "swing the bar shut" timer from a previous
+    // round's win -- otherwise it can fire during THIS round and stomp on
+    // its state (see the comment on barCloseTimer's declaration).
+    clearTimeout(barCloseTimer);
+    barCloseTimer = null;
   }
 
   // ── Reward / comment feedback shown after a round settles ──────────────
@@ -3781,7 +3808,9 @@ scheduleStripeToggle();
       bagUpTray();
       showWinComment();
       roundOver = true;
-      setTimeout(() => {
+      clearTimeout(barCloseTimer);
+      barCloseTimer = setTimeout(() => {
+        barCloseTimer = null;
         goldShowerActive = false;
         rampTarget = 0;
         startPhysics(); // keep frames coming for the bar-shut animation
@@ -3792,12 +3821,12 @@ scheduleStripeToggle();
     // down (not its current x), so later jostling from more balls piling
     // in can't disagree with what the ball visibly landed in. Tray gold
     // left over from earlier rounds doesn't count -- originals only.
-    const coloredCount = balls.filter(b => {
+    const coloredHits = balls.filter(b => {
       if (b.isReward) return false;
       const idx = b.slotIndex ?? Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
       return coloredSlotIndices.has(idx);
-    }).length;
-    if (coloredCount > 0) {
+    });
+    if (coloredHits.length > 0) {
       // Difficulty-scaled payout (see GOLD_RATE comment above): more
       // slots, fewer colored slots, and fewer balls dropped all raise the
       // per-hit prize; a taller board (more peg rows) still multiplies it.
@@ -3806,8 +3835,15 @@ scheduleStripeToggle();
       const perHit = Math.max(5, Math.round(
         GOLD_RATE * (slotCount / Math.max(1, coloredSlots)) / originals * rowFactor
       ));
+      // The leftmost/rightmost slots are riskier to land in (edge pegs
+      // funnel balls away from them) -- landing a colored hit there pays
+      // double, matched by the subtle "×2" drawn on that slot above.
+      const weightedHits = coloredHits.reduce((sum, b) => {
+        const idx = b.slotIndex ?? Math.max(0, Math.min(slotCount - 1, Math.floor(b.x / slotW)));
+        return sum + (idx === 0 || idx === slotCount - 1 ? 2 : 1);
+      }, 0);
       const cap = slotCount <= MOBILE_SLOT_THRESHOLD ? MAX_GOLD_MOBILE : MAX_GOLD_DESKTOP;
-      const total = Math.min(cap, perHit * coloredCount);
+      const total = Math.min(cap, perHit * weightedHits);
       updateGoldCount(total);
       spawnGoldBalls(total);
     } else {
@@ -3903,6 +3939,17 @@ scheduleStripeToggle();
       const cx = (i + 0.5) * slotW;
       ctx.fillStyle = slotColor(i, 0.9, accentColor);
       ctx.fillRect(i * slotW, pegsBottomY, slotW, rampYAt(cx) - pegsBottomY);
+      // Edge slots (leftmost/rightmost) pay double when colored -- a small,
+      // subtle marker so that's discoverable without reading a rules page.
+      if (!restaurantMode && (i === 0 || i === slotCount - 1) && coloredSlotIndices.has(i)) {
+        ctx.save();
+        ctx.font = `700 ${Math.max(9, Math.min(13, slotW * 0.22))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+        ctx.fillText("×2", cx, rampYAt(cx) - 4);
+        ctx.restore();
+      }
     }
     // slot dividers, down to wherever the bar currently sits under each
     ctx.strokeStyle = inkColor;
@@ -4000,24 +4047,27 @@ scheduleStripeToggle();
 
     // Bag tally + live tray fill -- pinned to the TOP of the tray strip
     // (not the bottom) since the pile fills bottom-up and was burying this
-    // text; small font + a text shadow so it stays legible sitting right
-    // over the gold pile either way.
-    ctx.font = '900 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    // text; small font + a light stamped outline (same trick as the
+    // win/lose comment's outline, just much thinner/softer) so it stays
+    // legible sitting right over the gold pile without reading as a heavy
+    // black blob.
+    ctx.font = '900 15px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
     ctx.textBaseline = "alphabetic";
-    ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
-    ctx.shadowBlur = 3;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 1;
-    ctx.fillStyle = "#ffd400";
-    ctx.textAlign = "left";
-    ctx.fillText(`\u{1F4B0} ×${goldBags}`, 8, floorY + 24);
+    const trayTextShadowOffsets = [
+      [-1, -1], [1, -1],
+      [-1, 1],  [1, 1],
+    ];
+    function fillTrayText(text, x, y, align) {
+      ctx.textAlign = align;
+      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      trayTextShadowOffsets.forEach(([dx, dy]) => ctx.fillText(text, x + dx, y + dy));
+      ctx.fillStyle = "#ffd400";
+      ctx.fillText(text, x, y);
+    }
+    fillTrayText(`\u{1F4B0} ×${goldBags}`, 8, floorY + 28, "left");
     // Live tray fill -- the physics pile is capped for stability (see
     // bagUpTray), so this is the real running total toward the next bag.
-    ctx.textAlign = "right";
-    ctx.fillText(`${trayGoldCount} / ${TRAY_CAPACITY}`, cssW - 8, floorY + 24);
-    ctx.shadowColor = "transparent";
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetY = 0;
+    fillTrayText(`${trayGoldCount} / ${TRAY_CAPACITY}`, cssW - 8, floorY + 28, "right");
     ctx.textAlign = "left";
   }
 
@@ -4503,7 +4553,6 @@ scheduleStripeToggle();
   const input     = document.getElementById("wheel-item-input");
   const listEl    = document.getElementById("wheel-item-list");
   const spinBtn   = document.getElementById("wheel-spin-btn");
-  const resetBtn  = document.getElementById("wheel-reset-btn");
   const clearBtn  = document.getElementById("wheel-clear-btn");
   const shuffleBtn= document.getElementById("wheel-shuffle-btn");
   const resultEl  = document.getElementById("wheel-result");
@@ -4769,7 +4818,9 @@ scheduleStripeToggle();
     drawWheel();
   });
 
-  resetBtn?.addEventListener("click", () => {
+  // No separate reset button -- clicking the wheel itself resets it (a
+  // no-op mid-spin, same guard the old button had).
+  canvas.addEventListener("click", () => {
     if (spinning) return;
     rotation = 0;
     lastPinIndex = 0;
