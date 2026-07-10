@@ -40,8 +40,13 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.11.1";
+const APP_VERSION = "1.12.0";
 const CHANGELOG = [
+  { version: "1.12.0", date: "2026-07-10", notes: [
+    "Rotation panel gets a 'Food Chart' entry (star-bulleted, line 15) -- top/bottom-rated items across the WHOLE rotation, sortable by Orders or Rating, 10 per page, plus a 'back to top' close row",
+    "Restaurant report modal shows a new Performance Trend chart -- one point per order date, averaging every rated item from that date together",
+    "Drop Game: countdown payout formula reworked (row-depth bonus, effective-slot cap), payout preview no longer QA-only, gold/bags/tray no longer persist across a refresh, countdown pauses during the reward shower and while any comment is showing",
+  ]},
   { version: "1.11.1", date: "2026-07-09", notes: [
     "Drop Game gold tray: the floor bar now fully retracts (whole floor drops open) instead of a narrow one-corner ramp, and stays open a several-second beat longer before closing",
     "Gold no longer jams or freezes mid-fall in the tray -- it overlaps freely instead of fighting for space, and the win comment now waits for every gold ball to actually settle before showing",
@@ -239,7 +244,7 @@ function buildRotationPanel(config) {
   const total    = config.restaurants.length;
   const curIdx   = getRotationIndex(config.startDate, total);
 
-  panel.innerHTML = config.restaurants.map((r, i) => {
+  const rows = config.restaurants.map((r, i) => {
     const cur     = i === curIdx;
     const name    = r.name || r.ref || "?";
     const cuisine = r.cuisine ? `<span class="rotation-cuisine">${esc(r.cuisine)}</span>` : "";
@@ -248,9 +253,33 @@ function buildRotationPanel(config) {
       <span class="rotation-name">${esc(name)}</span>
       ${cuisine}
     </div>`;
-  }).join("");
+  });
+
+  // A standalone entry (not a restaurant) at line 15 -- a black star bullet
+  // instead of the usual number badge marks it as different from the
+  // rotation list around it. If there aren't 15 rows yet, splice just
+  // clamps to the end, so it still shows up rather than being dropped.
+  const foodChartRow = `<div class="rotation-row rotation-row-foodchart" id="rotation-food-chart-row" title="See top-rated items across the whole rotation">
+      <span class="rotation-idx rotation-star">&#9733;</span>
+      <span class="rotation-name">Food Chart</span>
+      <span class="rotation-cuisine rotation-cuisine-stripes"></span>
+    </div>`;
+  rows.splice(14, 0, foodChartRow);
+  // Last row: collapses the slidedown shut again -- same "back to top"
+  // idea as the menu panel's category shortcut, just closing instead of
+  // scrolling since this whole panel (not a section within it) is what's
+  // open.
+  rows.push(`<button type="button" class="rotation-back-to-top" id="rotation-back-to-top-btn">&#9650; Close</button>`);
+  panel.innerHTML = rows.join("");
 
   panel.onclick = e => {
+    if (e.target.closest("#rotation-back-to-top-btn")) {
+      btn.classList.remove("open");
+      panel.classList.remove("open");
+      btn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      return;
+    }
+    if (e.target.closest("#rotation-food-chart-row")) { openFoodChart(); return; }
     const row = e.target.closest(".rotation-row");
     if (!row) return;
     openMenuReport(row.dataset.restaurant);
@@ -1516,6 +1545,125 @@ function computeItemStats(restaurantName) {
   return stats;
 }
 
+// Same idea as computeItemStats, but across EVERY restaurant in the
+// rotation at once (for the Food Chart) -- keyed by restaurant+item since
+// two different restaurants could otherwise share an item name and get
+// wrongly merged into one row.
+function computeAllItemStats() {
+  const stats = new Map(); // key: "restaurant|item" lowercase -> { restaurant, label, qty, ratingSum, ratingCount }
+
+  function entryFor(restaurant, label) {
+    const key = `${restaurant}|${label}`.toLowerCase();
+    if (!stats.has(key)) stats.set(key, { restaurant, label, qty: 0, ratingSum: 0, ratingCount: 0 });
+    return stats.get(key);
+  }
+
+  _historyRows.forEach(r => {
+    const restaurant = (r[2] || "").trim();
+    const item = (r[3] || "").trim();
+    if (!restaurant || !item) return;
+    entryFor(restaurant, item).qty += Number(r[4]) || 0;
+  });
+
+  _allRatingRows.forEach(r => {
+    const restaurant = (r[2] || "").trim();
+    const item = (r[3] || "").trim();
+    const rating = Number(r[r.length - 1]);
+    if (!restaurant || !item || isNaN(rating)) return;
+    const e = entryFor(restaurant, item);
+    e.ratingSum += rating;
+    e.ratingCount += 1;
+  });
+
+  return stats;
+}
+
+// ── Food Chart: top/bottom-rated items across the whole rotation ───────
+// "Orders" is deliberately the loudest number on the row (see CSS) --
+// more orders means more popular, which matters just as much as the
+// rating itself for a quick read of what's actually worth getting.
+const FOOD_CHART_PAGE_SIZE = 10;
+let _foodChartSortCol = "rating"; // "rating" or "orders" -- which column is driving the sort
+let _foodChartSortDir = "desc";   // "desc" = highest first (the default for either column); "asc" flips to lowest first
+let _foodChartPage = 1;
+
+function openFoodChart() {
+  _foodChartSortCol = "rating";
+  _foodChartSortDir = "desc";
+  _foodChartPage = 1;
+  renderFoodChart();
+  document.getElementById("food-chart-modal")?.classList.add("open");
+}
+function closeFoodChart(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById("food-chart-modal")?.classList.remove("open");
+}
+// Shared by both sortable headers -- clicking the column already driving
+// the sort just flips direction; clicking the OTHER column switches to it
+// (starting high-to-low, same convention either column starts with).
+function foodChartSortBy(col) {
+  if (_foodChartSortCol === col) {
+    _foodChartSortDir = _foodChartSortDir === "desc" ? "asc" : "desc";
+  } else {
+    _foodChartSortCol = col;
+    _foodChartSortDir = "desc";
+  }
+  _foodChartPage = 1;
+  renderFoodChart();
+}
+function foodChartGoToPage(p) {
+  _foodChartPage = p;
+  renderFoodChart();
+}
+function renderFoodChart() {
+  const stats = computeAllItemStats();
+  const rows = [...stats.values()]
+    .filter(s => s.ratingCount > 0)
+    .map(s => ({ ...s, avg: s.ratingSum / s.ratingCount }));
+  const sortKey = _foodChartSortCol === "orders" ? "qty" : "avg";
+  rows.sort((a, b) => _foodChartSortDir === "desc" ? b[sortKey] - a[sortKey] : a[sortKey] - b[sortKey]);
+
+  const arrow = _foodChartSortDir === "desc" ? "&#9660;" : "&#9650;";
+  const ratingThEl = document.getElementById("food-chart-rating-th");
+  const ordersThEl = document.getElementById("food-chart-orders-th");
+  if (ratingThEl) ratingThEl.innerHTML = `Rating ${_foodChartSortCol === "rating" ? arrow : ""}`;
+  if (ordersThEl) ordersThEl.innerHTML = `QTY ${_foodChartSortCol === "orders" ? arrow : ""}`;
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / FOOD_CHART_PAGE_SIZE));
+  _foodChartPage = Math.min(Math.max(1, _foodChartPage), totalPages);
+  const start = (_foodChartPage - 1) * FOOD_CHART_PAGE_SIZE;
+  const pageRows = rows.slice(start, start + FOOD_CHART_PAGE_SIZE);
+
+  const tbody = document.getElementById("food-chart-tbody");
+  const emptyEl = document.getElementById("food-chart-empty");
+  if (!rows.length) {
+    tbody.innerHTML = "";
+    if (emptyEl) emptyEl.style.display = "block";
+  } else {
+    if (emptyEl) emptyEl.style.display = "none";
+    tbody.innerHTML = pageRows.map(s => `<tr>
+      <td>
+        <div class="food-chart-item-name">${esc(s.label)}</div>
+        <div class="food-chart-restaurant">${esc(s.restaurant)}</div>
+      </td>
+      <td class="food-chart-orders">${s.qty}</td>
+      <td>${s.avg.toFixed(1)}/10</td>
+    </tr>`).join("");
+  }
+
+  const pagEl = document.getElementById("food-chart-pagination");
+  if (!pagEl) return;
+  if (totalPages <= 1) {
+    pagEl.innerHTML = "";
+    return;
+  }
+  let btns = "";
+  for (let p = 1; p <= totalPages; p++) {
+    btns += `<button type="button" class="food-chart-page-btn${p === _foodChartPage ? " active" : ""}" onclick="foodChartGoToPage(${p})">${p}</button>`;
+  }
+  pagEl.innerHTML = btns;
+}
+
 // One point per date this item has any ratings, averaged if more than one
 // person rated it that same day -- sorted chronologically for the trend
 // line. Ratings have no name column, so this is as granular as it gets.
@@ -1528,6 +1676,29 @@ function computeItemRatingTrend(restaurant, item) {
     if ((r[3] || "").trim().toLowerCase() !== itemLower) return;
     const date = (r[1] || "").trim();
     const rating = Number(r[r.length - 1]); // last column, tolerant of old/new schema
+    if (!date || isNaN(rating)) return;
+    if (!byDate.has(date)) byDate.set(date, { sum: 0, count: 0 });
+    const e = byDate.get(date);
+    e.sum += rating;
+    e.count += 1;
+  });
+  return [...byDate.entries()]
+    .map(([date, e]) => ({ date, avg: e.sum / e.count }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+// Same idea, but averaged across EVERY item ordered that date, not just
+// one -- "how did the whole group's order do" for a given restaurant, one
+// point per date. Only rated items count toward the average; anything
+// nobody bothered to rate just isn't in _allRatingRows at all, so it's
+// already excluded rather than needing to be filtered out separately.
+function computeRestaurantRatingTrend(restaurant) {
+  const name = (restaurant || "").trim().toLowerCase();
+  const byDate = new Map(); // date -> { sum, count }
+  _allRatingRows.forEach(r => {
+    if ((r[2] || "").trim().toLowerCase() !== name) return;
+    const date = (r[1] || "").trim();
+    const rating = Number(r[r.length - 1]);
     if (!date || isNaN(rating)) return;
     if (!byDate.has(date)) byDate.set(date, { sum: 0, count: 0 });
     const e = byDate.get(date);
@@ -2571,6 +2742,13 @@ function startCountdown() {
     // neon-bright.
     const darkerTone = hslToHex(h, Math.max(35, s * 0.5), Math.min(48, Math.max(35, l)));
     document.documentElement.style.setProperty("--theme-arrow", darkerTone);
+
+    // A brighter/lighter sibling of the above, same hue -- for places (like
+    // the Random Pick lightbox) that want the theme color to read as
+    // vivid/bright rather than the deliberately muted "just barely visible"
+    // darker tone.
+    const lighterTone = hslToHex(h, Math.max(55, s), Math.min(72, Math.max(58, l)));
+    document.documentElement.style.setProperty("--theme-arrow-light", lighterTone);
   }
   document.addEventListener("themechange", updateThemeComplement);
   updateThemeComplement();
@@ -2924,6 +3102,7 @@ function openMenuReport(restaurantName) {
   _reportMenu = findRestaurantByName(restaurantName)?.menu || allMenuItems;
 
   refreshReportModal();
+  renderRestaurantTrendChart(computeRestaurantRatingTrend(restaurantName));
   modal.classList.add("open");
 
   // Item Stats opens expanded by default now, instead of requiring a click
@@ -3130,8 +3309,31 @@ function closeItemDetail(e) {
 }
 
 function renderItemTrendChart(trend) {
-  const svg   = document.getElementById("item-detail-chart");
-  const empty = document.getElementById("item-detail-empty");
+  renderTrendChart(trend, {
+    svg: "item-detail-chart", empty: "item-detail-empty",
+    wrap: "item-detail-chart-wrap", tooltip: "item-detail-tooltip",
+  });
+}
+
+// Whole-restaurant performance trend -- one point per date, averaging
+// every rated item from that date's order together (not per-item). Lives
+// at the top of the restaurant's own report modal, above the per-item
+// Item Stats table.
+function renderRestaurantTrendChart(trend) {
+  renderTrendChart(trend, {
+    svg: "restaurant-trend-chart", empty: "restaurant-trend-empty",
+    wrap: "restaurant-trend-chart-wrap", tooltip: "restaurant-trend-tooltip",
+  });
+}
+
+// Shared line-chart renderer -- takes { svg, empty, wrap, tooltip } element
+// ids so both the per-item trend (openItemDetail) and the whole-restaurant
+// trend (openMenuReport) can draw the exact same style of chart into their
+// own separate DOM nodes without duplicating the SVG-building logic.
+function renderTrendChart(trend, ids) {
+  const svg   = document.getElementById(ids.svg);
+  const empty = document.getElementById(ids.empty);
+  if (!svg || !empty) return;
   if (!trend.length) {
     svg.innerHTML = "";
     svg.style.display = "none";
@@ -3181,12 +3383,13 @@ function renderItemTrendChart(trend) {
     ${xLabelSvg}
     ${hitsSvg}`;
 
-  const tooltip = document.getElementById("item-detail-tooltip");
+  const tooltip = document.getElementById(ids.tooltip);
+  const wrapEl  = document.getElementById(ids.wrap);
   svg.querySelectorAll(".item-detail-hit").forEach(hit => {
     hit.addEventListener("mouseenter", () => {
       tooltip.textContent = `${hit.dataset.date} — ${hit.dataset.rating}/10`;
       tooltip.style.display = "block";
-      const wrap = document.getElementById("item-detail-chart-wrap").getBoundingClientRect();
+      const wrap = wrapEl.getBoundingClientRect();
       const hr = hit.getBoundingClientRect();
       const tr = tooltip.getBoundingClientRect();
       let left = hr.left - wrap.left + hr.width / 2 - tr.width / 2;
@@ -3295,23 +3498,16 @@ function _runRandomPickSpin() {
   const items = _randomPickItems;
   _randomPickChosen = items[Math.floor(Math.random() * items.length)];
 
-  // While cycling, long names made the box keep flashing/resizing as it
-  // rotated through wildly different lengths -- truncated during the spin
-  // only, then the real full name is what it actually settles on.
-  const RANDOM_PICK_SPIN_MAX_LEN = 24;
-  function spinLabel(name) {
-    return name.length > RANDOM_PICK_SPIN_MAX_LEN
-      ? name.slice(0, RANDOM_PICK_SPIN_MAX_LEN - 1).trimEnd() + "…"
-      : name;
-  }
-
   const totalSteps = 30 + Math.floor(Math.random() * 7);
   let step = 0;
   function tick() {
     const isLast = step >= totalSteps;
+    // No more truncating during the spin -- the name box is a fixed
+    // 3-line-tall box now (see .random-pick-name), so long names just wrap
+    // instead of needing to be cut short to avoid resizing.
     nameEl.textContent = isLast
       ? _randomPickChosen.item
-      : spinLabel(items[Math.floor(Math.random() * items.length)].item);
+      : items[Math.floor(Math.random() * items.length)].item;
     if (isLast) {
       labelEl.textContent = "Tonight's pick:";
       nameEl.classList.add("settled");
@@ -3352,6 +3548,13 @@ function randomPickViewStats() {
   closeRandomPickLightbox();
   _reportMenu = currentRestaurantObj.menu || allMenuItems;
   openItemDetail(currentRestaurantObj.name, item);
+}
+// The whole name is clickable too once a result has landed -- but a click
+// mid-spin (while it's just cycling through random names) shouldn't do
+// anything, so this only acts once .settled is actually on the element.
+function randomPickNameClick() {
+  if (!document.getElementById("random-pick-name")?.classList.contains("settled")) return;
+  randomPickViewStats();
 }
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && document.getElementById("random-pick-lightbox").classList.contains("open")) {
@@ -5231,17 +5434,11 @@ scheduleStripeToggle();
   function layout() {
     const w = board.clientWidth, h = board.clientHeight;
     if (w <= 0 || h <= 0) return;
-    // Only the vertical axis needs the big reserve -- it's clearance for
-    // the pointer's pivot (which sits ~40px above the canvas) plus a real
-    // gap above THAT (about a pin-circle's width) so it never reads as
-    // flush against the board's own edge. The width doesn't need nearly as
-    // much margin; computing the two limits separately (instead of
-    // reserving the same amount out of whichever of w/h is smaller) means
-    // a narrow mobile board -- where width, not height, is what's actually
-    // tight -- lets the wheel use almost the full width instead of being
-    // shrunk by a vertical-only reserve it doesn't need sideways.
-    const maxByWidth  = w - 24;
-    const maxByHeight = h - 140;
+    // Responsive to the actual resizable box on both axes -- dragging the
+    // grip shorter shrinks the wheel, same as before. Margins just kept
+    // small so the wheel claims as much of that box as it can.
+    const maxByWidth  = w - 12;
+    const maxByHeight = h - 90;
     cssSize = Math.max(60, Math.min(maxByWidth, maxByHeight));
     canvasWrap.style.width  = `${cssSize}px`;
     canvasWrap.style.height = `${cssSize}px`;
@@ -5365,17 +5562,34 @@ scheduleStripeToggle();
 
     const colors = themeWedgeColors();
     const slice = (Math.PI * 2) / n;
-    // Starting point for how big the text COULD be, given wedge width and
-    // radius -- longer labels shrink from here on a per-item basis (see
-    // fitLabel below), so a few long names don't drag every other wedge's
-    // font size down with them.
-    const baseFontSize = Math.max(12, Math.min(r * 0.26, (r * 1.15) / n));
-    const minFontSize = 9;
+    // Was 9 -- too small to read comfortably even for a short, ordinary
+    // word (e.g. a plain 6-letter item name), especially once a wheel has
+    // enough items to shrink baseFontSize a lot to begin with.
+    const minFontSize = 11;
     // Radial room for the text -- kept well short of the hub (not just
     // rim-to-hub) so labels stay out in the wedge's outer band instead of
     // crowding together near the center once they're long enough to reach
-    // that far in.
-    const availableLen = pieR * 0.55;
+    // that far in. Widened a bit (0.55 -> 0.65) so an ordinary short word
+    // isn't needlessly shrunk/truncated before it actually needs to be.
+    const availableLen = pieR * 0.65;
+
+    // Starting point for how big the text COULD be, given wedge width and
+    // radius -- longer labels shrink from here on a per-item basis (see
+    // fitLabel below). But with few items on the wheel this could get
+    // large enough that a short name (e.g. "Ben") rendered huge while a
+    // slightly longer-but-still-short one (e.g. "Landen", "Samson") had to
+    // truncate to "Land…"/"Sams…" right next to it -- awkward. Capping it
+    // by what a representative ~10-character label needs to fit within
+    // availableLen means anything under that length reliably shows in
+    // full, instead of the font ballooning past what the wheel's actual
+    // content needs.
+    pctx.font = `900 100px ${CANVAS_FONT_FAMILY}`;
+    const tenCharWidthAt100 = pctx.measureText("MMMMMMMMMM").width;
+    const fitsTenCharsAt = (availableLen / tenCharWidthAt100) * 100;
+    const baseFontSize = Math.min(
+      Math.max(12, Math.min(r * 0.26, (r * 1.15) / n)),
+      Math.max(minFontSize, fitsTenCharsAt)
+    ) * 1.3;
 
     // Cap at 2 words first (reads better truncated at a word boundary than
     // mid-word, e.g. a long restaurant name), then shrink the font until

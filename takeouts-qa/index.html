@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:ital,wght@0,500;0,700;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="styles.v1.11.1.css">
+  <link rel="stylesheet" href="styles.v1.12.0.css">
 </head>
 <body>
 <div id="gate-overlay" class="gate-overlay">
@@ -24,7 +24,7 @@
     <button type="button" id="gate-submit" class="btn btn-primary" style="margin-top:1rem">Enter</button>
   </div>
 </div>
-<script src="gate.v1.11.1.js"></script>
+<script src="gate.v1.12.0.js"></script>
 <div class="debug-clock" id="debug-clock" style="display:none">
   <button type="button" class="debug-clock-label" id="debug-clock-toggle">
     Test Clock <span id="debug-clock-status"></span>
@@ -294,8 +294,8 @@
             <button type="button" id="wheel-edit-toggle-btn" class="wheel-accessory-btn wheel-edit-toggle-btn">
               Edit Items <span class="rotation-toggle-arrow">&#9660;</span>
             </button>
-            <button type="button" id="wheel-shuffle-btn" class="wheel-accessory-btn">Shuffle</button>
             <button type="button" id="wheel-clear-btn" class="wheel-accessory-btn">Clear All</button>
+            <button type="button" id="wheel-shuffle-btn" class="wheel-accessory-btn">Shuffle</button>
           </div>
           <div class="rotation-panel wheel-edit-panel" id="wheel-edit-panel">
             <div class="wheel-preset-actions">
@@ -348,8 +348,8 @@
 
 </div>
 <script src="config.js?v=1.9.1"></script>
-<script src="plinko-comments.v1.11.1.js"></script>
-<script src="app.v1.11.1.js"></script>
+<script src="plinko-comments.v1.12.0.js"></script>
+<script src="app.v1.12.0.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="traffic-widget.js"></script>
@@ -404,6 +404,13 @@
       <button type="button" class="report-modal-close" onclick="closeMenuReport()">&times;</button>
     </div>
     <div class="report-modal-body">
+      <div class="item-detail-stats-label">Restaurant Performance Trend</div>
+      <div class="item-detail-chart-wrap" id="restaurant-trend-chart-wrap">
+        <svg id="restaurant-trend-chart" class="item-detail-chart"></svg>
+        <div class="item-detail-tooltip" id="restaurant-trend-tooltip"></div>
+      </div>
+      <div id="restaurant-trend-empty" class="placeholder" style="display:none">No ratings logged yet for this restaurant.</div>
+
       <button type="button" id="report-stats-toggle-btn" class="report-stats-toggle-btn">
         Item Stats <span class="rotation-toggle-arrow">&#9660;</span>
       </button>
@@ -446,6 +453,30 @@
   </div>
 </div>
 
+<div class="report-modal" id="food-chart-modal" onclick="closeFoodChart(event)">
+  <div class="report-modal-box" id="food-chart-modal-box" onclick="event.stopPropagation()">
+    <div class="report-modal-header">
+      <h2>&#9733; Food Chart</h2>
+      <button type="button" class="report-modal-close" onclick="closeFoodChart()">&times;</button>
+    </div>
+    <div class="report-modal-body">
+      <div class="item-detail-stats-label">All rated food items</div>
+      <table class="report-table food-chart-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th id="food-chart-orders-th" class="food-chart-sortable" onclick="foodChartSortBy('orders')" title="Click to sort by orders">QTY</th>
+            <th id="food-chart-rating-th" class="food-chart-sortable" onclick="foodChartSortBy('rating')" title="Click to sort by rating">Rating &#9660;</th>
+          </tr>
+        </thead>
+        <tbody id="food-chart-tbody"></tbody>
+      </table>
+      <div id="food-chart-empty" class="placeholder" style="display:none">No rated items yet.</div>
+      <div class="food-chart-pagination" id="food-chart-pagination"></div>
+    </div>
+  </div>
+</div>
+
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
   <button class="lightbox-nav prev" onclick="event.stopPropagation();lbPrev()" hidden>&#8249;</button>
@@ -458,9 +489,9 @@
   <div class="random-pick-box" onclick="event.stopPropagation()">
     <button class="lightbox-close" onclick="closeRandomPickLightbox()">&times;</button>
     <div class="random-pick-label" id="random-pick-label">Picking something for you…</div>
-    <select id="random-pick-category" class="random-pick-category" onchange="randomPickCategoryChanged()"></select>
-    <div class="random-pick-name" id="random-pick-name">&nbsp;</div>
+    <div class="random-pick-name" id="random-pick-name" onclick="randomPickNameClick()">&nbsp;</div>
     <button type="button" class="random-pick-stats-link" id="random-pick-stats-link" style="display:none" onclick="randomPickViewStats()">View Item Stats &#8594;</button>
+    <select id="random-pick-category" class="random-pick-category" onchange="randomPickCategoryChanged()"></select>
     <div class="random-pick-actions" id="random-pick-actions" style="display:none">
       <button type="button" class="btn-primary" id="random-pick-add-btn" onclick="randomPickAdd()">Add to Order</button>
       <button type="button" class="btn-secondary" id="random-pick-again-btn" onclick="_runRandomPickSpin()">Pick Again</button>

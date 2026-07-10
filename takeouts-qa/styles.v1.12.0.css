@@ -444,6 +444,8 @@
       font-family: "Courier New", Courier, monospace;
       width: 1.5rem;
       flex-shrink: 0;
+      overflow: hidden;
+      display: inline-block;
     }
     .rotation-name { flex: 1; }
     .rotation-cuisine {
@@ -456,6 +458,64 @@
       padding: 0.1rem 0.4rem;
       flex-shrink: 0;
     }
+    /* Food Chart row -- a black star bullet instead of a number badge
+       marks it as a tool, not another restaurant in the list. */
+    /* Courier New (the numbered rows' font) doesn't have a proper black
+       star glyph -- it was falling back to a different font just for this
+       character, which rendered wider than the fixed 1.5rem slot and
+       pushed "Food Chart" out of alignment with the restaurant names
+       above it. A normal system font renders it at a predictable width. */
+    .rotation-star {
+      opacity: 1;
+      color: #000;
+      font-size: 0.9rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .rotation-row:hover .rotation-star { color: inherit; }
+    body.dark .rotation-star { color: var(--ink); }
+    /* A small striped badge sits where a cuisine tag would on a normal
+       row (same size class), instead of a stripe flag stretched across
+       the whole row -- same "this is different" signal, without
+       overwhelming the row. Sized to about 6 characters' width, same
+       padding/border as .rotation-cuisine so it lines up visually. */
+    .rotation-cuisine-stripes {
+      width: 3.4em;
+      height: 0.9rem;
+      padding: 0.1rem 0;
+      box-sizing: content-box;
+      background-image: repeating-linear-gradient(45deg,
+        #000 0px, #000 3px,
+        transparent 3px, transparent 8px);
+    }
+    .rotation-row-foodchart:hover .rotation-cuisine-stripes {
+      background-image: repeating-linear-gradient(45deg,
+        var(--accent) 0px, var(--accent) 3px,
+        transparent 3px, transparent 8px);
+    }
+    body.dark .rotation-cuisine-stripes {
+      background-image: repeating-linear-gradient(45deg,
+        var(--ink) 0px, var(--ink) 3px,
+        transparent 3px, transparent 8px);
+    }
+    /* Closes the whole slidedown back up -- last row, full width, styled
+       distinctly from the clickable rows above it. */
+    .rotation-back-to-top {
+      display: block;
+      width: 100%;
+      background: var(--bg);
+      border: none;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.1s, color 0.1s;
+    }
+    .rotation-back-to-top:hover { background: #000; color: var(--accent); }
+    body.dark .rotation-back-to-top:hover { background: var(--ink); color: var(--bg); }
     .fcal-row {
       display: flex;
       align-items: center;
@@ -1703,6 +1763,50 @@
     .report-item-row { cursor: pointer; }
     .report-item-row:hover td { background: #000; color: var(--accent) !important; }
 
+    /* ── Food Chart (top/bottom-rated items across the whole rotation) ── */
+    .food-chart-table th:nth-child(1) { width: 62%; }
+    .food-chart-table th:nth-child(2) { width: 18%; }
+    .food-chart-table th:nth-child(3) { width: 20%; }
+    /* Restaurant now stacks under the item name in the same cell instead
+       of its own column -- freed the Item column from being squeezed
+       right up against the QTY/Rating columns. */
+    .food-chart-item-name { font-weight: 700; }
+    .food-chart-restaurant { color: var(--text-dim); font-size: 0.72rem; margin-top: 0.15rem; }
+    /* Orders is deliberately the loudest number on the row -- more orders
+       means more popular, which is as much a signal as the rating itself. */
+    .food-chart-orders { font-size: 1.15rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .food-chart-sortable {
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.1s;
+    }
+    .food-chart-sortable:hover { text-decoration: underline; }
+    .food-chart-pagination {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+    .food-chart-page-btn {
+      min-width: 2rem;
+      padding: 0.3rem 0.5rem;
+      border: 2px solid #000;
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.1s, color 0.1s;
+    }
+    .food-chart-page-btn:hover { background: #000; color: var(--accent); }
+    .food-chart-page-btn.active { background: #000; color: var(--accent); }
+    body.dark .food-chart-page-btn { border-color: var(--ink); }
+    body.dark .food-chart-page-btn:hover,
+    body.dark .food-chart-page-btn.active { background: var(--ink); color: var(--bg); }
+
     /* ── Item detail: rating trend chart ── */
     .item-detail-stats {
       display: flex;
@@ -1713,6 +1817,14 @@
       color: var(--text-muted);
     }
     .item-detail-stat strong { color: var(--text); font-size: 1rem; }
+    .item-detail-stats-label {
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
     .item-detail-chart-wrap { position: relative; }
     .item-detail-chart { display: block; width: 100%; height: auto; }
     .item-detail-tooltip {
@@ -1910,27 +2022,26 @@
       -webkit-appearance: none;
       margin: 0 auto 1.1rem;
       padding: 0.45rem 2.2rem 0.45rem 1rem;
-      border: 2px solid #000;
+      border: none;
       border-radius: 999px;
-      box-shadow: 2px 2px 0 #000;
-      background-color: var(--bg);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23000'/%3E%3C/svg%3E");
+      /* A darker shade of the theme's own color (hue), not just a
+         grey-darkened background -- --theme-arrow carries the theme's hue
+         (same trick used elsewhere for guaranteed-visible theme tinting),
+         darkened further so it still reads as a distinct control. */
+      background-color: color-mix(in srgb, var(--theme-arrow, #667) 85%, black 15%);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23fff'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 0.9rem center;
-      color: var(--text);
+      color: #fff;
       font-family: inherit;
       font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      transition: background-color 0.1s ease;
     }
-    .random-pick-category:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 #000; }
-    body.dark .random-pick-category {
-      border-color: var(--ink);
-      box-shadow: 2px 2px 0 var(--ink);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23fff'/%3E%3C/svg%3E");
-    }
-    body.dark .random-pick-category:hover { box-shadow: 3px 3px 0 var(--ink); }
+    .random-pick-category:hover { background-color: color-mix(in srgb, var(--theme-arrow, #667) 70%, black 30%); }
+    body.dark .random-pick-category { background-color: color-mix(in srgb, var(--theme-arrow, #667) 75%, black 25%); }
+    body.dark .random-pick-category:hover { background-color: color-mix(in srgb, var(--theme-arrow, #667) 60%, black 40%); }
     .random-pick-label {
       font-size: 0.85rem;
       text-transform: uppercase;
@@ -1941,13 +2052,16 @@
     .random-pick-name {
       font-size: 1.3rem;
       font-weight: 900;
+      line-height: 1.15;
       font-family: "EB Garamond", Garamond, Georgia, serif;
       /* --accent is literally identical to --bg for every theme (same
          issue as the secret-game toggle arrow) -- a plain accent fill on
          this box's --bg background would be invisible except for its
-         stroke. --theme-arrow (computed in app.js, same hue but pulled
-         into a contrasting range) is a real, visible fill instead. */
-      color: var(--theme-arrow, var(--accent));
+         stroke. --theme-arrow-light (computed in app.js, same hue but
+         pulled into a bright, visible range) is a real, visible fill
+         instead -- brighter than the plain theme color on purpose, the
+         stroke/shadow below is what keeps it readable either way. */
+      color: var(--theme-arrow-light, var(--accent));
       -webkit-text-stroke: 2.5px #000;
       paint-order: stroke fill;
       text-shadow:
@@ -1959,14 +2073,26 @@
         -3px 0 0 #000,
         0 3px 0 #000,
         0 -3px 0 #000;
-      min-height: 2.4em;
+      /* Fixed height for exactly 3 lines, ALWAYS -- not min-height that
+         grows/shrinks with content. A box that kept resizing itself
+         (or the font shrinking/growing) as the spin cycled through
+         different-length names was the "flashing" that irritated the
+         eyes; a constant 3-line box holds steady regardless of what
+         text is showing. */
+      height: 3.6em;
       display: flex;
       align-items: center;
       justify-content: center;
       max-width: min(65vw, 34rem);
+      overflow: hidden;
       overflow-wrap: break-word;
     }
-    .random-pick-name.settled { animation: random-pick-pop 0.3s ease; }
+    .random-pick-name.settled { animation: random-pick-pop 0.3s ease; cursor: pointer; }
+    /* Color swap instead of underline -- an underline through a thick
+       stroked/shadowed stamp-style word looked terrible. Swaps to the
+       darker theme-arrow tone (the same family, just readable as a
+       distinct "active" state) instead. */
+    .random-pick-name.settled:hover { color: var(--theme-arrow, var(--accent)); }
     @keyframes random-pick-pop {
       0%   { transform: scale(0.85); }
       60%  { transform: scale(1.08); }
@@ -1974,7 +2100,7 @@
     }
     .random-pick-stats-link {
       display: block;
-      margin: 0.3rem auto 0;
+      margin: 0.3rem auto 1.1rem;
       background: none;
       border: none;
       color: var(--text-muted);
@@ -2368,6 +2494,9 @@
     /* ── Mobile layout ── */
     @media (max-width: 600px) {
       body { padding: 1rem 0.5rem 3rem; }
+
+      /* Table headers (Item Stats, Food Chart) -- ~15% smaller on mobile. */
+      .report-table th { font-size: 0.544rem; }
 
       /* Smaller cap on narrow boards -- combined with overflow-wrap above,
          this keeps long comments/results from overrunning the board. */
@@ -3247,6 +3376,29 @@
     .wheel-accessory-btn:hover:not(:disabled) { background: #000; color: var(--accent); }
     .wheel-accessory-btn:disabled { opacity: 0.4; cursor: default; }
 
+    /* Clear All -- a transparent red wash (destructive action), solid red
+       + yellow text on hover so it reads as a real warning right before
+       you click it. */
+    #wheel-clear-btn { background-color: color-mix(in srgb, var(--red) 30%, transparent); }
+    #wheel-clear-btn:hover:not(:disabled) { background-color: var(--red); color: #ffe100; }
+
+    /* Shuffle -- double width (it's the more-used, non-destructive
+       action) and filled with a darker shade of the theme color; reverts
+       to the plain default look on hover instead of the usual invert, so
+       hovering reads as "back to normal" rather than another accent. */
+    #wheel-shuffle-btn {
+      flex-grow: 2;
+      background-color: color-mix(in srgb, var(--theme-arrow, #667) 80%, black 20%);
+      color: #fff;
+      border-color: color-mix(in srgb, var(--theme-arrow, #667) 80%, black 20%);
+    }
+    #wheel-shuffle-btn:hover:not(:disabled) {
+      background-color: var(--bg);
+      color: var(--text);
+      border-color: #000;
+    }
+    body.dark #wheel-shuffle-btn:hover:not(:disabled) { border-color: var(--ink); }
+
     .wheel-edit-panel { width: 100%; }
     .wheel-edit-panel.open {
       padding: 0.6rem 0.5rem;
@@ -3656,12 +3808,14 @@
     }
 
     /* Wheel/Roulette controls, mobile: preset picker + Edit Items share the
-       first row, Shuffle + Clear All get their own row right below (fixed
-       48% each so they always land as a pair together, instead of
-       wrapping wherever they happen to fall based on label width); Spin
-       takes the full width. */
+       first row, Clear All + Shuffle get their own row right below (so
+       they always land as a pair together, instead of wrapping wherever
+       they happen to fall based on label width) -- Shuffle keeps its
+       double-width proportion here too instead of collapsing to equal
+       halves; Spin takes the full width. */
     @media (max-width: 600px) {
       .wheel-preset-select, .wheel-edit-toggle-btn { flex: 1 1 48%; width: auto; min-width: 0; }
-      .wheel-shuffle-btn, .wheel-clear-btn { flex: 1 1 48%; }
+      .wheel-clear-btn { flex: 1 1 32%; }
+      .wheel-shuffle-btn { flex: 2 1 64%; }
       .wheel-spin-btn { flex: 1 1 100%; min-height: 4.5rem; }
     }
