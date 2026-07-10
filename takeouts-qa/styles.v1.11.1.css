@@ -3026,11 +3026,36 @@
       color: var(--text-muted);
     }
     .plinko-gold-count {
+      position: relative;
       font-size: 0.7rem;
       font-weight: 900;
       letter-spacing: 0.04em;
       font-variant-numeric: tabular-nums;
       color: #a07800;
+    }
+    /* A quick "+42" pop that floats up and fades out right when gold is
+       actually awarded -- the badge's own number updating silently was
+       easy to miss in the moment. */
+    .plinko-gold-flash {
+      position: absolute;
+      left: 50%;
+      bottom: 100%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      color: #ffc400;
+      font-weight: 900;
+      font-size: 0.95rem;
+      -webkit-text-stroke: 1.5px #000;
+      paint-order: stroke fill;
+      pointer-events: none;
+      animation: plinko-gold-flash-pop 1.1s ease-out forwards;
+    }
+    @keyframes plinko-gold-flash-pop {
+      0%   { opacity: 0; transform: translate(-50%, 0) scale(0.7); }
+      15%  { opacity: 1; transform: translate(-50%, -4px) scale(1.15); }
+      30%  { transform: translate(-50%, -6px) scale(1); }
+      75%  { opacity: 1; }
+      100% { opacity: 0; transform: translate(-50%, -22px) scale(1); }
     }
     /* Compact, horizontal chip row (wraps as needed) sitting right under
        the board, instead of a tall one-per-line list. */

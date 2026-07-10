@@ -3747,21 +3747,31 @@ scheduleStripeToggle();
 
   function resetBalls() {
     // The tray's gold survives a reset -- it's the player's stash, held
-    // until it fills up and gets bagged. Only the round's black balls (and
-    // any stray unsettled gold) are cleared. Kept gold gets re-packed into
-    // the (possibly resized) tray via layoutTrayPile() below.
+    // until it fills up and gets bagged. Only the round's black balls are
+    // cleared. Kept gold gets re-packed into the (possibly resized) tray
+    // via layoutTrayPile() below.
+    //
+    // Any gold still mid-air/mid-shower (moving) gets dropped by this
+    // filter too -- restart can be clicked at any point, including mid
+    // shower -- but trayGoldCount (the persisted, real total) was already
+    // incremented the instant that gold was AWARDED, not when it visually
+    // landed. So restarting mid-shower must never change trayGoldCount
+    // itself, only reconcile how many physical placeholder balls represent
+    // it below (topped up, not just when the tray went fully empty).
     balls = balls.filter(b => b.isReward && !b.moving);
-    // trayGoldCount survives a page refresh via localStorage, but the
-    // actual ball objects don't -- if the persisted count says there
-    // should be gold sitting here and none exists yet, recreate enough
-    // placeholder gold balls (up to whatever the grid can actually show)
-    // so the pile visually comes back instead of the tray looking empty
-    // while the X/150 readout still shows a real number.
-    if (!balls.length && trayGoldCount > 0) {
+    // Bagging normally happens once a shower naturally finishes settling,
+    // inside evaluateOutcome() -- but hitting reset mid-shower skips that
+    // entirely, so a round that keeps getting interrupted could pile past
+    // TRAY_CAPACITY forever and never actually bag. Every reset re-checks
+    // this directly so the bag conversion is automatic no matter how (or
+    // how many times) the round got cut short.
+    bagUpTray();
+    const shown = balls.length;
+    if (shown < trayGoldCount) {
       const d = GOLD_R * 2;
       const cols = Math.max(1, Math.floor(cssW / d));
       const maxRows = Math.max(1, Math.floor(TRAY_H / d));
-      const restoreCount = Math.min(trayGoldCount, cols * maxRows);
+      const restoreCount = Math.min(trayGoldCount, cols * maxRows) - shown;
       for (let i = 0; i < restoreCount; i++) {
         balls.push({ x: 0, y: 0, vx: 0, vy: 0, moving: false, isReward: true, r: GOLD_R });
       }
@@ -3795,7 +3805,7 @@ scheduleStripeToggle();
   const GOLD_R = BALL_R * 0.75; // smaller than a regular ball
   const MAX_GOLD_MOBILE = 150, MAX_GOLD_DESKTOP = 400;
 
-  // ── 5-minute round + high score ──────────────────────────────────────
+  // ── 3-minute round + high score ──────────────────────────────────────
   // The clock counts DOWN, not up. It starts the moment the first ball
   // drops (not just from opening the panel) and persists across a refresh
   // via localStorage -- otherwise reloading the page mid-round would quietly
@@ -3803,7 +3813,7 @@ scheduleStripeToggle();
   // dropping until the player enters their initials (or skips), at which
   // point everything session-related wipes and the next drop starts a
   // fresh countdown.
-  const PLINKO_ROUND_MS = 5 * 60 * 1000;
+  const PLINKO_ROUND_MS = 3 * 60 * 1000;
   let plinkoRoundEndAt = Number(localStorage.getItem("plinkoRoundEndAt")) || null;
   let plinkoGameOver = false;
 
@@ -3824,6 +3834,18 @@ scheduleStripeToggle();
     }
     const el = document.getElementById("plinko-gold-count");
     if (el) el.innerHTML = `&#x1F7E1; ${goldTotal}`;
+    if (add) flashGoldAward(add, el);
+  }
+
+  // A brief "+N" pop above the badge right when gold is actually awarded --
+  // updating the number alone was easy to miss in the moment.
+  function flashGoldAward(add, anchorEl) {
+    if (!anchorEl) return;
+    const flash = document.createElement("span");
+    flash.className = "plinko-gold-flash";
+    flash.textContent = `+${add}`;
+    anchorEl.appendChild(flash);
+    flash.addEventListener("animationend", () => flash.remove());
   }
   updateGoldCount(0);
 
@@ -4008,7 +4030,12 @@ scheduleStripeToggle();
       // per-hit prize; a taller board (more peg rows) still multiplies it.
       const rowFactor = pegRowCount / REFERENCE_ROWS;
       const originals = Math.max(1, balls.filter(b => !b.isReward).length);
-      const perHit = Math.max(5, Math.round(
+      // Floor of 1, not 5 -- a floor of 5 was clamping BOTH a 1-ball and a
+      // 2-ball drop to the exact same payout on smaller/mobile boards
+      // (their raw computed values both landed under 5), hiding the /
+      // originals scaling that's the whole point of dropping fewer balls
+      // for a bigger individual payout.
+      const perHit = Math.max(1, Math.round(
         GOLD_RATE * (slotCount / Math.max(1, coloredSlots)) / originals * rowFactor
       ));
       // The leftmost/rightmost slots are riskier to land in (edge pegs
@@ -4603,7 +4630,7 @@ scheduleStripeToggle();
   }
 
   canvas.addEventListener("pointerdown", e => {
-    // The 5-minute round is over -- no more drops until the high-score
+    // The 3-minute round is over -- no more drops until the high-score
     // lightbox is dismissed (see endPlinkoRound/closePlinkoGameOver).
     if (plinkoGameOver) return;
     // Tray gold from earlier rounds doesn't count as an active round --
@@ -4703,7 +4730,7 @@ scheduleStripeToggle();
   // A simple stopwatch, not tied to any round -- starts the moment the
   // panel is first opened and just keeps counting for the rest of the
   // session, even if the panel is later collapsed and reopened.
-  // Counts DOWN from 5:00, not up -- sits at the full duration until the
+  // Counts DOWN from 3:00, not up -- sits at the full duration until the
   // first drop actually starts plinkoRoundEndAt (see releaseDrag above).
   function startClock() {
     const el = document.getElementById("plinko-clock");

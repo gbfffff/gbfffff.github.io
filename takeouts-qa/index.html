@@ -271,7 +271,7 @@
               <input type="checkbox" id="plinko-restaurant-mode">
               Restaurant Picker
             </label>
-            <span class="plinko-clock" id="plinko-clock" title="Time left this round">5:00</span>
+            <span class="plinko-clock" id="plinko-clock" title="Time left this round">3:00</span>
             <span class="plinko-gold-count" id="plinko-gold-count" title="Golden balls won this session">&#x1F7E1; 0</span>
           </div>
           <button type="button" id="game-mode-toggle-btn" class="game-mode-toggle-btn" title="Wheel">&#8594;</button>
@@ -467,6 +467,7 @@
 
 <div class="lightbox plinko-gameover-lightbox" id="plinko-gameover-lightbox">
   <div class="plinko-gameover-box" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="closePlinkoGameOver()">&times;</button>
     <div class="plinko-gameover-title">TIME'S UP!</div>
     <div class="plinko-gameover-score">Score: <span id="plinko-gameover-score">0</span></div>
     <div id="plinko-gameover-entry">
@@ -480,7 +481,6 @@
     <div class="plinko-leaderboard" id="plinko-leaderboard" style="display:none">
       <div class="plinko-leaderboard-title">&#127942; Top 10</div>
       <ol id="plinko-leaderboard-list"></ol>
-      <button type="button" class="btn-secondary" onclick="closePlinkoGameOver()">Close</button>
     </div>
   </div>
 </div>

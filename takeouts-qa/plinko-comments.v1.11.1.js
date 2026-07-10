@@ -19,6 +19,7 @@ const PLINKO_COMMENTS = [
   "You have won,\n but at what cost?",
   "I am gonna start charging you for this.",
   "If life is a soup, I am a fork.",
+  "Safety third.",
   "I can't go about my whole life thinking if you are AI or not.",
   "You are more than unique.\n You are non-fungible.",
   "By playing this continuously, you are contributing to wasting Microsoft's cloud resources."
