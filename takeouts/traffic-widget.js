@@ -29,15 +29,15 @@
   // double weight in the gauge average since that's the stretch that most
   // determines the real trip to College Park.
   const GAUGE_POINTS = [
-    { lat: 39.1466, lon: -77.2041, weight: 1 }, // 270 @ Ixtapalapa (Gaithersburg)
-    { lat: 39.0920, lon: -77.1746, weight: 1 }, // 270 @ Shanghai Taste (Rockville)
-    { lat: 39.0600, lon: -77.1467, weight: 1 }, // 270 @ Randolph Rd (Rockville)
-    { lat: 39.0334, lon: -77.1198, weight: 1 }, // 495 @ 270 spur (Bethesda)
-    { lat: 39.0421, lon: -77.0492, weight: 2 }, // 495 @ Georgia Ave (Silver Spring)
-    { lat: 39.0295, lon: -76.9718, weight: 2 }, // 495 @ New Hampshire Ave
-    { lat: 39.0335, lon: -76.9724, weight: 2 }, // 495 @ New Hampshire Ave exit (interchange)
-    { lat: 38.9958, lon: -76.9058, weight: 2 }, // 495 @ Kenilworth Ave (Greenbelt)
-    { lat: 38.9897, lon: -76.9378, weight: 1 }, // 95 @ College Park
+    { name: "270 @ Ixtapalapa (Gaithersburg)", lat: 39.1466, lon: -77.2041, weight: 1 },
+    { name: "270 @ Shanghai Taste (Rockville)", lat: 39.0920, lon: -77.1746, weight: 1 },
+    { name: "270 @ Randolph Rd (Rockville)", lat: 39.0600, lon: -77.1467, weight: 1 },
+    { name: "495 @ I-270 spur (Bethesda)", lat: 39.0334, lon: -77.1198, weight: 1 },
+    { name: "495 @ Georgia Ave (Silver Spring)", lat: 39.0421, lon: -77.0492, weight: 2 },
+    { name: "495 @ New Hampshire Ave", lat: 39.0295, lon: -76.9718, weight: 2 },
+    { name: "495 @ New Hampshire Ave exit (interchange)", lat: 39.0335, lon: -76.9724, weight: 2 },
+    { name: "495 @ Kenilworth Ave (Greenbelt)", lat: 38.9958, lon: -76.9058, weight: 2 },
+    { name: "95 @ College Park", lat: 38.9897, lon: -76.9378, weight: 1 },
   ];
 
   // The bar reads Good -> OK -> Bad left-to-right, but pct is a speed ratio
@@ -66,7 +66,41 @@
     const data = await res.json();
     const seg = data.flowSegmentData;
     if (!seg || !seg.freeFlowSpeed) return null;
-    return Math.min(1, seg.currentSpeed / seg.freeFlowSpeed);
+    // frc (functional road class) comes back with every flow query -- FRC0
+    // is motorway/limited-access (what 495/270/95 mainline should read as);
+    // anything higher means the point snapped to a ramp/arterial/local
+    // street instead. Kept so the checkpoint list can flag it.
+    return { ratio: Math.min(1, seg.currentSpeed / seg.freeFlowSpeed), frc: seg.frc || null };
+  }
+
+  // TomTom's functional road class labels, for the checkpoint list.
+  const FRC_LABELS = {
+    FRC0: "Motorway", FRC1: "Major road", FRC2: "Major road",
+    FRC3: "Secondary road", FRC4: "Local road", FRC5: "Local road",
+    FRC6: "Local road", FRC7: "Minor road",
+  };
+
+  // Kept around so the Checkpoint Details panel can render without
+  // re-fetching -- updateGauge() already hits all 9 points anyway.
+  let _lastPointResults = [];
+
+  function renderCheckpointsList() {
+    const el = document.getElementById("traffic-checkpoints-list");
+    if (!el) return;
+    el.innerHTML = _lastPointResults.map(p => {
+      const known = p.ratio !== null && p.ratio !== undefined;
+      const pct = known ? Math.round(p.ratio * 100) : null;
+      const frcLabel = p.frc ? (FRC_LABELS[p.frc] || p.frc) : "";
+      // A non-motorway frc is flagged -- likely means this point is
+      // reading a ramp/local segment instead of the highway it's named for.
+      const frcHtml = p.frc && p.frc !== "FRC0"
+        ? ` <span class="traffic-cp-frc-flag" title="Not reading as a motorway segment">&#9888; ${frcLabel}</span>`
+        : (frcLabel ? ` <span class="traffic-cp-frc">${frcLabel}</span>` : "");
+      return `<div class="traffic-checkpoint-row">
+        <span class="traffic-cp-name">${p.name}</span>
+        <span class="traffic-cp-stat">${known ? `${pct}%` : "No data"}${frcHtml}</span>
+      </div>`;
+    }).join("");
   }
 
   async function updateGauge() {
@@ -75,11 +109,15 @@
     try {
       const results = await Promise.all(GAUGE_POINTS.map(async p => {
         try {
-          return { ratio: await fetchFlowPoint(p), weight: p.weight || 1, status: null };
+          const flow = await fetchFlowPoint(p);
+          return { ratio: flow?.ratio ?? null, frc: flow?.frc ?? null, weight: p.weight || 1, status: null };
         } catch (err) {
-          return { ratio: null, weight: p.weight || 1, status: err.status || null };
+          return { ratio: null, frc: null, weight: p.weight || 1, status: err.status || null };
         }
       }));
+      _lastPointResults = GAUGE_POINTS.map((p, i) => ({ ...p, ...results[i] }));
+      renderCheckpointsList();
+
       const valid = results.filter(r => r.ratio !== null);
       if (!valid.length) {
         const status = results.find(r => r.status)?.status;
@@ -214,6 +252,16 @@
       const open = !toolsBtn.classList.contains("open");
       toolsBtn.classList.toggle("open", open);
       toolsPanel.classList.toggle("open", open);
+    });
+  }
+
+  const checkpointsBtn = document.getElementById("traffic-checkpoints-toggle-btn");
+  const checkpointsPanel = document.getElementById("traffic-checkpoints-panel");
+  if (checkpointsBtn && checkpointsPanel) {
+    checkpointsBtn.addEventListener("click", () => {
+      const open = !checkpointsBtn.classList.contains("open");
+      checkpointsBtn.classList.toggle("open", open);
+      checkpointsPanel.classList.toggle("open", open);
     });
   }
 

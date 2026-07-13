@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>::::/ Polls /::: GBF :::://///</title>
+  <meta name="theme-color" id="theme-color-meta" content="#fcf811">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:ital,wght@0,500;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="theme-switcher" id="theme-switcher">
+  <button class="theme-dark-btn" id="dark-toggle" title="Toggle dark mode">☾</button>
+  <div class="theme-swatch-current" id="theme-current" title="Change color"></div>
+  <div class="theme-options" id="theme-options">
+    <div class="theme-swatch" data-theme="yellow" style="background:#fcf811" title="Acid Yellow"></div>
+    <div class="theme-swatch" data-theme="green"  style="background:#39ff14" title="Acid Green"></div>
+    <div class="theme-swatch" data-theme="pink"   style="background:#fc16ac" title="Acid Pink"></div>
+    <div class="theme-swatch" data-theme="lightpink" style="background:#ffd1e8" title="Light Pink"></div>
+    <div class="theme-swatch" data-theme="cyan"   style="background:#04f2d6" title="Cyan"></div>
+    <div class="theme-swatch" data-theme="white"    style="background:#ffffff" title="White"></div>
+    <div class="theme-swatch" data-theme="offwhite" style="background:#fafcc4" title="Off White"></div>
+    <div class="theme-swatch" data-theme="grey"     style="background:#b8c4c6" title="Grey"></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <a href="../index.html" class="games-back-link">&larr; Games</a>
+  <header>
+    <div class="marquee-sign"><span class="marquee-friday-text">Polls</span></div>
+    <p class="site-label">Group Polling Tool</p>
+  </header>
+
+  <div class="stripe-divider" aria-hidden="true"></div>
+
+  <div class="mock-banner hidden" id="mock-banner">
+    Running in demo mode &mdash; no Google Sheet configured yet. See <code>config.js</code>.
+  </div>
+
+  <!-- CREATE POLL -->
+  <div class="card" id="create-view">
+    <div class="card-header">
+      <h2>New Poll</h2>
+    </div>
+    <div class="card-body">
+      <form id="create-form">
+        <div class="field-group">
+          <label class="field-label" for="question-input">Question</label>
+          <input type="text" id="question-input" placeholder="What should we do Friday?" required maxlength="200" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="vote-type-input">Voters Can Pick</label>
+          <select id="vote-type-input">
+            <option value="single">One Option</option>
+            <option value="multi">Multiple Options</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <span class="field-label">Options</span>
+          <div id="options-list" class="options-list"></div>
+          <button type="button" id="add-option-btn" class="btn btn-secondary" style="margin-top:0.6rem">+ Add Option</button>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="creator-input">Your Name <span class="field-optional">(optional)</span></label>
+          <input type="text" id="creator-input" placeholder="Anonymous" maxlength="60" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Poll</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- RECENT POLLS -->
+  <div class="card" id="recent-view">
+    <div class="card-header">
+      <h2>Recent Polls</h2>
+      <button type="button" id="refresh-recent-btn" class="btn-secondary-sm">Refresh</button>
+    </div>
+    <div class="card-body">
+      <ul id="recent-list" class="recent-list"></ul>
+      <div class="placeholder" id="recent-empty" style="display:none">No polls yet &mdash; create the first one above.</div>
+    </div>
+  </div>
+
+  <!-- SINGLE POLL: VOTE / RESULTS -->
+  <div class="card hidden" id="poll-view">
+    <div class="card-header">
+      <h2 id="poll-question">Loading&hellip;</h2>
+      <button type="button" id="back-btn" class="btn-secondary-sm">&larr; All Polls</button>
+    </div>
+    <div class="card-body">
+      <p id="poll-meta" class="poll-meta"></p>
+
+      <div id="share-row" class="share-row hidden">
+        <input type="text" id="share-link-input" class="share-link-input" readonly />
+        <button type="button" id="share-btn" class="btn-secondary-sm">Copy</button>
+      </div>
+
+      <form id="vote-form" class="hidden">
+        <div id="vote-options" class="vote-options"></div>
+        <button type="submit" class="btn btn-primary">Submit Vote</button>
+      </form>
+
+      <div id="results-view" class="results-view hidden">
+        <div id="results-list" class="results-list"></div>
+        <p id="results-total" class="results-total"></p>
+        <div class="poll-actions">
+          <button type="button" id="close-poll-btn" class="btn btn-secondary">Close Poll</button>
+        </div>
+      </div>
+
+      <div class="placeholder" id="poll-not-found" style="display:none">Poll not found. It may still be syncing &mdash; try refreshing in a moment.</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-stripe" aria-hidden="true"></div>
+    <span id="toast" class="toast hidden"></span>
+  </footer>
+
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

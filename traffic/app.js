@@ -47,8 +47,24 @@ async function fetchFlowPoint(point) {
   const data = await res.json();
   const seg = data.flowSegmentData;
   if (!seg || !seg.freeFlowSpeed) return null;
-  return Math.min(1, seg.currentSpeed / seg.freeFlowSpeed);
+  // frc (functional road class) comes back with every flow query --
+  // FRC0 is motorway/limited-access; higher numbers are ramps/arterials/
+  // local streets. Kept around (not just the ratio) so a point that's
+  // meant to be reading 495 itself but is actually snapping to a nearby
+  // ramp or frontage road is visible in the checkpoint list, not silently
+  // wrong.
+  return {
+    ratio: Math.min(1, seg.currentSpeed / seg.freeFlowSpeed),
+    frc: seg.frc || null,
+    currentSpeed: seg.currentSpeed,
+    freeFlowSpeed: seg.freeFlowSpeed,
+  };
 }
+
+// Per-point results from the most recent gauge fetch, kept around so the
+// "Show checkpoints on map" toggle can plot each of the 9 individually
+// without re-fetching -- updateGauge() already hits all 9 points anyway.
+let _lastPointResults = [];
 
 async function updateGauge() {
   const statusEl = document.getElementById("gauge-status");
@@ -58,11 +74,16 @@ async function updateGauge() {
   try {
     const results = await Promise.all(GAUGE_POINTS.map(async p => {
       try {
-        return { ratio: await fetchFlowPoint(p), weight: p.weight || 1, status: null };
+        const flow = await fetchFlowPoint(p);
+        return { ratio: flow?.ratio ?? null, frc: flow?.frc ?? null, currentSpeed: flow?.currentSpeed, freeFlowSpeed: flow?.freeFlowSpeed, weight: p.weight || 1, status: null };
       } catch (err) {
-        return { ratio: null, weight: p.weight || 1, status: err.status || null };
+        return { ratio: null, frc: null, weight: p.weight || 1, status: err.status || null };
       }
     }));
+    _lastPointResults = GAUGE_POINTS.map((p, i) => ({ ...p, ...results[i] }));
+    if (checkpointsVisible) renderCheckpoints();
+    renderGaugeCheckpointsList();
+
     const valid = results.filter(r => r.ratio !== null);
     if (!valid.length) {
       const status = results.find(r => r.status)?.status;
@@ -87,7 +108,8 @@ async function updateGauge() {
   }
 }
 
-let map, incidentLayer;
+let map, incidentLayer, checkpointLayer;
+let checkpointsVisible = false;
 
 function initMap() {
   map = L.map("map", {
@@ -110,9 +132,93 @@ function initMap() {
   }).addTo(map);
 
   incidentLayer = L.layerGroup().addTo(map);
+  checkpointLayer = L.layerGroup();
 
   map.fitBounds([[BBOX.south, BBOX.west], [BBOX.north, BBOX.east]]);
 }
+
+// Plots each of the 9 GAUGE_POINTS used to compute the "Right Now" average,
+// individually colored the same way the gauge classifies its overall score
+// -- so a driver can see WHICH stretch is actually slow, not just the
+// blended number.
+function checkpointFillColor(pct) {
+  if (pct === null) return getComputedStyle(document.documentElement).getPropertyValue("--text-dim").trim();
+  const varName = pct >= 92 ? "--green" : pct >= 60 ? "--yellow" : "--red";
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+}
+
+function renderCheckpoints() {
+  checkpointLayer.clearLayers();
+  _lastPointResults.forEach(p => {
+    const known = p.ratio !== null && p.ratio !== undefined;
+    const pct = known ? Math.round(p.ratio * 100) : null;
+    const marker = L.circleMarker([p.lat, p.lon], {
+      radius: 8,
+      color: "#0a0a0a",
+      weight: 2,
+      fillColor: checkpointFillColor(pct),
+      fillOpacity: 0.95,
+      className: "checkpoint-marker",
+    });
+    marker.bindPopup(
+      `<div class="checkpoint-popup"><span class="cp-name">${p.name}</span>${known ? `${pct}% of normal speed` : "No data"}</div>`
+    );
+    marker.addTo(checkpointLayer);
+  });
+}
+
+// TomTom's functional road class -- FRC0 is motorway/limited-access (what
+// 495/270/95 mainline should read as); everything above that is a ramp,
+// arterial, or local street. Shown per-checkpoint so a point that's meant
+// to be reading the highway itself but is actually snapping to a nearby
+// interchange ramp or frontage road is visible here instead of silently
+// skewing the average.
+const FRC_LABELS = {
+  FRC0: "Motorway", FRC1: "Major road", FRC2: "Major road",
+  FRC3: "Secondary road", FRC4: "Local road", FRC5: "Local road",
+  FRC6: "Local road", FRC7: "Minor road",
+};
+
+function renderGaugeCheckpointsList() {
+  const el = document.getElementById("gauge-checkpoints-list");
+  if (!el) return;
+  el.innerHTML = _lastPointResults.map(p => {
+    const known = p.ratio !== null && p.ratio !== undefined;
+    const pct = known ? Math.round(p.ratio * 100) : null;
+    const frcLabel = p.frc ? (FRC_LABELS[p.frc] || p.frc) : "";
+    // A non-motorway frc is flagged -- likely means this point is reading
+    // a ramp/local segment instead of the highway it's named for.
+    const frcFlag = p.frc && p.frc !== "FRC0" ? ` <span class="cp-frc-flag" title="Not reading as a motorway segment">&#9888; ${frcLabel}</span>` : (frcLabel ? ` <span class="cp-frc">${frcLabel}</span>` : "");
+    return `<div class="gauge-checkpoint-row">
+      <span class="cp-row-name">${p.name}</span>
+      <span class="cp-row-stat">${known ? `${pct}%` : "No data"}${frcFlag}</span>
+    </div>`;
+  }).join("");
+}
+
+function setCheckpointsVisible(visible) {
+  checkpointsVisible = visible;
+  const btn = document.getElementById("checkpoints-toggle");
+  if (visible) {
+    renderCheckpoints();
+    checkpointLayer.addTo(map);
+    btn.textContent = "Hide checkpoints";
+    btn.classList.add("active");
+  } else {
+    map.removeLayer(checkpointLayer);
+    btn.textContent = "Show 9 checkpoints on map";
+    btn.classList.remove("active");
+  }
+}
+
+document.getElementById("checkpoints-toggle").addEventListener("click", () => {
+  setCheckpointsVisible(!checkpointsVisible);
+});
+
+document.getElementById("gauge-readout-toggle").addEventListener("click", () => {
+  document.getElementById("gauge-checkpoints-panel").classList.toggle("open");
+  document.getElementById("gauge-readout-toggle").classList.toggle("open");
+});
 
 // TomTom iconCategory: 1 = Accident, 8 = Road Closed. Others (6 Jam,
 // 9 Road Works/Construction, etc.) are excluded. Each gets its own glyph

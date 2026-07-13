@@ -116,19 +116,125 @@ main {
 
 .gauge-readout {
   margin-top: 1rem;
+  width: 100%;
   display: flex;
   align-items: baseline;
   gap: 0.6rem;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .gauge-status {
   font-size: 1.3rem;
   font-weight: 700;
+  color: var(--text);
 }
 
 .gauge-detail {
   font-size: 0.8rem;
   color: var(--text-dim);
+}
+
+.gauge-readout-arrow {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.gauge-readout.open .gauge-readout-arrow { transform: rotate(180deg); }
+
+.gauge-checkpoints-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.gauge-checkpoints-panel.open {
+  max-height: 30rem;
+  margin-top: 0.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.gauge-checkpoints-list {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.5rem;
+}
+
+.gauge-checkpoint-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.3rem 0;
+  font-size: 0.78rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.gauge-checkpoint-row:first-child { border-top: none; }
+
+.cp-row-name { color: var(--text-dim); }
+
+.cp-row-stat {
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cp-frc {
+  font-weight: 400;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+}
+
+.cp-frc-flag {
+  font-weight: 700;
+  color: var(--yellow);
+  font-size: 0.72rem;
+}
+
+.checkpoints-toggle {
+  margin-top: 0.9rem;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.checkpoints-toggle:hover {
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+
+.checkpoints-toggle.active {
+  color: var(--text);
+  border-color: var(--text-dim);
+  background: rgba(255,255,255,0.06);
+}
+
+.checkpoint-marker {
+  border: 2px solid #0a0a0a;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0,0,0,0.6);
+}
+
+.checkpoint-popup {
+  font-size: 0.8rem;
+}
+
+.checkpoint-popup .cp-name {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.2rem;
 }
 
 /* Map */

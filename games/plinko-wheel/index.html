@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plinko / Wheel &mdash; GBF Games</title>
+  <meta name="theme-color" id="theme-color-meta" content="#fcf811">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:ital,wght@0,500;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="theme-switcher" id="theme-switcher">
+  <button class="theme-dark-btn" id="dark-toggle" title="Toggle dark mode">☾</button>
+  <div class="theme-swatch-current" id="theme-current" title="Change color"></div>
+  <div class="theme-options" id="theme-options">
+    <div class="theme-swatch" data-theme="white"      style="background:#ffffff" title="White"></div>
+    <div class="theme-swatch" data-theme="offwhite"   style="background:#fafcc4" title="Off White"></div>
+    <div class="theme-swatch" data-theme="wrinkled"   style="background:#f0ead6" title="Wrinkled Paper"></div>
+    <div class="theme-swatch" data-theme="newspaper"  style="background:#e8e4d2" title="Newspaper"></div>
+    <div class="theme-swatch" data-theme="lightpink"  style="background:#ffd1e8" title="Light Pink"></div>
+    <div class="theme-swatch" data-theme="yellow"     style="background:#fcf811" title="Acid Yellow"></div>
+    <div class="theme-swatch" data-theme="juicyyellow" style="background:#ffd500" title="Juicy Yellow"></div>
+    <div class="theme-swatch" data-theme="grey"       style="background:#b8c4c6" title="Grey"></div>
+    <div class="theme-swatch" data-theme="green"      style="background:#39ff14" title="Acid Green"></div>
+    <div class="theme-swatch" data-theme="emerald"    style="background:#10b981" title="Emerald Green"></div>
+    <div class="theme-swatch" data-theme="cyan"       style="background:#0abab5" title="Tiffany Blue"></div>
+    <div class="theme-swatch" data-theme="pink"       style="background:#fc16ac" title="Acid Pink"></div>
+  </div>
+</div>
+
+<div class="container">
+  <header class="games-header">
+    <a href="../index.html" class="games-back-link">&larr; Games</a>
+    <h1 class="games-page-title">Plinko / Wheel</h1>
+  </header>
+
+  <!-- DROP GAME -->
+  <div class="card" id="plinko-card">
+    <div class="card-body">
+      <button type="button" id="plinko-toggle-btn" class="rotation-toggle-btn plinko-toggle-btn open">
+        <span class="rotation-toggle-arrow">&#9660;</span>
+      </button>
+      <div id="plinko-panel" class="rotation-panel open">
+        <div class="plinko-controls">
+          <div id="plinko-mode-controls" class="plinko-mode-controls">
+            <label class="plinko-restaurant-toggle">
+              <input type="checkbox" id="plinko-restaurant-mode">
+              Restaurant Picker
+            </label>
+            <div class="plinko-control-group">
+              <span class="plinko-controls-label">Colors</span>
+              <input type="range" id="plinko-colors-slider" class="plinko-slider" min="1" max="0" value="0">
+              <span id="plinko-colored-count" class="plinko-slot-count"></span>
+            </div>
+            <div class="plinko-control-group">
+              <span class="plinko-controls-label">Balls</span>
+              <input type="range" id="plinko-balls-slider" class="plinko-slider" min="1" max="12" value="1">
+              <span id="plinko-ball-count" class="plinko-slot-count"></span>
+            </div>
+            <span class="plinko-payout-preview" id="plinko-debug-gold" title="Gold payout for the current Colors/Balls setting"></span>
+            <span class="plinko-clock" id="plinko-clock" title="Time left this round">3:00</span>
+            <span class="plinko-gold-count" id="plinko-gold-count" title="Golden balls won this session">&#x1F7E1; 0</span>
+            <button type="button" class="plinko-trophy-btn" id="plinko-trophy-btn" title="High Scores" onclick="openPlinkoLeaderboard()">&#127942;</button>
+            <button type="button" id="plinko-restart-btn" class="plinko-restart-btn" title="Restart board">&#8635;</button>
+          </div>
+          <button type="button" id="game-mode-toggle-btn" class="game-mode-toggle-btn" title="Wheel">&#8594;</button>
+        </div>
+        <div class="wheel-controls" id="wheel-controls">
+          <div class="wheel-accessory-row">
+            <select id="wheel-preset-select" class="wheel-preset-select">
+              <option value="">Load a preset…</option>
+              <optgroup label="Built-in">
+                <option value="restaurants">Restaurant Picker</option>
+                <option value="foodPopular">Food: Popular Picks</option>
+                <option value="foodMeat">Food: Meat Types</option>
+                <option value="event">Event</option>
+                <option value="names">Names</option>
+              </optgroup>
+              <optgroup label="My Presets" id="wheel-preset-custom-group"></optgroup>
+            </select>
+            <button type="button" id="wheel-edit-toggle-btn" class="wheel-accessory-btn wheel-edit-toggle-btn">
+              Edit Items <span class="rotation-toggle-arrow">&#9660;</span>
+            </button>
+            <button type="button" id="wheel-clear-btn" class="wheel-accessory-btn">Clear All</button>
+            <button type="button" id="wheel-shuffle-btn" class="wheel-accessory-btn">Shuffle</button>
+          </div>
+          <div class="rotation-panel wheel-edit-panel" id="wheel-edit-panel">
+            <div class="wheel-preset-actions">
+              <button type="button" id="wheel-save-preset-btn" class="btn-secondary" disabled>Save</button>
+              <button type="button" id="wheel-save-new-preset-btn" class="btn-secondary">Save As New…</button>
+              <button type="button" id="wheel-delete-preset-btn" class="btn-secondary" disabled>Delete</button>
+            </div>
+            <form id="wheel-item-form" class="wheel-item-form">
+              <input type="text" id="wheel-item-input" placeholder="Add an item…" maxlength="40">
+              <button type="submit" class="btn-secondary">Add</button>
+            </form>
+            <div id="wheel-item-list" class="wheel-item-list"></div>
+          </div>
+        </div>
+        <div class="plinko-board" id="plinko-board">
+          <canvas id="plinko-canvas"></canvas>
+          <div class="plinko-comment" id="plinko-comment"></div>
+          <div class="plinko-gold-flash-board" id="plinko-gold-flash-board"></div>
+        </div>
+        <div class="plinko-board wheel-board" id="wheel-board">
+          <div class="wheel-canvas-wrap" id="wheel-canvas-wrap">
+            <canvas id="wheel-canvas"></canvas>
+            <div class="wheel-pointer" aria-hidden="true"></div>
+          </div>
+          <div class="wheel-confetti" id="wheel-confetti"></div>
+          <div class="wheel-result" id="wheel-result"></div>
+        </div>
+        <div class="wheel-spin-bar" id="wheel-spin-bar">
+          <span id="wheel-only-controls" class="wheel-only-controls">
+            <button type="button" id="wheel-spin-btn" class="wheel-spin-btn">Spin</button>
+          </span>
+        </div>
+        <div class="resize-grip" id="plinko-board-grip" title="Drag to resize"></div>
+        <div id="plinko-restaurant-legend" class="rotation-panel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox plinko-gameover-lightbox" id="plinko-gameover-lightbox">
+  <div class="plinko-gameover-box" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="closePlinkoGameOver()">&times;</button>
+    <div class="plinko-gameover-title" id="plinko-gameover-title">TIME'S UP!</div>
+    <div class="plinko-gameover-score" id="plinko-gameover-score-row">Score: <span id="plinko-gameover-score">0</span></div>
+    <div id="plinko-gameover-entry">
+      <label class="plinko-gameover-label" for="plinko-gameover-initials">Enter your initials</label>
+      <input type="text" id="plinko-gameover-initials" class="plinko-gameover-initials" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
+      <div class="plinko-gameover-actions">
+        <button type="button" class="btn-primary" id="plinko-gameover-submit-btn" onclick="submitPlinkoScore()">Submit</button>
+        <button type="button" class="btn-secondary" onclick="closePlinkoGameOver()">Skip</button>
+      </div>
+    </div>
+    <div class="plinko-leaderboard" id="plinko-leaderboard" style="display:none">
+      <div class="plinko-leaderboard-title">&#127942; Top 10</div>
+      <ol id="plinko-leaderboard-list"></ol>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="plinko-comments.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

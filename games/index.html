@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBF Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:ital,wght@0,500;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hub-header">
+    <div class="hub-marquee"><span>GBF GAMES</span></div>
+    <p class="hub-subtitle">Polls, Plinko &amp; the Wheel of Fortune</p>
+  </header>
+
+  <nav class="hub-tabs" id="hub-tabs">
+    <button type="button" class="hub-tab active" data-game="polls">Polls</button>
+    <button type="button" class="hub-tab" data-game="plinko-wheel">Plinko / Wheel</button>
+  </nav>
+
+  <main class="hub-frame-wrap">
+    <iframe id="frame-polls" class="hub-frame active" title="Polls"></iframe>
+    <iframe id="frame-plinko-wheel" class="hub-frame" title="Plinko / Wheel"></iframe>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

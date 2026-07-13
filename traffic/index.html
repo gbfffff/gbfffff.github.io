@@ -15,7 +15,7 @@
   </header>
 
   <main>
-    <section class="card gauge-card">
+    <section class="card gauge-card" id="gauge-card">
       <div class="card-head">
         <h2>Right Now</h2>
         <span id="last-updated" class="last-updated"></span>
@@ -35,10 +35,17 @@
         </div>
       </div>
 
-      <div class="gauge-readout">
+      <button type="button" class="gauge-readout" id="gauge-readout-toggle">
         <span id="gauge-status" class="gauge-status">Loading&hellip;</span>
         <span id="gauge-detail" class="gauge-detail"></span>
+        <span class="gauge-readout-arrow" id="gauge-readout-arrow">&#9660;</span>
+      </button>
+
+      <div class="gauge-checkpoints-panel" id="gauge-checkpoints-panel">
+        <div class="gauge-checkpoints-list" id="gauge-checkpoints-list"></div>
       </div>
+
+      <button type="button" id="checkpoints-toggle" class="checkpoints-toggle">Show 9 checkpoints on map</button>
     </section>
 
     <section class="card map-card">

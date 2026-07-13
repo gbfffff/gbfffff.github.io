@@ -940,6 +940,16 @@
       color: #fff;
     }
 
+    .pill-qty {
+      background: var(--accent);
+      color: #000;
+      font-size: 0.72rem;
+      font-weight: 900;
+      padding: 0.05rem 0.35rem;
+      border-radius: 999px;
+    }
+    .selected-pill.is-taken .pill-qty { background: #fff; color: #cc0000; }
+
     .pill-remove {
       background: none;
       border: none;
@@ -1345,33 +1355,42 @@
       border-bottom: 2px solid #000;
     }
     .rating-item-row {
+      /* Name stacked above the tap-target row -- side-by-side left almost
+         no room for 10 comfortable touch targets, which is exactly what
+         made the old slider feel "sticky"/imprecise on a phone. */
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
+      flex-direction: column;
+      gap: 0.5rem;
       padding: 0.75rem 0;
       border-bottom: 1px solid #000;
     }
     .rating-item-row:last-child { border-bottom: none; }
-    .rating-item-name { font-weight: 700; color: var(--text); flex: 1; min-width: 0; }
-    .rating-item-input-wrap {
+    .rating-item-name { font-weight: 700; color: var(--text); }
+    .rating-item-input-wrap { width: 100%; }
+    .rating-item-scale {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.3rem;
+    }
+    .rating-item-btn {
+      height: 2.6rem;
+      border: 2px solid #000;
+      background: var(--bg);
+      color: #000;
+      font-weight: 700;
+      font-size: 0.85rem;
+      font-family: inherit;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      flex-shrink: 0;
-      width: 45%;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.1s ease, color 0.1s ease;
     }
-    .rating-item-input-wrap input[type="range"] {
-      width: 100%;
-      accent-color: #000;
-      cursor: pointer;
-    }
-    .rating-item-value {
-      font-weight: 900;
-      font-family: "Courier New", Courier, monospace;
-      min-width: 1.4rem;
-      text-align: right;
-    }
+    .rating-item-btn:active { transform: scale(0.94); }
+    .rating-item-btn.active { background: #000; color: var(--accent); }
+    body.dark .rating-item-btn { border-color: var(--ink); color: var(--ink); }
+    body.dark .rating-item-btn.active { background: var(--ink); color: var(--bg); }
 
 
 
@@ -1416,13 +1435,6 @@
         #000 0px, #000 14px,
         var(--accent) 14px, var(--accent) 28px
       );
-      animation: stripe-scroll 0.37s linear infinite;
-      animation-play-state: paused;
-    }
-    .stripe-divider.stripe-running { animation-play-state: running; }
-    @keyframes stripe-scroll {
-      from { background-position-x: 0; }
-      to   { background-position-x: 28px; }
     }
 
     /* ── Traffic card ── */
@@ -1519,6 +1531,25 @@
       font-weight: 700;
       color: var(--text);
     }
+
+    #traffic-checkpoints-toggle-btn { margin-top: 0.75rem; width: 100%; box-sizing: border-box; }
+
+    .traffic-checkpoints-list { padding: 0.75rem 0; }
+    .traffic-checkpoint-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem;
+      padding: 0.3rem 0;
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border-2, rgba(0,0,0,0.12));
+    }
+    .traffic-checkpoint-row:first-child { border-top: none; }
+    .traffic-cp-name { color: var(--text-muted); }
+    .traffic-cp-stat { font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+    .traffic-cp-frc { font-weight: 400; color: var(--text-muted); font-size: 0.72rem; }
+    .traffic-cp-frc-flag { font-weight: 700; color: #cc9900; font-size: 0.72rem; }
+    body.dark .traffic-checkpoint-row { border-color: var(--ink); }
 
     .traffic-map-panel { padding: 0; }
     .traffic-map-toolbar {
@@ -1682,7 +1713,10 @@
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.7);
-      z-index: 900;
+      /* Above Leaflet's own default control/pane z-indices (1000) -- the
+         traffic map's zoom buttons were otherwise rendering on top of any
+         open report/food-chart/item-detail modal. */
+      z-index: 2000;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
@@ -1808,6 +1842,20 @@
     body.dark .food-chart-page-btn.active { background: var(--ink); color: var(--bg); }
 
     /* ── Item detail: rating trend chart ── */
+    .item-detail-back-link {
+      display: block;
+      margin: 0 0 0.75rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+      font-family: inherit;
+    }
+    .item-detail-back-link:hover { color: var(--text); }
     .item-detail-stats {
       display: flex;
       flex-wrap: wrap;
@@ -1935,7 +1983,7 @@
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.93);
-      z-index: 1000;
+      z-index: 2000;
       align-items: center;
       justify-content: center;
     }
@@ -2006,7 +2054,13 @@
       border-radius: 10px;
       box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.6);
       padding: 3.5rem 3.5rem 3rem;
-      min-width: 420px;
+      /* Fixed width (not just a minimum) -- a shrink-to-fit box would still
+         narrow itself for a short name and widen for a long one, which is
+         the exact box-size-keeps-changing behavior the fixed-height
+         .random-pick-name box below was already trying to avoid. max-width
+         is just the small-viewport escape hatch. 525px = 420px + 25%, sized
+         up so it reads comfortably next to a 2-column menu panel layout. */
+      width: 525px;
       max-width: 90vw;
       text-align: center;
     }
@@ -2098,6 +2152,51 @@
       60%  { transform: scale(1.08); }
       100% { transform: scale(1); }
     }
+
+    /* ── Driver This Week ── */
+    .driver-card-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.5rem 1.75rem 1.75rem 1.25rem;
+    }
+    .driver-edit-btn {
+      background: none; border: none; cursor: pointer;
+      padding: 0.15rem;
+      opacity: 0.5; line-height: 1;
+      color: var(--text); transition: opacity 0.15s;
+      width: 1.8rem; height: 1.8rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .driver-edit-btn:hover { opacity: 1; }
+    /* Same stamped treatment the Drop Game's win comment / Wheel result use
+       (thick stroke + a directional block drop-shadow, not a symmetric
+       outline) -- uppercase, bold, theme-tinted fill so it stays readable
+       against a --bg that's identical to plain --accent for every theme. */
+    .driver-name-stamp {
+      font-size: 2.2rem;
+      font-weight: 900;
+      line-height: 1.3;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--theme-arrow-light, var(--accent));
+      -webkit-text-stroke: 4px #000;
+      paint-order: stroke fill;
+      text-shadow:
+        8px 8px 0 #000,
+        12px 8px 0 #000,
+        8px 12px 0 #000,
+        12px 12px 0 #000,
+        4px 8px 0 #000,
+        8px 4px 0 #000,
+        4px 4px 0 #000,
+        12px 4px 0 #000,
+        4px 12px 0 #000;
+      text-align: center;
+      overflow-wrap: break-word;
+      max-width: 100%;
+    }
     .random-pick-stats-link {
       display: block;
       margin: 0.3rem auto 1.1rem;
@@ -2142,127 +2241,6 @@
     body.dark .random-pick-actions .btn-primary:hover,
     body.dark .random-pick-actions .btn-secondary:hover {
       box-shadow: 5px 5px 0 var(--ink);
-    }
-
-    /* ── Drop Game round-over / high score lightbox ── */
-    .plinko-gameover-lightbox { background: rgba(0, 0, 0, 0.85); }
-    .plinko-gameover-box {
-      position: relative;
-      background: var(--bg);
-      border: 3px solid #000;
-      border-radius: 10px;
-      box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.6);
-      padding: 2.5rem 3rem;
-      min-width: 320px;
-      max-width: 90vw;
-      text-align: center;
-    }
-    body.dark .plinko-gameover-box { border-color: var(--ink); box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.15); }
-    .plinko-gameover-title {
-      font-size: 2rem;
-      font-weight: 900;
-      font-family: "EB Garamond", Garamond, Georgia, serif;
-      color: var(--theme-arrow, var(--accent));
-      -webkit-text-stroke: 2px #000;
-      paint-order: stroke fill;
-      text-shadow: 2px 2px 0 #000, -2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000;
-      margin-bottom: 0.5rem;
-    }
-    .plinko-gameover-score {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 1.5rem;
-    }
-    .plinko-gameover-score span { color: var(--gold, var(--theme-arrow)); font-size: 1.4rem; }
-    .plinko-gameover-label {
-      display: block;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin-bottom: 0.6rem;
-    }
-    /* Old-school arcade high-score entry -- 3 wide, centered, uppercase
-       monospace letters, like a coin-op marquee. */
-    .plinko-gameover-initials {
-      display: block;
-      width: 6rem;
-      margin: 0 auto 1.25rem;
-      padding: 0.5rem;
-      border: 2px solid #000;
-      border-radius: 6px;
-      background: var(--bg);
-      color: var(--text);
-      font-family: "Courier New", monospace;
-      font-size: 2rem;
-      font-weight: 900;
-      letter-spacing: 0.4em;
-      text-align: center;
-      text-transform: uppercase;
-    }
-    body.dark .plinko-gameover-initials { border-color: var(--ink); }
-    .plinko-gameover-actions { display: flex; gap: 0.75rem; justify-content: center; margin-top: 0.5rem; }
-    /* Bigger, bolder than plain form buttons -- same pill/offset-shadow
-       treatment as the Random Pick lightbox's Add/Pick Again, since this
-       is the payoff moment of a full round, not a routine form action. */
-    .plinko-gameover-actions .btn-primary,
-    .plinko-gameover-actions .btn-secondary {
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 0.7rem 1.5rem;
-      border: 2px solid #000;
-      border-radius: 999px;
-      box-shadow: 3px 3px 0 #000;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .plinko-gameover-actions .btn-primary:hover,
-    .plinko-gameover-actions .btn-secondary:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 5px 5px 0 #000;
-    }
-    .plinko-gameover-actions .btn-primary:disabled {
-      transform: none;
-      box-shadow: 3px 3px 0 #000;
-      opacity: 0.6;
-    }
-    body.dark .plinko-gameover-actions .btn-primary,
-    body.dark .plinko-gameover-actions .btn-secondary {
-      border-color: var(--ink);
-      box-shadow: 3px 3px 0 var(--ink);
-    }
-    body.dark .plinko-gameover-actions .btn-primary:hover,
-    body.dark .plinko-gameover-actions .btn-secondary:hover {
-      box-shadow: 5px 5px 0 var(--ink);
-    }
-    .plinko-leaderboard-title {
-      font-size: 1.1rem;
-      font-weight: 900;
-      margin-bottom: 0.75rem;
-    }
-    #plinko-leaderboard-list {
-      list-style: none;
-      margin: 0 0 1.25rem;
-      padding: 0;
-      min-width: 14rem;
-      text-align: left;
-    }
-    #plinko-leaderboard-list li {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: 0.3rem 0.5rem;
-      font-weight: 700;
-      font-family: "Courier New", monospace;
-      border-bottom: 1px solid var(--border);
-    }
-    #plinko-leaderboard-list li:nth-child(1) { color: var(--theme-arrow, var(--accent)); font-size: 1.05em; }
-    .plinko-leaderboard-name { letter-spacing: 0.2em; }
-    .plinko-leaderboard-empty, .plinko-leaderboard-loading {
-      justify-content: center !important;
-      color: var(--text-muted);
-      font-family: inherit !important;
-      font-weight: 400 !important;
     }
 
     /* ── Menu panel ── */
@@ -2394,6 +2372,19 @@
       border-bottom: 2px solid #000;
     }
     .menu-panel-shortcuts:empty { display: none; }
+    .menu-panel-search-wrap {
+      flex: 1 1 11rem;
+      min-width: 8rem;
+      margin-bottom: 0.6rem;
+    }
+    .menu-panel-search {
+      width: 100%;
+      margin: 0;
+      padding: 0.5rem 0.9rem !important;
+      border-radius: 999px !important;
+      font-family: "EB Garamond", Garamond, Georgia, serif;
+      font-size: 0.95rem;
+    }
     .menu-shortcut-btn {
       position: relative;
       background: var(--bg);
@@ -3036,702 +3027,6 @@
       );
     }
 
-    /* ── Drop Game (Plinko) ── */
-    #plinko-card { border-bottom: none; }
-    #plinko-card.plinko-card-open { border-bottom: 2px solid #000; }
-    .plinko-toggle-btn {
-      justify-content: center;
-      border-top: none;
-      width: 100%;
-      padding: 0.25rem 0.85rem;
-    }
-    /* Plain downward triangle, no glow, no badge -- filled with a darker,
-       same-hue tone of the theme's accent (--accent is literally identical
-       to --bg for every theme, so the raw accent color is invisible here;
-       --theme-arrow, computed in app.js, keeps the tone but pulls it into
-       a contrasting range). */
-    .plinko-toggle-btn .rotation-toggle-arrow {
-      font-size: 1.4em;
-      display: inline-block;
-      color: var(--theme-arrow, var(--accent));
-    }
-    /* Light blue (cyan) theme's computed tone still read a bit flat --
-       this hand-picked darker teal is what was actually asked for. */
-    [data-theme="cyan"] .plinko-toggle-btn .rotation-toggle-arrow { color: #3f9bab; }
-    .plinko-controls {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.6rem 0.85rem;
-      border-bottom: 2px solid #000;
-    }
-    .plinko-mode-controls {
-      display: flex;
-      flex: 1;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem 1.25rem;
-      min-width: 0;
-    }
-    .plinko-control-group {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .game-mode-toggle-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      width: 1.9rem;
-      height: 1.9rem;
-      background: none;
-      border: 2px solid #000;
-      border-radius: 999px;
-      color: var(--text);
-      font-size: 1rem;
-      font-weight: 900;
-      line-height: 1;
-      cursor: pointer;
-      opacity: 0.8;
-      transition: opacity 0.1s, background 0.1s, color 0.1s, transform 0.2s ease;
-      font-family: inherit;
-    }
-    .game-mode-toggle-btn:hover { opacity: 1; background: #000; color: var(--accent); }
-    /* Two modes share the same card -- [data-mode] on the card picks
-       which board/control set is visible. */
-    #plinko-card[data-mode="plinko"] #wheel-controls,
-    #plinko-card[data-mode="plinko"] #wheel-board,
-    #plinko-card[data-mode="plinko"] #wheel-spin-bar { display: none; }
-    #plinko-card:not([data-mode="plinko"]) #plinko-mode-controls,
-    #plinko-card:not([data-mode="plinko"]) #plinko-board,
-    #plinko-card:not([data-mode="plinko"]) #plinko-restaurant-legend { display: none; }
-    #wheel-only-controls { display: inline-flex; align-items: stretch; gap: 0.6rem; flex: 1; }
-    .plinko-controls-label {
-      font-size: 0.7rem;
-      font-weight: 900;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-    .plinko-step-btn {
-      width: 1.6rem;
-      height: 1.6rem;
-      border: 2px solid #000;
-      background: var(--bg);
-      color: #000;
-      font-weight: 900;
-      font-size: 0.9rem;
-      line-height: 1;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .plinko-step-btn:hover { background: #000; color: var(--accent); }
-    .plinko-restart-btn {
-      /* Own full-width row, right under the gold count/trophy line above --
-         flex-basis:100% forces a wrap in this wrapping flex row regardless
-         of container width. */
-      flex: 1 0 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      align-self: flex-end;
-      width: 2.6rem;
-      height: 2.6rem;
-      margin-left: auto;
-      /* Theme-accent background instead of solid black (read as too heavy)
-         -- --accent is literally identical to --bg for every theme though,
-         so the icon needs --theme-arrow (a real, guaranteed-visible tone)
-         rather than plain --accent, or it'd vanish against its own fill. */
-      background: var(--accent);
-      border: 2px solid #000;
-      border-radius: 8px;
-      box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
-      color: var(--theme-arrow, #000);
-      font-size: 1.4rem;
-      font-weight: 900;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-      font-family: inherit;
-    }
-    .plinko-restart-btn:hover {
-      background: #000;
-      color: var(--accent);
-    }
-    body.dark .plinko-restart-btn { border-color: var(--ink); box-shadow: 3px 3px 0 rgba(255, 255, 255, 0.15); }
-    body.dark .plinko-restart-btn:hover { background: var(--ink); color: var(--bg); }
-    .plinko-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 7rem;
-      height: 4px;
-      background: #000;
-      cursor: pointer;
-    }
-    .plinko-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 1.1rem;
-      height: 1.1rem;
-      background: var(--accent);
-      border: 2px solid #000;
-      cursor: pointer;
-    }
-    .plinko-slider::-moz-range-thumb {
-      width: 1.1rem;
-      height: 1.1rem;
-      background: var(--accent);
-      border: 2px solid #000;
-      cursor: pointer;
-    }
-    .plinko-slider::-moz-range-track { background: #000; height: 4px; }
-    .plinko-slot-count {
-      min-width: 1.5rem;
-      text-align: center;
-      font-weight: 900;
-      font-size: 0.85rem;
-    }
-    .plinko-restaurant-toggle {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.7rem;
-      font-weight: 900;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      cursor: pointer;
-    }
-    .plinko-restaurant-toggle input { accent-color: #000; width: 15px; height: 15px; cursor: pointer; }
-    .plinko-clock {
-      font-size: 1rem;
-      font-weight: 900;
-      letter-spacing: 0.04em;
-      font-variant-numeric: tabular-nums;
-      color: var(--text-muted);
-    }
-    .plinko-gold-count {
-      position: relative;
-      font-size: 1rem;
-      font-weight: 900;
-      letter-spacing: 0.04em;
-      font-variant-numeric: tabular-nums;
-      color: #a07800;
-    }
-    /* High-score lookup, available any time (not just at game-over) --
-       matches the other small icon controls in this row. */
-    .plinko-trophy-btn {
-      background: none;
-      border: none;
-      font-size: 1rem;
-      line-height: 1;
-      padding: 0;
-      cursor: pointer;
-      transition: transform 0.15s ease;
-    }
-    .plinko-trophy-btn:hover { transform: scale(1.15); }
-    /* Live preview of the current Colors/Balls payout, shown to everyone
-       for transparency -- how much a hit is actually worth right now. */
-    .plinko-payout-preview {
-      font-size: 0.68rem;
-      font-weight: 700;
-      font-family: "Courier New", monospace;
-      color: var(--text);
-      border: 1px solid #000;
-      border-radius: 4px;
-      padding: 0.05rem 0.35rem;
-    }
-    body.dark .plinko-payout-preview { border-color: var(--ink); }
-    /* A quick "+42" pop that floats up and fades out right when gold is
-       actually awarded -- the badge's own number updating silently was
-       easy to miss in the moment. */
-    .plinko-gold-flash {
-      position: absolute;
-      left: 50%;
-      bottom: 100%;
-      transform: translateX(-50%);
-      white-space: nowrap;
-      color: #ffc400;
-      font-weight: 900;
-      font-size: 0.95rem;
-      -webkit-text-stroke: 1.5px #000;
-      paint-order: stroke fill;
-      pointer-events: none;
-      animation: plinko-gold-flash-pop 1.1s ease-out forwards;
-    }
-    @keyframes plinko-gold-flash-pop {
-      0%   { opacity: 0; transform: translate(-50%, 0) scale(0.7); }
-      15%  { opacity: 1; transform: translate(-50%, -4px) scale(1.15); }
-      30%  { transform: translate(-50%, -6px) scale(1); }
-      75%  { opacity: 1; }
-      100% { opacity: 0; transform: translate(-50%, -22px) scale(1); }
-    }
-    /* Big version, centered over the peg field itself -- the small badge
-       flash near the controls was too easy to miss (or off-screen) on a
-       wide desktop layout. */
-    .plinko-gold-flash-board {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-      z-index: 15;
-    }
-    .plinko-gold-flash-big {
-      color: #ffc400;
-      font-weight: 900;
-      font-family: "EB Garamond", Garamond, Georgia, serif;
-      font-size: min(4rem, 14cqh, 20cqw);
-      -webkit-text-stroke: 3px #000;
-      paint-order: stroke fill;
-      text-shadow: 3px 3px 0 #000, -3px 3px 0 #000, 3px -3px 0 #000, -3px -3px 0 #000;
-      animation: plinko-gold-flash-board-pop 1.4s ease-out forwards;
-    }
-    @keyframes plinko-gold-flash-board-pop {
-      0%   { opacity: 0; transform: scale(0.6); }
-      15%  { opacity: 1; transform: scale(1.15); }
-      30%  { transform: scale(1); }
-      75%  { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(1.1) translateY(-30px); }
-    }
-    /* Compact, horizontal chip row (wraps as needed) sitting right under
-       the board, instead of a tall one-per-line list. */
-    #plinko-restaurant-legend.rotation-panel.open {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.5rem 0.6rem;
-    }
-    .plinko-legend-row {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.2rem 0.55rem;
-      font-size: 0.78rem;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-    }
-    .plinko-legend-num {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 1.6rem;
-      height: 1.6rem;
-      flex-shrink: 0;
-      background: #000;
-      color: var(--accent);
-      font-weight: 900;
-      font-size: 0.8rem;
-    }
-    /* ── Wheel of Fortune ── */
-    /* ── Wheel/Roulette controls ──
-       One clear hierarchy: a compact accessory row up top (preset picker,
-       Edit Items, Shuffle, Clear All -- the tucked-away extras), the
-       collapsible edit panel, and then the big Spin bar LAST so the
-       primary action is docked directly against the wheel below it. */
-    .wheel-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-      padding: 0.5rem 0.85rem;
-      border-bottom: 2px solid #000;
-    }
-    .wheel-accessory-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    /* Identical fixed-height boxes, one shared font -- the select is
-       OS-rendered, so a hard height is the only reliable way to keep it
-       and the buttons the same size. Kept compact (not the full-size Spin
-       button) since these are the tucked-away extras, not the primary
-       action. */
-    .wheel-preset-select, .wheel-accessory-btn {
-      height: 1.9rem;
-      box-sizing: border-box;
-      padding: 0 0.7rem;
-      border: 2px solid #000;
-      border-radius: 8px;
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.68rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .wheel-preset-select { width: 10rem; padding-right: 2.1rem; }
-    .wheel-accessory-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-    .wheel-accessory-btn:hover:not(:disabled) { background: #000; color: var(--accent); }
-    .wheel-accessory-btn:disabled { opacity: 0.4; cursor: default; }
-
-    /* Clear All -- a transparent red wash (destructive action), solid red
-       + yellow text on hover so it reads as a real warning right before
-       you click it. */
-    #wheel-clear-btn { background-color: color-mix(in srgb, var(--red) 30%, transparent); }
-    #wheel-clear-btn:hover:not(:disabled) { background-color: var(--red); color: #ffe100; }
-
-    /* Shuffle -- double width (it's the more-used, non-destructive
-       action) and filled with a darker shade of the theme color; reverts
-       to the plain default look on hover instead of the usual invert, so
-       hovering reads as "back to normal" rather than another accent. */
-    #wheel-shuffle-btn {
-      flex-grow: 2;
-      background-color: color-mix(in srgb, var(--theme-arrow, #667) 80%, black 20%);
-      color: #fff;
-      border-color: color-mix(in srgb, var(--theme-arrow, #667) 80%, black 20%);
-    }
-    #wheel-shuffle-btn:hover:not(:disabled) {
-      background-color: var(--bg);
-      color: var(--text);
-      border-color: #000;
-    }
-    body.dark #wheel-shuffle-btn:hover:not(:disabled) { border-color: var(--ink); }
-
-    .wheel-edit-panel { width: 100%; }
-    .wheel-edit-panel.open {
-      padding: 0.6rem 0.5rem;
-      background-image: repeating-linear-gradient(45deg, #000 0px, #000 24px, var(--accent) 24px, var(--accent) 48px);
-    }
-    .wheel-preset-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem; }
-    /* Solid bg (not .btn-secondary's transparent) -- these sit on the
-       edit panel's striped background and would be unreadable otherwise. */
-    .wheel-edit-panel .btn-secondary {
-      padding: 0.45rem 0.9rem;
-      font-family: inherit;
-      font-size: 0.72rem;
-      font-weight: 700;
-      border-radius: 8px;
-      background: var(--bg);
-      cursor: pointer;
-    }
-    .wheel-edit-panel .btn-secondary:disabled { opacity: 0.45; cursor: default; }
-    .wheel-item-form { display: flex; align-items: center; gap: 0.5rem; }
-    .wheel-item-form input[type="text"] {
-      width: 12rem;
-      max-width: 40vw;
-      padding: 0.4rem 0.6rem;
-      border: 2px solid #000;
-      border-radius: 8px;
-      background: var(--bg);
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.82rem;
-    }
-    .wheel-item-list {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.4rem;
-      flex: 1;
-      min-width: 0;
-      margin-top: 0.75rem;
-    }
-    .wheel-item-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.25rem 0.3rem 0.25rem 0.7rem;
-      border: 2px solid #000;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      background: #d3d3d3;
-      color: #000;
-    }
-    .wheel-item-text {
-      outline: none;
-      min-width: 0.6rem;
-      cursor: text;
-    }
-    .wheel-item-text:focus { background: color-mix(in srgb, var(--accent) 35%, transparent); }
-    .wheel-item-chip-remove {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 1.1rem;
-      height: 1.1rem;
-      border: none;
-      border-radius: 50%;
-      background: #000;
-      color: var(--accent);
-      font-size: 0.7rem;
-      font-weight: 900;
-      line-height: 1;
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    /* The big Spin bar now sits BELOW the wheel itself (not above, with the
-       rest of the controls) -- its own padding since it's no longer inside
-       .wheel-controls's padded column. */
-    .wheel-spin-bar { display: flex; width: 100%; padding: 0.6rem 0.85rem; border-top: 2px solid #000; }
-    body.dark .wheel-spin-bar { border-color: var(--ink); }
-    .wheel-only-controls { display: flex; flex: 1; align-items: stretch; gap: 0.6rem; }
-    .wheel-spin-btn {
-      flex: 1;
-      min-height: 5.5rem;
-      border: 2px solid #000;
-      border-radius: 999px;
-      background: #000;
-      color: #ffc400;
-      font-family: inherit;
-      font-weight: 900;
-      font-size: 2.2rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .wheel-spin-btn:disabled { opacity: 0.4; cursor: default; }
-    /* Same diagonal-stripe hover as the site's other submit buttons; a
-       subtle black halo keeps the label legible over the stripes. */
-    .wheel-spin-btn:hover:not(:disabled) {
-      color: #fff;
-      background-color: var(--accent);
-      background-image: repeating-linear-gradient(
-        45deg,
-        #000 0px, #000 6px,
-        var(--accent) 6px, var(--accent) 14px
-      );
-      text-shadow: 0 0 8px #000, 0 0 3px #000;
-    }
-    /* #wheel-board (ID) so this beats .plinko-board's display:block --
-       same specificity as a class, but .plinko-board is declared later in
-       this file and would otherwise win and silently break centering. */
-    #wheel-board {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .wheel-canvas-wrap { position: relative; line-height: 0; }
-    .wheel-canvas-wrap canvas { display: block; max-width: 100%; max-height: 100%; cursor: pointer; }
-    /* A hinged flipper, not a flat triangle -- pivots at the top (its
-       transform-origin) and flicks down/back via .flick whenever the spin
-       animation carries a rim pin past it, like a real wheel's clicker.
-       Tip only grazes the rim (a couple px) rather than poking deep into
-       the wheel; pivot sits clear above it. */
-    /* Tip lands at y=20px (top + height), matching the pins' radius (the
-       pie edge, pieR = r-20 in drawPockets) -- so the flapper reaches
-       across the outer bleed ring and contacts exactly where the pins
-       physically are. */
-    .wheel-pointer {
-      position: absolute;
-      top: -40px;
-      left: 50%;
-      width: 22px;
-      /* top + height must land at 20px -- that's where the pins actually
-         are (pieR = r - 20 in drawPockets), so the tip reaches the rim
-         instead of stopping short in mid-air. */
-      height: 60px;
-      transform: translateX(-50%);
-      transform-origin: 50% 6%;
-      z-index: 5;
-      pointer-events: none;
-    }
-    .wheel-pointer::before {
-      content: "";
-      position: absolute;
-      inset: 8px 0 0 0;
-      /* The glow lives IN the fill itself, not radiating off the shape --
-         a bright core blooming out into a darker edge, plus an inset
-         highlight so the surface itself reads as lit up rather than the
-         triangle having a colored shadow behind/around it. The three stops
-         are set as custom properties by updatePointerGlow() (JS) -- always
-         the current theme accent's color-wheel complement, not a fixed
-         hardcoded red, with a sane fallback if JS hasn't run yet. */
-      background: radial-gradient(circle at 50% 30%,
-        var(--pointer-core, #fff2b0) 0%,
-        var(--pointer-mid, #ff8a3d) 35%,
-        var(--pointer-mid, #ff4d4d) 60%,
-        var(--pointer-edge, #b30000) 100%);
-      box-shadow: inset 0 0 10px 2px color-mix(in srgb, var(--pointer-core, #fff2b0) 70%, white);
-      clip-path: polygon(50% 100%, 6% 10%, 94% 10%);
-      border-radius: 2px 2px 6px 6px;
-    }
-    .wheel-pointer::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      background: #b30000;
-      border: 2px solid #000;
-    }
-    @keyframes wheel-pointer-flick {
-      0%   { transform: translateX(-50%) rotate(0deg); }
-      35%  { transform: translateX(-50%) rotate(-24deg); }
-      100% { transform: translateX(-50%) rotate(0deg); }
-    }
-    .wheel-pointer.flick { animation: wheel-pointer-flick 0.15s ease-out; }
-    /* Same "stamped" look as the Drop Game's winning comment (gold fill,
-       thick black stroke + drop-shadow stack) -- no background box needed,
-       reads fine over any wedge color. */
-    .wheel-result {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
-      width: 96%;
-      max-width: 96%;
-      box-sizing: border-box;
-      padding: 0 1.5rem;
-      color: #ffc400;
-      font-weight: 900;
-      font-size: min(4rem, 12cqh, 24cqw);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      line-height: 1.3;
-      text-align: center;
-      overflow-wrap: break-word;
-      word-break: break-word;
-      -webkit-text-stroke: 6px #000;
-      paint-order: stroke fill;
-      text-shadow:
-        12px 12px 0 #000,
-        18px 12px 0 #000,
-        12px 18px 0 #000,
-        18px 18px 0 #000,
-        6px 12px 0 #000,
-        12px 6px 0 #000,
-        6px 6px 0 #000,
-        18px 6px 0 #000,
-        6px 18px 0 #000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-      z-index: 20;
-    }
-    .wheel-result.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    .wheel-confetti {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 15;
-    }
-    /* Named apart from the pre-existing .confetti-piece easter egg (used
-       in the header box, animated via Web Animations JS, not CSS) so the
-       two features never collide. */
-    .wheel-confetti-piece {
-      position: absolute;
-      top: -20px;
-      width: 8px;
-      height: 14px;
-      opacity: 1;
-      animation-name: wheel-confetti-fall;
-      animation-timing-function: linear;
-      animation-fill-mode: forwards;
-    }
-    /* A dashed perforation line near one edge, like a movie ticket stub. */
-    .wheel-confetti-piece::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 30%;
-      border-left: 1px dashed rgba(0, 0, 0, 0.45);
-    }
-    @keyframes wheel-confetti-fall {
-      0%   { transform: translate(0, 0) rotate(0deg); }
-      100% { transform: translate(var(--confetti-drift), var(--confetti-fall)) rotate(var(--confetti-spin)); }
-    }
-    .plinko-board {
-      position: relative;
-      display: block;
-      height: 540px;
-      min-height: 290px;
-      max-height: 3000px;
-      overflow: hidden;
-      resize: vertical;
-      background: var(--bg);
-      container-type: size;
-    }
-    /* Wheel gets a taller default board (+50% over the Drop Game's 540px)
-       so it renders bigger out of the box, without anyone having to drag
-       the resize grip first. Still just the starting height -- the same
-       grip still resizes it same as Drop Game's board. */
-    #wheel-board { height: 600px; }
-    /* Same hollow-stroke-with-drop-shadow-backing technique as the menu's
-       category labels (.mpi-section-label) -- readable on any background
-       without needing its own box. Lose uses the theme's own accent color;
-       win overrides to gold and goes bigger. */
-    .plinko-comment {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
-      width: 96%;
-      max-width: 96%;
-      box-sizing: border-box;
-      padding: 0 1.5rem;
-      color: var(--accent);
-      font-weight: 900;
-      font-size: min(2.25rem, 6.75cqh, 15cqw);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      line-height: 1.3;
-      text-align: center;
-      white-space: pre-line;
-      overflow-wrap: break-word;
-      word-break: break-word;
-      -webkit-text-stroke: 4px #000;
-      paint-order: stroke fill;
-      text-shadow:
-        8px 8px 0 #000,
-        12px 8px 0 #000,
-        8px 12px 0 #000,
-        12px 12px 0 #000,
-        4px 8px 0 #000,
-        8px 4px 0 #000,
-        4px 4px 0 #000,
-        12px 4px 0 #000,
-        4px 12px 0 #000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-      z-index: 20;
-    }
-    .plinko-comment.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    .plinko-comment.win {
-      color: #ffc400;
-      font-size: min(4rem, 12cqh, 24cqw);
-      -webkit-text-stroke: 6px #000;
-      text-shadow:
-        12px 12px 0 #000,
-        18px 12px 0 #000,
-        12px 18px 0 #000,
-        18px 18px 0 #000,
-        6px 12px 0 #000,
-        12px 6px 0 #000,
-        6px 6px 0 #000,
-        18px 6px 0 #000,
-        6px 18px 0 #000;
-    }
-    #plinko-canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      cursor: grab;
-      touch-action: none;
-    }
-    #plinko-canvas.dragging { cursor: grabbing; }
 
     footer button {
       background: none; border: none;
@@ -3819,3 +3114,140 @@
       .wheel-shuffle-btn { flex: 2 1 64%; }
       .wheel-spin-btn { flex: 1 1 100%; min-height: 4.5rem; }
     }
+
+    /* ── Reports and Stats (under Rate Your Order) ── */
+    .order-reports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+      gap: 0.9rem;
+    }
+    .order-reports-widget {
+      border: 2px solid #000;
+      padding: 0.7rem 0.8rem;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.12s ease;
+    }
+    .order-reports-widget:hover { background: rgba(0,0,0,0.05); }
+    .order-reports-widget-num { display: flex; flex-direction: column; justify-content: center; }
+    .order-reports-widget-foodchart,
+    .order-reports-widget-restaurants {
+      grid-column: 1 / -1;
+      text-align: left;
+    }
+    .order-reports-widget-heading {
+      margin: 0 0 0.6rem;
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .order-reports-foodchart-mini { display: flex; flex-direction: column; }
+    .order-reports-foodchart-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.45rem 0;
+      font-size: 1rem;
+      border-top: 1px solid rgba(0,0,0,0.12);
+    }
+    .order-reports-foodchart-row:first-child { border-top: none; }
+    .order-reports-foodchart-item { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .order-reports-foodchart-rating { font-weight: 900; flex-shrink: 0; font-size: 0.95rem; }
+    body.dark .order-reports-foodchart-row { border-color: rgba(255,255,255,0.15); }
+
+    .order-reports-favshates-mini-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      height: 100%;
+    }
+    .order-reports-favshates-mini-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Masked instead of rendered as a plain emoji glyph -- a plain &#128077;
+       always shows in its native yellow/red no matter the active theme.
+       Masking uses the glyph's own shape as a stencil and fills it with
+       --ink via background-color, so it recolors with every theme (and
+       dark mode) exactly like the rest of the app's icons/arrows do. */
+    .order-reports-favshates-icon {
+      width: 1.7rem;
+      height: 1.7rem;
+      margin: 0 auto;
+      background-color: var(--ink);
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+    }
+    .order-reports-favshates-icon.icon-thumbsup {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='80' font-size='90' text-anchor='middle'%3E%F0%9F%91%8D%3C/text%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='80' font-size='90' text-anchor='middle'%3E%F0%9F%91%8D%3C/text%3E%3C/svg%3E");
+    }
+    .order-reports-favshates-icon.icon-brokenheart {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='80' font-size='90' text-anchor='middle'%3E%F0%9F%92%94%3C/text%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='80' font-size='90' text-anchor='middle'%3E%F0%9F%92%94%3C/text%3E%3C/svg%3E");
+    }
+
+    .order-reports-favshates-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .order-reports-favshates-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      padding: 0.45rem 0;
+      border-top: 1px solid rgba(0,0,0,0.12);
+      cursor: pointer;
+    }
+    .order-reports-favshates-row:first-child { border-top: none; }
+    .order-reports-favshates-row:hover { opacity: 0.7; }
+    .order-reports-favshates-label { font-size: 0.85rem; font-weight: 700; }
+    .order-reports-favshates-restaurant { font-size: 0.7rem; color: var(--text-muted); }
+    .order-reports-favshates-rating { font-size: 0.72rem; color: var(--text-dim); }
+    body.dark .order-reports-favshates-row { border-color: rgba(255,255,255,0.15); }
+    @media (max-width: 500px) {
+      .order-reports-favshates-cols { grid-template-columns: 1fr; }
+    }
+    .order-reports-stat-value {
+      font-size: 1.4rem;
+      font-weight: 900;
+      line-height: 1.15;
+    }
+    .order-reports-stat-label {
+      font-size: 0.62rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .order-reports-stat-sub {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-top: 0.15rem;
+    }
+    .order-reports-detail-summary { font-size: 0.85rem; margin-bottom: 1rem; }
+    .order-reports-bar-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .order-reports-bar-row {
+      display: grid;
+      grid-template-columns: 7rem 1fr 4rem;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.8rem;
+    }
+    .order-reports-bar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .order-reports-bar-track { background: rgba(0,0,0,0.08); height: 0.8rem; }
+    .order-reports-bar-fill { background: var(--ink); height: 100%; }
+    .order-reports-bar-value { text-align: right; font-weight: 700; }
+
+    body.dark .order-reports-widget { border-color: var(--ink); }
+    body.dark .order-reports-widget:hover { background: rgba(255,255,255,0.08); }
+    body.dark .order-reports-bar-track { background: rgba(255,255,255,0.12); }

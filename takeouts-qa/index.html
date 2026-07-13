@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:ital,wght@0,500;0,700;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="styles.v1.12.0.css">
+  <link rel="stylesheet" href="styles.v1.13.0.css">
 </head>
 <body>
 <div id="gate-overlay" class="gate-overlay">
@@ -24,7 +24,7 @@
     <button type="button" id="gate-submit" class="btn btn-primary" style="margin-top:1rem">Enter</button>
   </div>
 </div>
-<script src="gate.v1.12.0.js"></script>
+<script src="gate.v1.13.0.js"></script>
 <div class="debug-clock" id="debug-clock" style="display:none">
   <button type="button" class="debug-clock-label" id="debug-clock-toggle">
     Test Clock <span id="debug-clock-status"></span>
@@ -142,6 +142,28 @@
     </div>
   </div>
 
+  <!-- DRIVER THIS WEEK -->
+  <div class="card" id="driver-card">
+    <div class="card-header">
+      <h2>Driver This Week</h2>
+    </div>
+    <div class="card-body driver-card-body">
+      <div class="driver-name-stamp" id="driver-name">—</div>
+      <button type="button" class="driver-edit-btn" id="driver-edit-btn" title="Swap driver for this week"><svg width="14" height="14" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 1.5 L9.5 3.5 L3.5 9.5 L1 10 L1.5 7.5 Z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6.5 2.5 L8.5 4.5" stroke="currentColor" stroke-width="1.2"/></svg></button>
+    </div>
+  </div>
+
+  <div id="driver-edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center">
+    <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:340px;width:90%;text-align:center">
+      <p style="margin-bottom:1rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600">Who's driving this week?</p>
+      <input type="text" id="driver-edit-input" placeholder="Driver name" autocomplete="off" style="width:100%;padding:0.6rem;border:2px solid #000;font-size:1rem;font-family:inherit;text-align:center;box-sizing:border-box">
+      <div style="display:flex;gap:0.75rem;justify-content:center;margin-top:1.1rem">
+        <button type="button" id="driver-edit-ok" style="padding:0.5rem 1.25rem;border:2px solid #000;background:#000;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Save</button>
+        <button type="button" id="driver-edit-cancel" style="padding:0.5rem 1.25rem;border:2px solid #000;background:transparent;color:#000;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ORDERS LIST -->
   <div class="card">
     <div class="card-header toggle-header">
@@ -197,6 +219,66 @@
     </div>
   </div>
 
+  <!-- REPORTS AND STATS (all-time stats across History + Ratings, all restaurants) -->
+  <div class="card" id="order-reports-card" style="display:none">
+    <div class="card-header">
+      <h2>Reports and Stats</h2>
+    </div>
+    <div class="card-body">
+      <div class="order-reports-grid">
+        <div class="order-reports-widget order-reports-widget-num" onclick="openOrderReportsDetail('satisfaction')">
+          <div class="order-reports-stat-value" id="order-reports-satisfaction">—</div>
+          <div class="order-reports-stat-label">Overall Satisfaction</div>
+          <div class="order-reports-stat-sub" id="order-reports-satisfaction-sub"></div>
+        </div>
+        <div class="order-reports-widget order-reports-widget-num" onclick="openOrderReportsDetail('spend')">
+          <div class="order-reports-stat-value" id="order-reports-spend">—</div>
+          <div class="order-reports-stat-label">Average $ / Person</div>
+          <div class="order-reports-stat-sub" id="order-reports-spend-sub"></div>
+        </div>
+        <div class="order-reports-widget order-reports-widget-num" style="cursor:default">
+          <div class="order-reports-stat-value" id="order-reports-orders">—</div>
+          <div class="order-reports-stat-label">Dishes Logged</div>
+          <div class="order-reports-stat-sub" id="order-reports-orders-sub"></div>
+        </div>
+        <div class="order-reports-widget order-reports-widget-favshates" onclick="openOrderReportsDetail('favshates')">
+          <div class="order-reports-favshates-mini-cols">
+            <div class="order-reports-favshates-mini-col">
+              <div class="order-reports-favshates-icon icon-thumbsup"></div>
+              <div class="order-reports-stat-value" id="order-reports-favs-count">0</div>
+              <div class="order-reports-stat-label">Favs</div>
+            </div>
+            <div class="order-reports-favshates-mini-col">
+              <div class="order-reports-favshates-icon icon-brokenheart"></div>
+              <div class="order-reports-stat-value" id="order-reports-hates-count">0</div>
+              <div class="order-reports-stat-label">Hates</div>
+            </div>
+          </div>
+        </div>
+        <div class="order-reports-widget order-reports-widget-foodchart" onclick="openFoodChart()">
+          <h3 class="order-reports-widget-heading">&#9733; Food Chart &mdash; Most Ordered</h3>
+          <div class="order-reports-foodchart-mini" id="order-reports-foodchart-mini"></div>
+          <div id="order-reports-foodchart-empty" class="placeholder" style="display:none">No rated items yet</div>
+        </div>
+        <div class="order-reports-widget order-reports-widget-restaurants" onclick="openOrderReportsDetail('restaurants')">
+          <h3 class="order-reports-widget-heading">Restaurant Stats</h3>
+          <div class="order-reports-foodchart-mini" id="order-reports-restaurants-mini"></div>
+          <div id="order-reports-restaurants-empty" class="placeholder" style="display:none">No data yet</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-modal" id="order-reports-detail-modal" onclick="closeOrderReportsDetail(event)">
+    <div class="report-modal-box" onclick="event.stopPropagation()">
+      <div class="report-modal-header">
+        <h2 id="order-reports-detail-title">Detail</h2>
+        <button type="button" class="report-modal-close" onclick="closeOrderReportsDetail()">&times;</button>
+      </div>
+      <div class="report-modal-body" id="order-reports-detail-body"></div>
+    </div>
+  </div>
+
   <!-- TRAFFIC -->
   <div class="card" id="traffic-card">
     <div class="card-header">
@@ -216,6 +298,13 @@
             <span class="label-good">Good</span><span class="label-ok">OK</span><span class="label-bad">Bad</span>
           </div>
           <div class="traffic-gauge-detail" id="traffic-gauge-detail"></div>
+
+          <button type="button" id="traffic-checkpoints-toggle-btn" class="rotation-toggle-btn">
+            Checkpoint Details <span class="rotation-toggle-arrow">&#9660;</span>
+          </button>
+          <div id="traffic-checkpoints-panel" class="rotation-panel">
+            <div id="traffic-checkpoints-list" class="traffic-checkpoints-list"></div>
+          </div>
         </div>
 
         <div class="traffic-panel traffic-map-panel">
@@ -247,93 +336,6 @@
     </div>
   </div>
 
-  <!-- DROP GAME -->
-  <div class="card" id="plinko-card">
-    <div class="card-body">
-      <button type="button" id="plinko-toggle-btn" class="rotation-toggle-btn plinko-toggle-btn">
-        <span class="rotation-toggle-arrow">&#9660;</span>
-      </button>
-      <div id="plinko-panel" class="rotation-panel">
-        <div class="plinko-controls">
-          <div id="plinko-mode-controls" class="plinko-mode-controls">
-            <label class="plinko-restaurant-toggle">
-              <input type="checkbox" id="plinko-restaurant-mode">
-              Restaurant Picker
-            </label>
-            <div class="plinko-control-group">
-              <span class="plinko-controls-label">Colors</span>
-              <input type="range" id="plinko-colors-slider" class="plinko-slider" min="1" max="0" value="0">
-              <span id="plinko-colored-count" class="plinko-slot-count"></span>
-            </div>
-            <div class="plinko-control-group">
-              <span class="plinko-controls-label">Balls</span>
-              <input type="range" id="plinko-balls-slider" class="plinko-slider" min="1" max="12" value="1">
-              <span id="plinko-ball-count" class="plinko-slot-count"></span>
-            </div>
-            <span class="plinko-payout-preview" id="plinko-debug-gold" title="Gold payout for the current Colors/Balls setting"></span>
-            <span class="plinko-clock" id="plinko-clock" title="Time left this round">3:00</span>
-            <span class="plinko-gold-count" id="plinko-gold-count" title="Golden balls won this session">&#x1F7E1; 0</span>
-            <button type="button" class="plinko-trophy-btn" id="plinko-trophy-btn" title="High Scores" onclick="openPlinkoLeaderboard()">&#127942;</button>
-            <button type="button" id="plinko-restart-btn" class="plinko-restart-btn" title="Restart board">&#8635;</button>
-          </div>
-          <button type="button" id="game-mode-toggle-btn" class="game-mode-toggle-btn" title="Wheel">&#8594;</button>
-        </div>
-        <div class="wheel-controls" id="wheel-controls">
-          <div class="wheel-accessory-row">
-            <select id="wheel-preset-select" class="wheel-preset-select">
-              <option value="">Load a preset…</option>
-              <optgroup label="Built-in">
-                <option value="restaurants">Restaurant Picker</option>
-                <option value="foodPopular">Food: Popular Picks</option>
-                <option value="foodMeat">Food: Meat Types</option>
-                <option value="event">Event</option>
-                <option value="names">Names</option>
-              </optgroup>
-              <optgroup label="My Presets" id="wheel-preset-custom-group"></optgroup>
-            </select>
-            <button type="button" id="wheel-edit-toggle-btn" class="wheel-accessory-btn wheel-edit-toggle-btn">
-              Edit Items <span class="rotation-toggle-arrow">&#9660;</span>
-            </button>
-            <button type="button" id="wheel-clear-btn" class="wheel-accessory-btn">Clear All</button>
-            <button type="button" id="wheel-shuffle-btn" class="wheel-accessory-btn">Shuffle</button>
-          </div>
-          <div class="rotation-panel wheel-edit-panel" id="wheel-edit-panel">
-            <div class="wheel-preset-actions">
-              <button type="button" id="wheel-save-preset-btn" class="btn-secondary" disabled>Save</button>
-              <button type="button" id="wheel-save-new-preset-btn" class="btn-secondary">Save As New…</button>
-              <button type="button" id="wheel-delete-preset-btn" class="btn-secondary" disabled>Delete</button>
-            </div>
-            <form id="wheel-item-form" class="wheel-item-form">
-              <input type="text" id="wheel-item-input" placeholder="Add an item…" maxlength="40">
-              <button type="submit" class="btn-secondary">Add</button>
-            </form>
-            <div id="wheel-item-list" class="wheel-item-list"></div>
-          </div>
-        </div>
-        <div class="plinko-board" id="plinko-board">
-          <canvas id="plinko-canvas"></canvas>
-          <div class="plinko-comment" id="plinko-comment"></div>
-          <div class="plinko-gold-flash-board" id="plinko-gold-flash-board"></div>
-        </div>
-        <div class="plinko-board wheel-board" id="wheel-board">
-          <div class="wheel-canvas-wrap" id="wheel-canvas-wrap">
-            <canvas id="wheel-canvas"></canvas>
-            <div class="wheel-pointer" aria-hidden="true"></div>
-          </div>
-          <div class="wheel-confetti" id="wheel-confetti"></div>
-          <div class="wheel-result" id="wheel-result"></div>
-        </div>
-        <div class="wheel-spin-bar" id="wheel-spin-bar">
-          <span id="wheel-only-controls" class="wheel-only-controls">
-            <button type="button" id="wheel-spin-btn" class="wheel-spin-btn">Spin</button>
-          </span>
-        </div>
-        <div class="resize-grip" id="plinko-board-grip" title="Drag to resize"></div>
-        <div id="plinko-restaurant-legend" class="rotation-panel"></div>
-      </div>
-    </div>
-  </div>
-
   <footer>
     <div class="footer-stripe" aria-hidden="true"></div>
     <span id="last-updated" style="display:none"></span>
@@ -348,13 +350,12 @@
 
 </div>
 <script src="config.js?v=1.9.1"></script>
-<script src="plinko-comments.v1.12.0.js"></script>
-<script src="app.v1.12.0.js"></script>
+<script src="app.v1.13.0.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="traffic-widget.js"></script>
+<script src="traffic-widget.js?v=1.13.0"></script>
 
-<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center">
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;display:none;align-items:center;justify-content:center">
   <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:320px;width:90%;text-align:center">
     <p id="confirm-modal-msg" style="margin-bottom:1.25rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600"></p>
     <div style="display:flex;gap:0.75rem;justify-content:center">
@@ -364,7 +365,7 @@
   </div>
 </div>
 
-<div id="pin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center">
+<div id="pin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center">
   <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:320px;width:90%;text-align:center">
     <p id="pin-modal-msg" style="margin-bottom:1rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600">Enter PIN to reopen ordering for a new round.</p>
     <input type="password" id="pin-modal-input" inputmode="numeric" maxlength="5" placeholder="PIN" style="width:100%;padding:0.6rem;border:2px solid #000;font-size:1rem;font-family:inherit;text-align:center;letter-spacing:0.2em;box-sizing:border-box">
@@ -376,15 +377,15 @@
   </div>
 </div>
 
-<div id="override-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center">
-  <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:340px;width:90%;text-align:center">
-    <p style="margin-bottom:1rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600">Pick a restaurant to override this week's rotation. Everyone will see this change.</p>
-    <div id="override-modal-list" style="display:flex;flex-direction:column;gap:0.5rem;max-height:260px;overflow-y:auto;text-align:left"></div>
-    <button id="override-modal-cancel" style="margin-top:1.1rem;padding:0.5rem 1.25rem;border:2px solid #000;background:transparent;color:#000;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Cancel</button>
+<div id="override-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center">
+  <div style="background:var(--accent);border:2px solid #000;padding:1.25rem;max-width:340px;width:90%;text-align:center;max-height:85vh;display:flex;flex-direction:column">
+    <p style="margin-bottom:1rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600;flex-shrink:0">Pick a restaurant to override this week's rotation. Everyone will see this change.</p>
+    <div id="override-modal-list" style="display:flex;flex-direction:column;gap:0.45rem;text-align:left;overflow-y:auto"></div>
+    <button id="override-modal-cancel" style="margin-top:1.1rem;padding:0.5rem 1.25rem;border:2px solid #000;background:transparent;color:#000;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;flex-shrink:0">Cancel</button>
   </div>
 </div>
 
-<div id="override-reason-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center">
+<div id="override-reason-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center">
   <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:340px;width:90%;text-align:center">
     <p id="override-reason-msg" style="margin-bottom:1rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600"></p>
     <textarea id="override-reason-input" placeholder="Reason for the override (shown on hover)" rows="3" style="width:100%;padding:0.6rem;border:2px solid #000;font-size:0.85rem;font-family:inherit;box-sizing:border-box;resize:vertical"></textarea>
@@ -443,6 +444,7 @@
       <button type="button" class="report-modal-close" onclick="closeItemDetail()">&times;</button>
     </div>
     <div class="report-modal-body">
+      <button type="button" class="item-detail-back-link" id="item-detail-back-link" style="display:none" onclick="backToFoodChart()">&#8592; Back to Food Chart</button>
       <div class="item-detail-stats" id="item-detail-stats"></div>
       <div class="item-detail-chart-wrap" id="item-detail-chart-wrap">
         <svg id="item-detail-chart" class="item-detail-chart"></svg>
@@ -499,24 +501,5 @@
   </div>
 </div>
 
-<div class="lightbox plinko-gameover-lightbox" id="plinko-gameover-lightbox">
-  <div class="plinko-gameover-box" onclick="event.stopPropagation()">
-    <button class="lightbox-close" onclick="closePlinkoGameOver()">&times;</button>
-    <div class="plinko-gameover-title" id="plinko-gameover-title">TIME'S UP!</div>
-    <div class="plinko-gameover-score" id="plinko-gameover-score-row">Score: <span id="plinko-gameover-score">0</span></div>
-    <div id="plinko-gameover-entry">
-      <label class="plinko-gameover-label" for="plinko-gameover-initials">Enter your initials</label>
-      <input type="text" id="plinko-gameover-initials" class="plinko-gameover-initials" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA">
-      <div class="plinko-gameover-actions">
-        <button type="button" class="btn-primary" id="plinko-gameover-submit-btn" onclick="submitPlinkoScore()">Submit</button>
-        <button type="button" class="btn-secondary" onclick="closePlinkoGameOver()">Skip</button>
-      </div>
-    </div>
-    <div class="plinko-leaderboard" id="plinko-leaderboard" style="display:none">
-      <div class="plinko-leaderboard-title">&#127942; Top 10</div>
-      <ol id="plinko-leaderboard-list"></ol>
-    </div>
-  </div>
-</div>
 </body>
 </html>

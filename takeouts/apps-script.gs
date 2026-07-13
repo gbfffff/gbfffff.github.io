@@ -8,18 +8,17 @@
 //    • Execute as: Me
 //    • Who has access: Anyone
 // 4. Copy the web app URL into config.js → APPS_SCRIPT_URL
-// 5. Tabs "Orders", "Drivers", "History", "Ratings", "Overrides", and
-//    "PlinkoScores" are created automatically (with headers) on first write
-//    to each -- no manual setup.
+// 5. Tabs "Orders", "Drivers", "History", "Ratings", and "Overrides" are
+//    created automatically (with headers) on first write to each -- no
+//    manual setup.
 //
 // SHEET READING (for displaying orders on the site):
 // 6. In your Google Sheet → File → Share → Publish to web
 //    • Choose "Entire Document" and format "Comma-separated values (.csv)"
 //    • Click Publish — this lets the site read orders without an API key
-// 7. Note the "gid" of the "History", "Ratings", "Overrides", and
-//    "PlinkoScores" tabs (visible in the URL when that tab is open) →
-//    config.js needs these as
-//    HISTORY_GID/RATINGS_GID/OVERRIDES_GID/PLINKO_SCORES_GID
+// 7. Note the "gid" of the "History", "Ratings", and "Overrides" tabs
+//    (visible in the URL when that tab is open) → config.js needs these as
+//    HISTORY_GID/RATINGS_GID/OVERRIDES_GID
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ORDERS_SHEET    = "Orders";
@@ -27,8 +26,6 @@ const DRIVERS_SHEET   = "Drivers";
 const HISTORY_SHEET   = "History";
 const RATINGS_SHEET   = "Ratings";
 const OVERRIDES_SHEET = "Overrides";
-const PLINKO_SCORES_SHEET = "PlinkoScores";
-const PLINKO_TOP_N = 10;
 
 function doGet(e) {
   const ss   = SpreadsheetApp.getActiveSpreadsheet();
@@ -98,23 +95,6 @@ function doGet(e) {
       sheet.appendRow([now, data.date, data.restaurant, data.reason || ""]);
     }
 
-    // Drop Game high score -- a 5-minute countdown round ends, the player
-    // enters a 3-letter arcade-style initials, and their gold total for
-    // that round gets submitted here. Only the top 10 ever survive; every
-    // submission re-sorts and trims the sheet immediately rather than
-    // growing forever and letting the site do the trimming client-side
-    // (which would mean everyone's browser has to download and re-sort the
-    // whole history just to show 10 rows).
-    if (data.type === "plinkoScore") {
-      const sheet = getOrCreateSheet(ss, PLINKO_SCORES_SHEET);
-      if (sheet.getLastRow() === 0) {
-        sheet.appendRow(["Timestamp", "Name", "Score"]);
-      }
-      const initials = String(data.name || "???").trim().toUpperCase().slice(0, 3) || "???";
-      const score = Math.max(0, Math.round(Number(data.score) || 0));
-      sheet.appendRow([now, initials, score]);
-      trimPlinkoScores(sheet);
-    }
   } catch (err) {
     return ContentService
       .createTextOutput(JSON.stringify({ ok: false, error: err.message }))
@@ -126,28 +106,20 @@ function doGet(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-// Keeps only the PLINKO_TOP_N highest scores -- sorts every row (by Score,
-// descending) and rewrites the sheet with just the survivors. Simple
-// full-rewrite rather than surgical row deletion since this sheet is tiny
-// (never more than a handful of rows above the cap between submissions).
-function trimPlinkoScores(sheet) {
-  if (sheet.getLastRow() <= 1) return; // header only, nothing to trim
-  const data = sheet.getDataRange().getValues();
-  const header = data[0];
-  const rows = data.slice(1).sort((a, b) => Number(b[2]) - Number(a[2])).slice(0, PLINKO_TOP_N);
-  sheet.getRange(2, 1, Math.max(0, sheet.getLastRow() - 1), header.length).clearContent();
-  if (rows.length) sheet.getRange(2, 1, rows.length, header.length).setValues(rows);
-}
-
 function getOrCreateSheet(ss, name) {
   return ss.getSheetByName(name) || ss.insertSheet(name);
 }
 
-// Finds the History row for this date+restaurant+item+person and sets its
-// Rated flag to 1 and RatedAt to the given timestamp. History rows are
-// per-orderer (one row per person per item, not aggregated across
-// everyone who ordered it) -- so the match MUST include the rater's name,
-// or it can flip a completely different person's row instead of theirs.
+// Finds the History row for this date+restaurant+item+person and records
+// that THIS person has rated it. Rated (column 7) is a comma-joined list
+// of who has rated the row so far, NOT a single 1/0 flag -- a row can
+// represent multiple co-orderers of the same shared/combined item (see
+// the Names column, which is itself comma-joined), and each of them needs
+// to be tracked independently. Setting a bare 1 here used to mark the row
+// "done" for every name on it the instant the FIRST co-orderer rated it,
+// silently suppressing the rating prompt for everyone else who ordered
+// the same item. The match MUST include the rater's name, or it can flip
+// a completely different person's row instead of theirs.
 // Columns 7/8 (Rated/RatedAt) may not exist yet on a sheet created before
 // this feature -- backfill the header in that case so the row write below
 // lands in the right columns.
@@ -168,7 +140,8 @@ function markHistoryRowRated(ss, date, restaurant, item, raterName, now) {
   // so that whitespace alone can't make an otherwise-correct match fail.
   const wantRestaurant = String(restaurant).trim();
   const wantItem = String(item).trim();
-  const wantName = String(raterName || "").trim().toLowerCase();
+  const wantNameTrimmed = String(raterName || "").trim();
+  const wantName = wantNameTrimmed.toLowerCase();
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
@@ -179,7 +152,17 @@ function markHistoryRowRated(ss, date, restaurant, item, raterName, now) {
         String(row[2]).trim() === wantRestaurant &&
         String(row[3]).trim() === wantItem &&
         names.includes(wantName)) {
-      sheet.getRange(i + 1, 7, 1, 2).setValues([[1, now]]);
+      // Legacy rows may already have a bare "1" from before this change --
+      // treat that as "no per-name record", starting the list fresh with
+      // just this rater rather than trying to interpret it as a name.
+      const existingRaw = String(row[6] || "").trim();
+      const alreadyRated = existingRaw && existingRaw !== "1"
+        ? existingRaw.split(",").map(n => n.trim())
+        : [];
+      if (!alreadyRated.some(n => n.toLowerCase() === wantName)) {
+        alreadyRated.push(wantNameTrimmed);
+      }
+      sheet.getRange(i + 1, 7, 1, 2).setValues([[alreadyRated.join(", "), now]]);
       break;
     }
   }

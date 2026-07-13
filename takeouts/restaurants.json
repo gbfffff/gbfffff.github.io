@@ -1755,12 +1755,20 @@
           "price": 6.5,
           "protein": true,
           "orOptions": [
-            "Chicken",
-            "Beef",
+            "Pollo",
+            "Mole",
+            "Carne Asada",
+            "Suadero",
+            "Lengua",
+            "Tripa",
+            "Cachete",
             "Al Pastor",
+            "Chorizo",
+            "Cochinita",
+            "Alambre",
+            "Pescado",
             "Veggie"
           ],
-          "popular": true,
           "desc": "10\" flour tortilla with pinto beans, rice, crema & choice of protein",
           "category": "Burritos & Plates"
         },
@@ -1769,9 +1777,18 @@
           "price": 8.0,
           "protein": true,
           "orOptions": [
-            "Chicken",
-            "Beef",
+            "Pollo",
+            "Mole",
+            "Carne Asada",
+            "Suadero",
+            "Lengua",
+            "Tripa",
+            "Cachete",
             "Al Pastor",
+            "Chorizo",
+            "Cochinita",
+            "Alambre",
+            "Pescado",
             "Veggie"
           ],
           "desc": "Bowl with pinto beans, rice, crema & choice of protein",
@@ -1782,10 +1799,8 @@
           "price": 9.0,
           "protein": true,
           "orOptions": [
-            "Chicken",
-            "Beef",
-            "Al Pastor",
-            "Veggie"
+            "Salsa Verde",
+            "Mole"
           ],
           "desc": "3 corn tortillas filled with shredded pollo, topped with crema & queso fresco",
           "category": "Burritos & Plates"
@@ -1801,7 +1816,7 @@
           "price": 5.0,
           "desc": "Flat deep fried corn tortilla with tinga shredded beef or pata",
           "orOptions": [
-            "Beef",
+            "Tinga ShreddedBeef",
             "Pata"
           ],
           "category": "Burritos & Plates"
