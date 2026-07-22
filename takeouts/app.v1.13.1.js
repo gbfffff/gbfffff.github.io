@@ -284,8 +284,10 @@ function buildRotationPanel(config) {
     const cur     = i === curIdx;
     const name    = r.name || r.ref || "?";
     const cuisine = r.cuisine ? `<span class="rotation-cuisine">${esc(r.cuisine)}</span>` : "";
+    const curArrow = cur ? `<span class="rotation-row-current-arrow" aria-hidden="true">&#9654;</span>` : "";
     return `<div class="rotation-row${cur ? " rotation-row-current" : ""}" data-restaurant="${escAttr(name)}" title="View order history &amp; ratings for ${escAttr(name)}">
       <span class="rotation-idx">${i + 1}</span>
+      ${curArrow}
       <span class="rotation-name">${esc(name)}</span>
       ${cuisine}
     </div>`;
@@ -589,8 +591,10 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     const sizeHint    = item.sizes ? `<span class="mpi-protein-hint">choose ${Object.keys(item.sizes).join("/")}</span>` : "";
     const proteinHint = (!item.orOptions?.length && item.protein) ? `<span class="mpi-protein-hint">+ protein</span>` : "";
     const desc        = item.desc ? `<span class="mpi-desc">${esc(item.desc)}</span>` : "";
-    return `<div class="mpi" data-name="${escAttr(item.item)}">
-      <span class="mpi-left"><span class="mpi-name">${esc(item.item)}${orHint || sidesHint}${sauceHint}${!orHint && !sidesHint ? sizeHint || proteinHint : ""}</span>${desc}</span>
+    const oos         = !!item.outOfStock;
+    const oosBadge     = oos ? `<span class="mpi-oos-badge">Out of Stock</span>` : "";
+    return `<div class="mpi${oos ? " mpi-out-of-stock" : ""}" data-name="${escAttr(item.item)}" data-oos="${oos ? "1" : "0"}">
+      <span class="mpi-left"><span class="mpi-name">${esc(item.item)}${orHint || sidesHint}${sauceHint}${!orHint && !sidesHint ? sizeHint || proteinHint : ""}</span>${desc}${oosBadge}</span>
       ${price}
     </div>`;
   }
@@ -713,6 +717,7 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     }
     const row = e.target.closest(".mpi");
     if (!row) return;
+    if (row.dataset.oos === "1") return;
     addItem(row.dataset.name);
     // don't steal focus if a protein/or-options prompt is about to appear
     const meta = allMenuItems.find(m => m.item === row.dataset.name);
@@ -745,66 +750,8 @@ function buildMenu(items) {
       <div class="menu-dropdown" id="menu-dropdown"></div>
     </div>
     <div class="selected-pills" id="selected-pills"></div>
-    <div id="protein-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--bg);border:2px solid #000;border-radius:6px;font-size:0.85rem">
-      <span style="color:var(--text-muted)">Protein for <strong id="protein-prompt-item"></strong>:</span>
-      <div style="display:flex;gap:0.5rem;margin-top:0.4rem;align-items:center">
-        <input type="text" id="protein-input" placeholder="e.g. Chicken, Beef, Al Pastor, Veggie…" style="flex:1;min-width:0;padding:0.4rem 0.6rem;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.85rem;font-family:inherit" />
-        <button type="button" id="protein-add-btn" class="protein-btn protein-btn-add">Add</button>
-        <button type="button" id="protein-skip-btn" class="protein-btn">Skip</button>
-      </div>
-    </div>
-    <div id="combo-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--bg);border:2px solid #000;border-radius:6px;font-size:0.85rem">
-      <div style="color:var(--text-muted);margin-bottom:0.5rem">Adding: <strong id="combo-prompt-item"></strong></div>
-      <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
-        <input type="checkbox" id="combo-checkbox" style="accent-color:var(--gold);width:15px;height:15px" />
-        Make it a combo &nbsp;<span id="combo-price-label" style="color:var(--gold);font-weight:700"></span>
-      </label>
-      <div id="combo-side-wrap" style="display:none;margin-top:0.5rem;flex-direction:column;gap:0.4rem">
-        <div style="font-size:0.75rem;color:var(--text-muted)">Side choice</div>
-        <select id="combo-side-select" style="width:100%;padding:0.4rem 0.6rem;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.85rem;font-family:inherit"></select>
-        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem">Drink (included) — type your choice</div>
-        <input type="text" id="combo-drink-input" placeholder="e.g. Coke, Sprite, water…" style="width:100%;padding:0.4rem 0.6rem;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.85rem;font-family:inherit;box-sizing:border-box" />
-      </div>
-      <div style="display:flex;gap:0.5rem;margin-top:0.6rem">
-        <button type="button" id="combo-add-btn" class="protein-btn protein-btn-add">Add to Order</button>
-        <button type="button" id="combo-skip-btn" class="protein-btn">Cancel</button>
-      </div>
-    </div>
-    <div id="extras-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--bg);border:2px solid #000;border-radius:6px;font-size:0.85rem">
-      <div style="color:var(--text-muted);margin-bottom:0.5rem">Add protein to <strong id="extras-prompt-item"></strong>? <span style="font-size:0.72rem;opacity:0.7">(optional)</span></div>
-      <div id="extras-options" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.6rem"></div>
-      <div style="display:flex;gap:0.5rem">
-        <button type="button" id="extras-skip-btn" class="protein-btn">No thanks, just the salad</button>
-      </div>
-    </div>
-    <div id="or-options-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--bg);border:2px solid #000;border-radius:6px;font-size:0.85rem">
-      <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose one for <strong id="or-options-prompt-item"></strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
-      <div id="or-options-list" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.6rem"></div>
-      <div style="display:flex;gap:0.5rem">
-        <button type="button" id="or-options-add-btn" class="protein-btn protein-btn-add" disabled>Add to Order</button>
-      </div>
-    </div>
-    <div id="sides-pick-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--bg);border:2px solid #000;border-radius:6px;font-size:0.85rem">
-      <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose <strong id="sides-pick-count"></strong> sides for <strong id="sides-pick-item"></strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
-      <div id="sides-pick-list" style="display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.6rem;max-height:220px;overflow-y:auto"></div>
-      <div style="display:flex;gap:0.5rem">
-        <button type="button" id="sides-pick-add-btn" class="protein-btn protein-btn-add" disabled>Add to Order</button>
-      </div>
-    </div>
-    <div id="size-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--bg);border:2px solid #000;border-radius:6px;font-size:0.85rem">
-      <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose an option for <strong id="size-prompt-item"></strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
-      <div id="size-prompt-list" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.6rem"></div>
-      <div style="display:flex;gap:0.5rem">
-        <button type="button" id="size-prompt-add-btn" class="protein-btn protein-btn-add" disabled>Add to Order</button>
-      </div>
-    </div>
-    <div id="sauce-pick-prompt" style="display:none;margin-top:0.5rem;padding:0.6rem 0.75rem;background:var(--bg);border:2px solid #000;border-radius:6px;font-size:0.85rem">
-      <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose <strong id="sauce-pick-count"></strong> sauces for <strong id="sauce-pick-item"></strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
-      <div id="sauce-pick-list" style="display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.6rem;max-height:220px;overflow-y:auto"></div>
-      <div style="display:flex;gap:0.5rem">
-        <button type="button" id="sauce-pick-add-btn" class="protein-btn protein-btn-add" disabled>Add to Order</button>
-      </div>
-    </div>`;
+    <div id="order-subtotal" class="order-subtotal"></div>
+    <div id="active-prompts" class="active-prompts-container"></div>`;
 
   const input    = document.getElementById("menu-search");
   const dropdown = document.getElementById("menu-dropdown");
@@ -826,9 +773,11 @@ function buildMenu(items) {
       const takenLbl = takers.length ? `<span class="dd-taken">${takers.join(", ")}</span>` : "";
       const proteinLbl  = m.protein ? `<span class="dd-protein">+ protein</span>` : "";
       const popularStar = m.popular ? `<span class="dd-popular">★</span>` : "";
-      return `<div class="menu-dropdown-item${taken ? " is-selected" : ""}" data-name="${escAttr(m.item)}">
+      const oos         = !!m.outOfStock;
+      const oosLbl      = oos ? `<span class="dd-oos">Out of Stock</span>` : "";
+      return `<div class="menu-dropdown-item${taken ? " is-selected" : ""}${oos ? " is-oos" : ""}" data-name="${escAttr(m.item)}" data-oos="${oos ? "1" : "0"}">
         <span class="dd-name">${popularStar}${esc(m.item)}${proteinLbl}</span>
-        <span class="dd-right">${takenLbl}${price}</span>
+        <span class="dd-right">${oosLbl}${takenLbl}${price}</span>
       </div>`;
     }).join("");
 
@@ -836,10 +785,12 @@ function buildMenu(items) {
 
     // .is-selected just marks "already in your order" (a visual checkmark
     // in the dropdown) -- it no longer disables the row, since ordering
-    // the same item again (a 2nd/3rd of it) is allowed now.
+    // the same item again (a 2nd/3rd of it) is allowed now. .is-oos DOES
+    // block the click, since there's genuinely nothing to add.
     dropdown.querySelectorAll(".menu-dropdown-item").forEach(el => {
       el.addEventListener("mousedown", e => {
         e.preventDefault();
+        if (el.dataset.oos === "1") return;
         addItem(el.dataset.name);
         input.value = "";
         dropdown.style.display = "none";
@@ -915,71 +866,167 @@ function addItem(name) {
     checkDuplicates();
 }
 
+// Every item-configuration prompt (extras/combo/protein/orOptions/sidesPick/
+// saucePick/size) is mounted as its own independent card inside
+// #active-prompts instead of reusing a shared singleton element. That means
+// starting a second item's prompt before finishing the first no longer
+// leaves a stale, invisible listener bound to a shared "Add to Order"
+// button (which used to silently add the abandoned first selection too) --
+// each card just stacks up, visible, until it's added or closed with the
+// ✕ on its own.
+let _promptSeq = 0;
+function mountPrompt(html) {
+  const container = document.getElementById("active-prompts");
+  if (!container) return null;
+  const el = document.createElement("div");
+  el.className = "order-prompt";
+  el.innerHTML = `<button type="button" class="prompt-close-btn" aria-label="Cancel">✕</button>` + html;
+  container.appendChild(el);
+  return el;
+}
+
+// Builds the optional extras checklist HTML -- shared by showExtrasPrompt
+// (an item with ONLY extras) and any required-picker prompt that ALSO has
+// extras (orOptions/sidesPick/size), which render this section inline in
+// the SAME card right under the required choices. That matches how the real
+// ordering site shows every modifier group in one scrollable form instead
+// of gating the optional toppings behind a separate "finish this step
+// first" screen, which read as "the toppings are just missing" the one time
+// someone stopped at the required step without continuing.
+// Each extra is an independent checkbox (matches the real site's Toppings/
+// Keto groups) -- any number can be picked at once, so "No Cilantro" and
+// "No Onions" can both apply to the same taco. An extra with `max > 1`
+// (e.g. Big Greek's "Extra Pita", orderable up to 3) renders as a +/-
+// quantity stepper instead. An extra with `default: true` is pre-checked to
+// match an ingredient the real site includes standard (e.g. a sandwich's
+// Tomato/Onion) -- leaving it checked stays silent (it's just the default),
+// unchecking it records "No {name}" so removing a default is still visible
+// in the order line.
+function extrasSectionHTML(meta, opts = {}) {
+  const heading = opts.heading || `Add extra? <span style="font-size:0.72rem;opacity:0.7">(optional -- pick any number)</span>`;
+  const divider = opts.divider ? "margin-top:0.75rem;padding-top:0.6rem;border-top:1px solid var(--border);" : "";
+  return `
+    <div style="${divider}color:var(--text-muted);margin-bottom:0.5rem">${heading}</div>
+    <div class="extras-options" style="display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.6rem;max-height:220px;overflow-y:auto">
+      ${meta.extras.map(e => {
+        if (Number(e.max) > 1) {
+          return `<div class="extras-option-qty" data-extra="${escAttr(e.name)}" data-price="${e.price}" data-max="${e.max}" data-qty="0" style="display:flex;align-items:center;gap:0.5rem;color:var(--text)">
+            <button type="button" class="protein-btn qty-minus" style="padding:0.15rem 0.55rem" aria-label="Decrease">−</button>
+            <span class="qty-value" style="min-width:1.4em;text-align:center;font-weight:700">0</span>
+            <button type="button" class="protein-btn qty-plus" style="padding:0.15rem 0.55rem" aria-label="Increase">+</button>
+            <span>${esc(e.name)} <span style="font-size:0.72rem;opacity:0.7">(up to ${e.max})</span>${Number(e.price) ? ` <span style="color:var(--gold)">+$${Number(e.price).toFixed(2)} ea</span>` : ""}</span>
+          </div>`;
+        }
+        return `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+          <input type="checkbox" class="extras-option-checkbox" data-extra="${escAttr(e.name)}" data-price="${e.price}" data-default="${e.default ? "1" : "0"}" ${e.default ? "checked" : ""} style="accent-color:var(--gold);width:15px;height:15px">
+          ${esc(e.name)}${Number(e.price) ? ` <span style="color:var(--gold)">+$${Number(e.price).toFixed(2)}</span>` : ""}
+        </label>`;
+      }).join("")}
+    </div>`;
+}
+
+// Wires the +/- steppers within `el` and returns a function that reads back
+// the chosen list at commit time: a checked non-default extra by name, a
+// stepper with qty > 0 as "{name} xN" (or bare name if qty is 1), and "No
+// {name}" for any DEFAULT extra the user unchecked.
+function wireExtras(el) {
+  const boxes    = [...el.querySelectorAll(".extras-option-checkbox")];
+  const steppers = [...el.querySelectorAll(".extras-option-qty")];
+  steppers.forEach(row => {
+    const max     = Number(row.dataset.max) || 1;
+    const valueEl = row.querySelector(".qty-value");
+    row.querySelector(".qty-minus").addEventListener("click", () => {
+      row.dataset.qty = Math.max(0, Number(row.dataset.qty) - 1);
+      valueEl.textContent = row.dataset.qty;
+    });
+    row.querySelector(".qty-plus").addEventListener("click", () => {
+      row.dataset.qty = Math.min(max, Number(row.dataset.qty) + 1);
+      valueEl.textContent = row.dataset.qty;
+    });
+  });
+  return function collectExtras() {
+    const chosen = [];
+    boxes.forEach(b => {
+      if (b.dataset.default === "1") {
+        if (!b.checked) chosen.push(`No ${b.dataset.extra}`);
+      } else if (b.checked) {
+        chosen.push(b.dataset.extra);
+      }
+    });
+    steppers.forEach(row => {
+      const qty = Number(row.dataset.qty);
+      if (qty > 0) chosen.push(qty > 1 ? `${row.dataset.extra} x${qty}` : row.dataset.extra);
+    });
+    return chosen;
+  };
+}
+
+// Combines a required-picker's chosen name(s) with whatever collectExtras()
+// picked up into the final order-line name, parenthesized like sidesPick's
+// multi-pick list -- smartSplit() only treats a comma as a new order item
+// when it's outside parens, so this keeps "Taco + (No Cilantro, No Onions)"
+// as one line, not two.
+function withExtras(baseName, chosenExtras) {
+  return chosenExtras.length ? `${baseName} + (${chosenExtras.join(", ")})` : baseName;
+}
+
 function showExtrasPrompt(baseName, meta) {
-  const prompt    = document.getElementById("extras-prompt");
-  const label     = document.getElementById("extras-prompt-item");
-  const optionsEl = document.getElementById("extras-options");
-  const skipBtn   = document.getElementById("extras-skip-btn");
-  if (!prompt) return;
+  const el = mountPrompt(
+    extrasSectionHTML(meta, { heading: `Add extra to <strong>${esc(baseName)}</strong>? <span style="font-size:0.72rem;opacity:0.7">(optional -- pick any number)</span>` }) +
+    `<div style="display:flex;gap:0.5rem">
+      <button type="button" class="protein-btn protein-btn-add extras-skip-btn">Add to Order</button>
+    </div>`);
+  if (!el) return;
 
-  label.textContent = baseName;
+  const addBtn        = el.querySelector(".extras-skip-btn");
+  const closeBtn      = el.querySelector(".prompt-close-btn");
+  const collectExtras = wireExtras(el);
 
-  optionsEl.innerHTML = meta.extras.map(e =>
-    `<button type="button" class="protein-btn extras-option-btn" data-extra="${escAttr(e.name)}" data-price="${e.price}">
-      ${esc(e.name)} <span style="color:var(--gold);margin-left:0.25rem">+$${Number(e.price).toFixed(2)}</span>
-    </button>`
-  ).join("");
-
-  prompt.style.display = "block";
-
-  function commit(finalName) {
-    prompt.style.display = "none";
+  addBtn.addEventListener("click", () => {
+    const finalName = withExtras(baseName, collectExtras());
     // Ordering the same item twice is allowed -- checkDuplicates() still
     // warns (e.g. someone else already has it), it just no longer blocks it.
     selectedItems.push(finalName);
     renderPills();
     checkDuplicates();
-    cleanup();
-  }
-  function onOption(e) {
-    const btn = e.target.closest(".extras-option-btn");
-    if (!btn) return;
-    commit(`${baseName} + ${btn.dataset.extra}`);
-  }
-  function onSkip() { commit(baseName); }
-  function cleanup() {
-    optionsEl.removeEventListener("click", onOption);
-    skipBtn.removeEventListener("click", onSkip);
-  }
-  optionsEl.addEventListener("click", onOption);
-  skipBtn.addEventListener("click", onSkip);
+    el.remove();
+  });
+  closeBtn.addEventListener("click", () => el.remove());
 }
 
 function showComboPrompt(baseName, meta) {
-  const prompt      = document.getElementById("combo-prompt");
-  const label       = document.getElementById("combo-prompt-item");
-  const checkbox    = document.getElementById("combo-checkbox");
-  const priceEl     = document.getElementById("combo-price-label");
-  const sideWrap    = document.getElementById("combo-side-wrap");
-  const sideSelect  = document.getElementById("combo-side-select");
-  const drinkInput  = document.getElementById("combo-drink-input");
-  const addBtn      = document.getElementById("combo-add-btn");
-  const skipBtn     = document.getElementById("combo-skip-btn");
-  if (!prompt) return;
+  const el = mountPrompt(`
+    <div style="color:var(--text-muted);margin-bottom:0.5rem">Adding: <strong>${esc(baseName)}</strong></div>
+    <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+      <input type="checkbox" class="combo-checkbox" style="accent-color:var(--gold);width:15px;height:15px" />
+      Make it a combo &nbsp;<span style="color:var(--gold);font-weight:700">(+$${Number(meta.comboPrice).toFixed(2)})</span>
+    </label>
+    <div class="combo-side-wrap" style="display:none;margin-top:0.5rem;flex-direction:column;gap:0.4rem">
+      <div style="font-size:0.75rem;color:var(--text-muted)">Side choice</div>
+      <select class="combo-side-select" style="width:100%;padding:0.4rem 0.6rem;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.85rem;font-family:inherit">
+        ${(meta.comboSides || []).map(s => `<option>${esc(s)}</option>`).join("")}
+      </select>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem">Drink (included) — type your choice</div>
+      <input type="text" class="combo-drink-input" placeholder="e.g. Coke, Sprite, water…" style="width:100%;padding:0.4rem 0.6rem;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.85rem;font-family:inherit;box-sizing:border-box" />
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-top:0.6rem">
+      <button type="button" class="protein-btn protein-btn-add combo-add-btn">Add to Order</button>
+      <button type="button" class="protein-btn combo-skip-btn">Cancel</button>
+    </div>`);
+  if (!el) return;
 
-  label.textContent       = baseName;
-  priceEl.textContent     = `(+$${Number(meta.comboPrice).toFixed(2)})`;
-  checkbox.checked        = false;
-  sideWrap.style.display  = "none";
-  drinkInput.value        = "";
-  sideSelect.innerHTML    = (meta.comboSides || []).map(s => `<option>${s}</option>`).join("");
-  prompt.style.display    = "block";
+  const checkbox   = el.querySelector(".combo-checkbox");
+  const sideWrap   = el.querySelector(".combo-side-wrap");
+  const sideSelect = el.querySelector(".combo-side-select");
+  const drinkInput = el.querySelector(".combo-drink-input");
+  const addBtn     = el.querySelector(".combo-add-btn");
+  const skipBtn    = el.querySelector(".combo-skip-btn");
+  const closeBtn   = el.querySelector(".prompt-close-btn");
 
-  function onCheck() {
+  checkbox.addEventListener("change", () => {
     sideWrap.style.display = checkbox.checked ? "flex" : "none";
-  }
-  function commit() {
-    prompt.style.display = "none";
+  });
+  addBtn.addEventListener("click", () => {
     let finalName = baseName;
     if (checkbox.checked) {
       const drink = drinkInput.value.trim();
@@ -992,157 +1039,141 @@ function showComboPrompt(baseName, meta) {
     selectedItems.push(finalName);
     renderPills();
     checkDuplicates();
-    cleanup();
-  }
-  function cancel() { prompt.style.display = "none"; cleanup(); }
-  function cleanup() {
-    checkbox.removeEventListener("change", onCheck);
-    addBtn.removeEventListener("click", commit);
-    skipBtn.removeEventListener("click", cancel);
-  }
-  checkbox.addEventListener("change", onCheck);
-  addBtn.addEventListener("click", commit);
-  skipBtn.addEventListener("click", cancel);
+    el.remove();
+  });
+  skipBtn.addEventListener("click", () => el.remove());
+  closeBtn.addEventListener("click", () => el.remove());
 }
 
 function showProteinPrompt(baseName) {
-  const prompt   = document.getElementById("protein-prompt");
-  const label    = document.getElementById("protein-prompt-item");
-  const input    = document.getElementById("protein-input");
-  const addBtn   = document.getElementById("protein-add-btn");
-  const skipBtn  = document.getElementById("protein-skip-btn");
-  if (!prompt) return;
+  const el = mountPrompt(`
+    <span style="color:var(--text-muted)">Protein for <strong>${esc(baseName)}</strong>:</span>
+    <div style="display:flex;gap:0.5rem;margin-top:0.4rem;align-items:center">
+      <input type="text" class="protein-input" placeholder="e.g. Chicken, Beef, Al Pastor, Veggie…" style="flex:1;min-width:0;padding:0.4rem 0.6rem;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.85rem;font-family:inherit" />
+      <button type="button" class="protein-btn protein-btn-add protein-add-btn">Add</button>
+      <button type="button" class="protein-btn protein-skip-btn">Skip</button>
+    </div>`);
+  if (!el) return;
 
-  label.textContent = baseName;
-  input.value = "";
-  prompt.style.display = "block";
+  const input    = el.querySelector(".protein-input");
+  const addBtn   = el.querySelector(".protein-add-btn");
+  const skipBtn  = el.querySelector(".protein-skip-btn");
+  const closeBtn = el.querySelector(".prompt-close-btn");
   input.focus();
 
   function commit() {
     const protein = input.value.trim();
     const finalName = protein ? `${baseName} (${protein})` : baseName;
-    prompt.style.display = "none";
     // Ordering the same item twice is allowed -- checkDuplicates() still
     // warns (e.g. someone else already has it), it just no longer blocks it.
     selectedItems.push(finalName);
     renderPills();
     checkDuplicates();
-    // clean up listeners
-    addBtn.removeEventListener("click", onAdd);
-    skipBtn.removeEventListener("click", onSkip);
-    input.removeEventListener("keydown", onKey);
+    el.remove();
   }
 
-  function onAdd()  { commit(); }
-  function onSkip() { input.value = ""; commit(); }
-  function onKey(e) { if (e.key === "Enter") { e.preventDefault(); commit(); } }
-
-  addBtn.addEventListener("click",  onAdd);
-  skipBtn.addEventListener("click", onSkip);
-  input.addEventListener("keydown", onKey);
+  addBtn.addEventListener("click",  commit);
+  skipBtn.addEventListener("click", () => { input.value = ""; commit(); });
+  input.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); commit(); } });
+  closeBtn.addEventListener("click", () => el.remove());
 }
 
 function showOrOptionsPrompt(baseName, meta) {
-  const prompt = document.getElementById("or-options-prompt");
-  const label  = document.getElementById("or-options-prompt-item");
-  const listEl = document.getElementById("or-options-list");
-  const addBtn = document.getElementById("or-options-add-btn");
-  if (!prompt) return;
+  const hasExtras = meta.extras && meta.extras.length;
+  const el = mountPrompt(`
+    <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose one for <strong>${esc(baseName)}</strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
+    <div class="or-options-list" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.6rem">
+      ${meta.orOptions.map(opt =>
+        `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+          <input type="checkbox" class="or-option-checkbox" data-option="${escAttr(opt)}" style="accent-color:var(--gold);width:15px;height:15px">
+          ${esc(opt)}
+        </label>`
+      ).join("")}
+    </div>` +
+    (hasExtras ? extrasSectionHTML(meta, { divider: true }) : "") +
+    `<div style="display:flex;gap:0.5rem">
+      <button type="button" class="protein-btn protein-btn-add or-options-add-btn" disabled>Add to Order</button>
+    </div>`);
+  if (!el) return;
 
-  label.textContent = baseName;
-  listEl.innerHTML = meta.orOptions.map(opt =>
-    `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
-      <input type="checkbox" class="or-option-checkbox" data-option="${escAttr(opt)}" style="accent-color:var(--gold);width:15px;height:15px">
-      ${esc(opt)}
-    </label>`
-  ).join("");
-  addBtn.disabled = true;
-  prompt.style.display = "block";
+  const listEl   = el.querySelector(".or-options-list");
+  const addBtn   = el.querySelector(".or-options-add-btn");
+  const closeBtn = el.querySelector(".prompt-close-btn");
+  const boxes    = [...listEl.querySelectorAll(".or-option-checkbox")];
+  const collectExtras = hasExtras ? wireExtras(el) : () => [];
 
-  const boxes = [...listEl.querySelectorAll(".or-option-checkbox")];
-
-  function onChange(e) {
+  listEl.addEventListener("change", e => {
     const box = e.target.closest(".or-option-checkbox");
     if (!box) return;
     if (box.checked) boxes.forEach(b => { if (b !== box) b.checked = false; });
     addBtn.disabled = !boxes.some(b => b.checked);
-  }
-
-  function commit() {
+  });
+  addBtn.addEventListener("click", () => {
     const chosen = boxes.find(b => b.checked);
     if (!chosen) return;
-    const finalName = `${baseName} (${chosen.dataset.option})`;
-    prompt.style.display = "none";
-    // Ordering the same item twice is allowed -- checkDuplicates() still
-    // warns (e.g. someone else already has it), it just no longer blocks it.
+    const finalName = withExtras(`${baseName} (${chosen.dataset.option})`, collectExtras());
     selectedItems.push(finalName);
     renderPills();
     checkDuplicates();
-    cleanup();
-  }
-  function cleanup() {
-    listEl.removeEventListener("change", onChange);
-    addBtn.removeEventListener("click", commit);
-  }
-  listEl.addEventListener("change", onChange);
-  addBtn.addEventListener("click", commit);
+    el.remove();
+  });
+  closeBtn.addEventListener("click", () => el.remove());
 }
 
 // For combo entrees that include "at least N regular sides" -- the picks are
 // free (included in the base price), so the compact menu display just says
 // "+ N sides" instead of listing every option inline.
 function showSidesPickPrompt(baseName, meta) {
-  const prompt = document.getElementById("sides-pick-prompt");
-  const label  = document.getElementById("sides-pick-item");
-  const count  = document.getElementById("sides-pick-count");
-  const listEl = document.getElementById("sides-pick-list");
-  const addBtn = document.getElementById("sides-pick-add-btn");
-  if (!prompt) return;
-
   const n = meta.sidesPick.count || 2;
-  label.textContent = baseName;
-  count.textContent = n;
-  listEl.innerHTML = meta.sidesPick.options.map(opt =>
-    `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
-      <input type="checkbox" class="sides-pick-checkbox" data-option="${escAttr(opt)}" style="accent-color:var(--gold);width:15px;height:15px">
-      ${esc(opt)}
-    </label>`
-  ).join("");
-  addBtn.disabled = true;
-  prompt.style.display = "block";
+  // A sidesPick->saucePick chain (Sardis/Pollo Cabana chicken orders) never
+  // also has extras today, so extras only render inline here when there's
+  // no saucePick to chain into afterward -- keeps this to two sections, not
+  // three, in the one case that actually occurs.
+  const hasExtras = !meta.saucePick && meta.extras && meta.extras.length;
+  const el = mountPrompt(`
+    <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose ${n} sides for <strong>${esc(baseName)}</strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
+    <div class="sides-pick-list" style="display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.6rem;max-height:220px;overflow-y:auto">
+      ${meta.sidesPick.options.map(opt =>
+        `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+          <input type="checkbox" class="sides-pick-checkbox" data-option="${escAttr(opt)}" style="accent-color:var(--gold);width:15px;height:15px">
+          ${esc(opt)}
+        </label>`
+      ).join("")}
+    </div>` +
+    (hasExtras ? extrasSectionHTML(meta, { divider: true }) : "") +
+    `<div style="display:flex;gap:0.5rem">
+      <button type="button" class="protein-btn protein-btn-add sides-pick-add-btn" disabled>Add to Order</button>
+    </div>`);
+  if (!el) return;
 
-  const boxes = [...listEl.querySelectorAll(".sides-pick-checkbox")];
+  const listEl   = el.querySelector(".sides-pick-list");
+  const addBtn   = el.querySelector(".sides-pick-add-btn");
+  const closeBtn = el.querySelector(".prompt-close-btn");
+  const boxes    = [...listEl.querySelectorAll(".sides-pick-checkbox")];
+  const collectExtras = hasExtras ? wireExtras(el) : () => [];
 
-  function onChange(e) {
+  listEl.addEventListener("change", e => {
     const box = e.target.closest(".sides-pick-checkbox");
     if (!box) return;
     const checked = boxes.filter(b => b.checked);
     if (checked.length > n) box.checked = false;
     addBtn.disabled = boxes.filter(b => b.checked).length !== n;
-  }
-
-  function commit() {
+  });
+  addBtn.addEventListener("click", () => {
     const chosen = boxes.filter(b => b.checked).map(b => b.dataset.option);
     if (chosen.length !== n) return;
     const finalName = `${baseName} (${chosen.join(", ")})`;
-    prompt.style.display = "none";
-    cleanup();
+    el.remove();
     if (meta.saucePick) {
       showSaucePickPrompt(finalName, meta);
       return;
     }
-    // Ordering the same item twice is allowed -- checkDuplicates() still
-    // warns (e.g. someone else already has it), it just no longer blocks it.
-    selectedItems.push(finalName);
+    const withExtrasName = withExtras(finalName, collectExtras());
+    selectedItems.push(withExtrasName);
     renderPills();
     checkDuplicates();
-  }
-  function cleanup() {
-    listEl.removeEventListener("change", onChange);
-    addBtn.removeEventListener("click", commit);
-  }
-  listEl.addEventListener("change", onChange);
-  addBtn.addEventListener("click", commit);
+  });
+  closeBtn.addEventListener("click", () => el.remove());
 }
 
 // Sauce choices are included free with chicken orders but are tracked as
@@ -1150,12 +1181,21 @@ function showSidesPickPrompt(baseName, meta) {
 // Worksheet's "Group Duplicates" view can tally them across everyone's
 // orders, e.g. "6x Sauce: Aji Amarillo Aoli".
 function showSaucePickPrompt(finalDishName, meta) {
-  const prompt = document.getElementById("sauce-pick-prompt");
-  const label  = document.getElementById("sauce-pick-item");
-  const count  = document.getElementById("sauce-pick-count");
-  const listEl = document.getElementById("sauce-pick-list");
-  const addBtn = document.getElementById("sauce-pick-add-btn");
-  if (!prompt) {
+  const n = meta.saucePick.count || 2;
+  const el = mountPrompt(`
+    <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose ${n} sauces for <strong>${esc(finalDishName)}</strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
+    <div class="sauce-pick-list" style="display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.6rem;max-height:220px;overflow-y:auto">
+      ${meta.saucePick.options.map(opt =>
+        `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+          <input type="checkbox" class="sauce-pick-checkbox" data-option="${escAttr(opt)}" style="accent-color:var(--gold);width:15px;height:15px">
+          ${esc(opt)}
+        </label>`
+      ).join("")}
+    </div>
+    <div style="display:flex;gap:0.5rem">
+      <button type="button" class="protein-btn protein-btn-add sauce-pick-add-btn" disabled>Add to Order</button>
+    </div>`);
+  if (!el) {
     // Ordering the same item twice is allowed -- checkDuplicates() still
     // warns (e.g. someone else already has it), it just no longer blocks it.
     selectedItems.push(finalDishName);
@@ -1164,89 +1204,79 @@ function showSaucePickPrompt(finalDishName, meta) {
     return;
   }
 
-  const n = meta.saucePick.count || 2;
-  label.textContent = finalDishName;
-  count.textContent = n;
-  listEl.innerHTML = meta.saucePick.options.map(opt =>
-    `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
-      <input type="checkbox" class="sauce-pick-checkbox" data-option="${escAttr(opt)}" style="accent-color:var(--gold);width:15px;height:15px">
-      ${esc(opt)}
-    </label>`
-  ).join("");
-  addBtn.disabled = true;
-  prompt.style.display = "block";
+  const listEl   = el.querySelector(".sauce-pick-list");
+  const addBtn   = el.querySelector(".sauce-pick-add-btn");
+  const closeBtn = el.querySelector(".prompt-close-btn");
+  const boxes    = [...listEl.querySelectorAll(".sauce-pick-checkbox")];
 
-  const boxes = [...listEl.querySelectorAll(".sauce-pick-checkbox")];
-
-  function onChange(e) {
+  listEl.addEventListener("change", e => {
     const box = e.target.closest(".sauce-pick-checkbox");
     if (!box) return;
     const checked = boxes.filter(b => b.checked);
     if (checked.length > n) box.checked = false;
     addBtn.disabled = boxes.filter(b => b.checked).length !== n;
-  }
-
-  function commit() {
+  });
+  addBtn.addEventListener("click", () => {
     const chosen = boxes.filter(b => b.checked).map(b => b.dataset.option);
     if (chosen.length !== n) return;
-    prompt.style.display = "none";
-    selectedItems.push(finalDishName);
+    // Sauces are independent tally lines regardless of what happens to the
+    // dish next, so push them now; the dish itself still needs to check for
+    // a chained extras step before landing in the order. (No current item
+    // combines sidesPick+saucePick with extras too, but handle it if one
+    // ever does rather than silently dropping the extras group.)
     chosen.forEach(sauce => selectedItems.push(`Sauce: ${sauce}`));
+    el.remove();
+    if (meta.extras && meta.extras.length) {
+      showExtrasPrompt(finalDishName, meta);
+      return;
+    }
+    selectedItems.push(finalDishName);
     renderPills();
     checkDuplicates();
-    cleanup();
-  }
-  function cleanup() {
-    listEl.removeEventListener("change", onChange);
-    addBtn.removeEventListener("click", commit);
-  }
-  listEl.addEventListener("change", onChange);
-  addBtn.addEventListener("click", commit);
+  });
+  closeBtn.addEventListener("click", () => el.remove());
 }
 
 // For standalone Sides A La Carte items: one canonical item, priced
 // automatically from the Regular/Large size chosen (no duplicate menu rows).
 function showSizePrompt(baseName, meta) {
-  const prompt = document.getElementById("size-prompt");
-  const label  = document.getElementById("size-prompt-item");
-  const listEl = document.getElementById("size-prompt-list");
-  const addBtn = document.getElementById("size-prompt-add-btn");
-  if (!prompt) return;
+  const radioName  = `size-prompt-radio-${++_promptSeq}`;
+  const hasExtras  = meta.extras && meta.extras.length;
+  const el = mountPrompt(`
+    <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose an option for <strong>${esc(baseName)}</strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
+    <div class="size-prompt-list" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.6rem">
+      ${Object.entries(meta.sizes).map(([size, price]) =>
+        `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+          <input type="radio" name="${radioName}" class="size-prompt-radio" data-size="${escAttr(size)}" style="accent-color:var(--gold);width:15px;height:15px">
+          ${esc(size)} <span style="color:var(--text-dim);font-size:0.8rem">$${Number(price).toFixed(2)}</span>
+        </label>`
+      ).join("")}
+    </div>` +
+    (hasExtras ? extrasSectionHTML(meta, { divider: true }) : "") +
+    `<div style="display:flex;gap:0.5rem">
+      <button type="button" class="protein-btn protein-btn-add size-prompt-add-btn" disabled>Add to Order</button>
+    </div>`);
+  if (!el) return;
 
-  label.textContent = baseName;
-  listEl.innerHTML = Object.entries(meta.sizes).map(([size, price]) =>
-    `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
-      <input type="radio" name="size-prompt-radio" class="size-prompt-radio" data-size="${escAttr(size)}" style="accent-color:var(--gold);width:15px;height:15px">
-      ${esc(size)} <span style="color:var(--text-dim);font-size:0.8rem">$${Number(price).toFixed(2)}</span>
-    </label>`
-  ).join("");
-  addBtn.disabled = true;
-  prompt.style.display = "block";
+  const listEl   = el.querySelector(".size-prompt-list");
+  const addBtn   = el.querySelector(".size-prompt-add-btn");
+  const closeBtn = el.querySelector(".prompt-close-btn");
+  const boxes    = [...listEl.querySelectorAll(".size-prompt-radio")];
+  const collectExtras = hasExtras ? wireExtras(el) : () => [];
 
-  const boxes = [...listEl.querySelectorAll(".size-prompt-radio")];
-
-  function onChange() {
+  listEl.addEventListener("change", () => {
     addBtn.disabled = !boxes.some(b => b.checked);
-  }
-
-  function commit() {
+  });
+  addBtn.addEventListener("click", () => {
     const chosen = boxes.find(b => b.checked);
     if (!chosen) return;
-    const finalName = `${baseName} (${chosen.dataset.size})`;
-    prompt.style.display = "none";
-    // Ordering the same item twice is allowed -- checkDuplicates() still
-    // warns (e.g. someone else already has it), it just no longer blocks it.
+    const finalName = withExtras(`${baseName} (${chosen.dataset.size})`, collectExtras());
     selectedItems.push(finalName);
     renderPills();
     checkDuplicates();
-    cleanup();
-  }
-  function cleanup() {
-    listEl.removeEventListener("change", onChange);
-    addBtn.removeEventListener("click", commit);
-  }
-  listEl.addEventListener("change", onChange);
-  addBtn.addEventListener("click", commit);
+    el.remove();
+  });
+  closeBtn.addEventListener("click", () => el.remove());
 }
 
 function renderPills() {
@@ -1263,8 +1293,13 @@ function renderPills() {
   container.innerHTML = [...counts.entries()].map(([item, count]) => {
     const taken = (takenItems[item.toLowerCase()] || []).length > 0;
     const qtyLabel = count > 1 ? `<span class="pill-qty">&times;${count}</span>` : "";
+    // Only known menu items resolve to a price -- a free-text leftover or a
+    // "Sauce: X" tally line (no catalog entry of its own) shows no price
+    // badge rather than a misleading $0.00.
+    const meta = findMenuItem(item.replace(/\s*\(.*\)\s*$/, "").trim()) || findMenuItem(item);
+    const priceLabel = meta ? `<span class="pill-price">$${(priceForOrderLine(item) * count).toFixed(2)}</span>` : "";
     return `<span class="selected-pill${taken ? " is-taken" : ""}">
-      ${esc(item)}${qtyLabel}
+      ${esc(item)}${qtyLabel}${priceLabel}
       <button type="button" class="pill-remove" data-item="${escAttr(item)}">&times;</button>
     </span>`;
   }).join("");
@@ -1277,6 +1312,14 @@ function renderPills() {
       checkDuplicates();
     });
   });
+
+  // Running subtotal for what's been added so far -- visible immediately as
+  // items go in, well before Submit Order.
+  const subtotalEl = document.getElementById("order-subtotal");
+  if (subtotalEl) {
+    const total = selectedItems.reduce((sum, item) => sum + priceForOrderLine(item), 0);
+    subtotalEl.textContent = selectedItems.length ? `Subtotal: $${total.toFixed(2)}` : "";
+  }
 }
 
 function updateMenuIndicators() {
@@ -2640,30 +2683,32 @@ function findMenuItem(name, menu) {
   return m || null;
 }
 
-// Resolves the price for one order-line item. meta.sizes is a generic
-// {optionName: price} map -- Regular/Large for Sides A La Carte, but also
-// Chicken/Steak, Fish/+Seafood, etc. for entrees priced by protein choice
-// ("Pollo o Lomo Saltado (Steak)" -> meta.sizes.Steak). Falls through to the
-// flat price for everything else, including non-price-affecting parenthetical
-// suffixes like an orOptions choice or a "(SideA, SideB)" sidesPick tag.
-function resolveItemPrice(itemText, menu) {
-  const m = itemText.match(/^(.*)\s\((.+)\)$/);
-  if (m) {
-    const meta = findMenuItem(m[1].trim(), menu);
-    if (meta?.sizes && Object.prototype.hasOwnProperty.call(meta.sizes, m[2])) {
-      return Number(meta.sizes[m[2]]) || 0;
+// Finds the outermost parenthesized group that closes at the very end of
+// `text`, depth-aware so a chosen option's own parens (e.g. sidesPick's
+// "Lengua (Beef Tongue) (+$1.50)") don't get mistaken for the group boundary.
+// Returns null if the text doesn't end in ")".
+function extractTrailingGroup(text) {
+  if (!text.endsWith(")")) return null;
+  let depth = 0;
+  for (let i = text.length - 1; i >= 0; i--) {
+    if (text[i] === ")") depth++;
+    else if (text[i] === "(") {
+      depth--;
+      if (depth === 0) {
+        return { name: text.slice(0, i).trim(), inner: text.slice(i + 1, text.length - 1) };
+      }
     }
   }
-  const baseName = itemText.replace(/\s*\(.*\)\s*$/, "").trim();
-  const meta = findMenuItem(baseName, menu) || findMenuItem(itemText, menu);
-  return Number(meta?.price) || 0;
+  return null;
 }
 
-function smartSplit(orderText) {
-  const clean = orderText.replace(/ \| Notes:.*$/, "");
+// Splits on top-level commas only (ignores commas nested inside parens) --
+// shared by smartSplit (order items) and resolveItemPrice (chosen options
+// within one item's sidesPick/orOptions group).
+function splitTopLevel(str) {
   const parts = [];
   let depth = 0, cur = "";
-  for (const ch of clean) {
+  for (const ch of str) {
     if (ch === "(") { depth++; cur += ch; }
     else if (ch === ")") { depth--; cur += ch; }
     else if (ch === "," && depth === 0) { parts.push(cur.trim()); cur = ""; }
@@ -2673,25 +2718,81 @@ function smartSplit(orderText) {
   return parts.filter(Boolean);
 }
 
-function calcOrderTotal(orderText) {
-  const parts = smartSplit(orderText);
+// orOptions/sidesPick have no native per-choice pricing, so a choice that
+// costs more/less than the item's base price gets its delta baked directly
+// into the option's own label (e.g. "Lengua (Beef Tongue) (+$1.50)",
+// "Solo Queso (Cheese Only) (-$5.50)"). Reads that trailing "(+$N.NN)" /
+// "(-$N.NN)" back out; returns 0 if the label doesn't end in one.
+function bakedDelta(optionText) {
+  const m = optionText.match(/\(([+-])\$(\d+(?:\.\d+)?)\)\s*$/);
+  if (!m) return 0;
+  return (m[1] === "-" ? -1 : 1) * Number(m[2]);
+}
 
-  let total = 0;
-  parts.filter(Boolean).forEach(part => {
-    const plusIdx = part.indexOf(" + ");
-    const baseName = plusIdx >= 0 ? part.slice(0, plusIdx).trim() : part.trim();
-    const suffix   = plusIdx >= 0 ? part.slice(plusIdx + 3).trim() : "";
-    const meta = findMenuItem(baseName.replace(/\s*\(.*\)\s*$/, "").trim()) || findMenuItem(baseName);
-    if (!meta) return;
-    total += resolveItemPrice(baseName);
-    if (suffix.startsWith("Combo") && meta.comboPrice) {
-      total += Number(meta.comboPrice);
-    } else if (suffix && meta.extras?.length) {
-      const ex = meta.extras.find(e => e.name === suffix);
-      if (ex) total += Number(ex.price) || 0;
+// Resolves the price for one order-line item. meta.sizes is a generic
+// {optionName: price} map -- Regular/Large for Sides A La Carte, but also
+// Chicken/Steak, Fish/+Seafood, etc. for entrees priced by protein choice
+// ("Pollo o Lomo Saltado (Steak)" -> meta.sizes.Steak). Falls through to the
+// flat base price plus any baked-in deltas from a chosen orOptions/sidesPick
+// option (or 0 for non-price-affecting suffixes, like a free protein name).
+function resolveItemPrice(itemText, menu) {
+  const m = itemText.match(/^(.*)\s\((.+)\)$/);
+  if (m) {
+    const meta = findMenuItem(m[1].trim(), menu);
+    if (meta?.sizes && Object.prototype.hasOwnProperty.call(meta.sizes, m[2])) {
+      return Number(meta.sizes[m[2]]) || 0;
     }
-  });
-  return total;
+  }
+  const group = extractTrailingGroup(itemText);
+  const baseName = group ? group.name : itemText;
+  const meta = findMenuItem(baseName, menu) || findMenuItem(itemText, menu);
+  let price = Number(meta?.price) || 0;
+  if (group) {
+    splitTopLevel(group.inner).forEach(opt => { price += bakedDelta(opt); });
+  }
+  return price;
+}
+
+function smartSplit(orderText) {
+  return splitTopLevel(orderText.replace(/ \| Notes:.*$/, ""));
+}
+
+// Prices one order-line item (an item name, optionally with a " + (...)"
+// combo/extras suffix) -- shared by calcOrderTotal (summing a whole order)
+// and the pill list (showing each item's own price as soon as it's added,
+// before the order is even submitted).
+function priceForOrderLine(part) {
+  const plusIdx = part.indexOf(" + ");
+  const baseName = plusIdx >= 0 ? part.slice(0, plusIdx).trim() : part.trim();
+  const suffix   = plusIdx >= 0 ? part.slice(plusIdx + 3).trim() : "";
+  const meta = findMenuItem(baseName.replace(/\s*\(.*\)\s*$/, "").trim()) || findMenuItem(baseName);
+  if (!meta) return 0;
+  let price = resolveItemPrice(baseName);
+  if (suffix.startsWith("Combo") && meta.comboPrice) {
+    price += Number(meta.comboPrice);
+  } else if (suffix && meta.extras?.length) {
+    // suffix can hold more than one extra now, parenthesized like
+    // "(No Cilantro, No Onions)" -- sum whichever chosen names match a
+    // real extra. Strip the wrapping parens first (old single-extra
+    // orders saved before this change have no parens, so this is a no-op
+    // for them and they still resolve the same as always). A quantity
+    // extra (max > 1, e.g. Big Greek's "Extra Pita" up to 3) is saved as
+    // "Extra Pita x2" -- strip the "xN" suffix to find the base extra,
+    // then multiply its price by N.
+    suffix.replace(/^\(|\)$/g, "").split(",").forEach(n => {
+      const trimmed  = n.trim();
+      const qtyMatch = trimmed.match(/^(.*)\s+x(\d+)$/);
+      const name     = qtyMatch ? qtyMatch[1].trim() : trimmed;
+      const qty      = qtyMatch ? Number(qtyMatch[2]) : 1;
+      const ex = meta.extras.find(e => e.name === name);
+      if (ex) price += (Number(ex.price) || 0) * qty;
+    });
+  }
+  return price;
+}
+
+function calcOrderTotal(orderText) {
+  return smartSplit(orderText).filter(Boolean).reduce((total, part) => total + priceForOrderLine(part), 0);
 }
 
 let _lastOrderRows  = [];
@@ -3368,7 +3469,11 @@ function startCountdown() {
     return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
   }
   function updateThemeComplement() {
-    const accent = getComputedStyle(document.body).getPropertyValue("--accent").trim() || "#fcf811";
+    // Source from --theme-color (the theme's actual vivid color), not
+    // --accent -- --accent is now a lighter highlight tint of it, and
+    // computing off that would double-lighten these derived colors.
+    const style = getComputedStyle(document.body);
+    const accent = (style.getPropertyValue("--theme-color").trim() || style.getPropertyValue("--accent").trim()) || "#fcf811";
     const [h, s, l] = hexToHsl(accent);
     const complement = hslToHex((h + 180) % 360, Math.max(s, 55), l);
     document.documentElement.style.setProperty("--theme-complement", complement);
@@ -3387,7 +3492,17 @@ function startCountdown() {
     // the Random Pick lightbox) that want the theme color to read as
     // vivid/bright rather than the deliberately muted "just barely visible"
     // darker tone.
-    const lighterTone = hslToHex(h, Math.max(55, s), Math.min(72, Math.max(58, l)));
+    //
+    // Clamping to a fixed [58,72] lightness band (the original approach)
+    // only guarantees contrast against bg's that sit outside that band.
+    // Several themes' accents already sit *inside* it -- yellow (l=53),
+    // juicyyellow (l=50), green (l=54), pink (l=54) -- so the clamp barely
+    // moved them and the "highlight" came out nearly identical to the bg.
+    // Instead, pick whichever side of the lightness scale is far from the
+    // source color: light bg's (l >= 50) get a dark, rich highlight; dark
+    // bg's get a light, bright one. That guarantees a large delta no matter
+    // where the source lightness started.
+    const lighterTone = hslToHex(h, Math.max(60, s), l >= 50 ? 32 : 72);
     document.documentElement.style.setProperty("--theme-arrow-light", lighterTone);
   }
   document.addEventListener("themechange", updateThemeComplement);
