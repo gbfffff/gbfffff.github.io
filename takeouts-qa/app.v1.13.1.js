@@ -40,8 +40,17 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.13.0";
+const APP_VERSION = "1.13.1";
 const CHANGELOG = [
+  { version: "1.13.1", date: "2026-07-22", notes: [
+    "Full menus added for Wai Kee (Traditional Chinese), Pollo Cabana, Taco Madre, and Big Greek, scraped directly from each restaurant's own ordering platform for exact modifiers/pricing",
+    "Extras reworked from single-pick buttons to independent multi-select checkboxes -- any number can apply at once (e.g. \"No Cilantro\" and \"No Onions\" together), with +/- quantity steppers for repeatable add-ons (e.g. up to 3 Extra Pita) and pre-checked boxes for ingredients a dish includes by default (unchecking one records \"No {item}\")",
+    "Fixed a bug where starting a second item's option prompt before finishing the first could silently re-add the abandoned first selection -- every prompt now mounts as its own independent, stackable card with a ✕ to cancel it outright",
+    "Items with a required choice (protein/side/size) AND separate optional add-ons now show both in one combined card instead of gating the add-ons behind a second step",
+    "Fixed order-total calculation silently ignoring price deltas baked into protein/side choice labels (e.g. a $1.50 upcharge for a specific protein) -- those now correctly add to the total",
+    "Selected-item pills now show each item's own price, plus a running subtotal, before Submit Order",
+    "Menu items can now be individually marked out of stock -- dimmed, badged, and blocked from being added",
+  ]},
   { version: "1.13.0", date: "2026-07-12", notes: [
     "Drop Game (Plinko) and Wheel of Fortune moved out to their own standalone game at games/plinko-wheel/, alongside Polls under a new games/ hub -- no longer part of this app's order-taking page",
     "New \"Reports and Stats\" card under Rate Your Order: a grid of small widgets (Overall Satisfaction, Average $/Person, Dishes Logged, Food Chart preview, Favs and Hates, Restaurant Popularity) -- click any widget for a bigger detail view (trend chart, bar chart, or full pie + legend), which links straight through to that dish's/restaurant's report",
