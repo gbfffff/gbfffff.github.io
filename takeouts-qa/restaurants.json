@@ -1944,10 +1944,10 @@
     {
       "name": "Ah'Haan",
       "cuisine": "Thai",
-      "phone": "",
+      "phone": "2404774587",
       "orderUrl": "https://ahhaan.com/menu/",
-      "mapUrl": "",
-      "address": "",
+      "mapUrl": "https://maps.app.goo.gl/8o8TgMxY4LwA9KR29",
+      "address": "237 Kentlands Blvd Unit A, Gaithersburg, MD 20878",
       "menuUrl": "https://ahhaan.com/menu/",
       "menuImages": [
         "images/Ah-Haan-Menu_Page_1-Rev.-2026-01-12-791x1024.png",
@@ -2815,6 +2815,10 @@
           "item": "Half Chicken",
           "price": 17.0,
           "desc": "Half a charbroiled Peruvian chicken. Includes choice of 2 regular sides.",
+          "meatChoice": {
+            "label": "Meat (optional)",
+            "options": ["Both Dark Meat", "Both White Meat"]
+          },
           "sidesPick": {
             "count": 2,
             "options": [
@@ -2856,6 +2860,10 @@
           "item": "Half Chicken Lunch Special",
           "price": 18.5,
           "desc": "Mon-Fri until 4pm only. Half chicken with a regular fountain soda. Includes choice of 2 regular sides.",
+          "meatChoice": {
+            "label": "Meat (optional)",
+            "options": ["Both Dark Meat", "Both White Meat"]
+          },
           "sidesPick": {
             "count": 2,
             "options": [
@@ -2899,7 +2907,8 @@
           "desc": "A whole charbroiled Peruvian chicken, no sides included.",
           "category": "Charbroiled Peruvian Chicken",
           "saucePick": {
-            "count": 2,
+            "min": 6,
+            "max": 8,
             "options": [
               "Aji Amarillo Aoli (Yellow/Medium)",
               "Rocoto Pepper Aoli (Red/Hot)",
@@ -2940,7 +2949,8 @@
           },
           "category": "Charbroiled Peruvian Chicken",
           "saucePick": {
-            "count": 2,
+            "min": 6,
+            "max": 8,
             "options": [
               "Aji Amarillo Aoli (Yellow/Medium)",
               "Rocoto Pepper Aoli (Red/Hot)",
@@ -2981,7 +2991,8 @@
           },
           "category": "Charbroiled Peruvian Chicken",
           "saucePick": {
-            "count": 2,
+            "min": 6,
+            "max": 8,
             "options": [
               "Aji Amarillo Aoli (Yellow/Medium)",
               "Rocoto Pepper Aoli (Red/Hot)",
@@ -3022,7 +3033,8 @@
           },
           "category": "Charbroiled Peruvian Chicken",
           "saucePick": {
-            "count": 2,
+            "min": 6,
+            "max": 8,
             "options": [
               "Aji Amarillo Aoli (Yellow/Medium)",
               "Rocoto Pepper Aoli (Red/Hot)",
@@ -3063,7 +3075,8 @@
           },
           "category": "Charbroiled Peruvian Chicken",
           "saucePick": {
-            "count": 2,
+            "min": 8,
+            "max": 12,
             "options": [
               "Aji Amarillo Aoli (Yellow/Medium)",
               "Rocoto Pepper Aoli (Red/Hot)",
@@ -3104,7 +3117,8 @@
           },
           "category": "Charbroiled Peruvian Chicken",
           "saucePick": {
-            "count": 2,
+            "min": 8,
+            "max": 12,
             "options": [
               "Aji Amarillo Aoli (Yellow/Medium)",
               "Rocoto Pepper Aoli (Red/Hot)",
@@ -3120,9 +3134,9 @@
         {
           "item": "Family Special",
           "price": 65.0,
-          "desc": "2 whole chickens with 6 large sides and a 2-liter soda included. Feeds 6-7.",
+          "desc": "2 whole chickens with 5 large sides and a 2-liter soda included. Feeds 6-7.",
           "sidesPick": {
-            "count": 6,
+            "count": 5,
             "options": [
               "White Rice",
               "Arroz Chaufa (Peruvian Fried Rice)",

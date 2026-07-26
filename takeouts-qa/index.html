@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:ital,wght@0,500;0,700;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="styles.v1.13.1.css">
+  <link rel="stylesheet" href="styles.v1.14.0.css">
 </head>
 <body>
 <div id="gate-overlay" class="gate-overlay">
@@ -24,7 +24,7 @@
     <button type="button" id="gate-submit" class="btn btn-primary" style="margin-top:1rem">Enter</button>
   </div>
 </div>
-<script src="gate.v1.13.0.js"></script>
+<script src="gate.v1.14.0.js"></script>
 <div class="debug-clock" id="debug-clock" style="display:none">
   <button type="button" class="debug-clock-label" id="debug-clock-toggle">
     Test Clock <span id="debug-clock-status"></span>
@@ -60,7 +60,7 @@
     <div class="theme-swatch" data-theme="pink"       style="background:#fc16ac" title="Acid Pink"></div>
   </div>
 </div>
-<div class="container">
+<div class="container" id="app-content">
 
   <header>
     <div class="marquee-sign"><span class="marquee-friday-text">TAKEOUT ORDER</span></div>
@@ -95,6 +95,7 @@
     <div class="card-header">
       <h2 id="menu-panel-title">Menu</h2>
     </div>
+    <div class="menu-panel-images" id="menu-panel-images"></div>
     <div class="menu-panel-shortcuts" id="menu-panel-shortcuts"></div>
     <div class="menu-panel" id="menu-panel"></div>
     <div class="resize-grip" id="menu-panel-grip" title="Drag to resize"></div>
@@ -150,17 +151,6 @@
     <div class="card-body driver-card-body">
       <div class="driver-name-stamp" id="driver-name">—</div>
       <button type="button" class="driver-edit-btn" id="driver-edit-btn" title="Swap driver for this week"><svg width="14" height="14" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 1.5 L9.5 3.5 L3.5 9.5 L1 10 L1.5 7.5 Z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6.5 2.5 L8.5 4.5" stroke="currentColor" stroke-width="1.2"/></svg></button>
-    </div>
-  </div>
-
-  <div id="driver-edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center">
-    <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:340px;width:90%;text-align:center">
-      <p style="margin-bottom:1rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600">Who's driving this week?</p>
-      <input type="text" id="driver-edit-input" placeholder="Driver name" autocomplete="off" style="width:100%;padding:0.6rem;border:2px solid #000;font-size:1rem;font-family:inherit;text-align:center;box-sizing:border-box">
-      <div style="display:flex;gap:0.75rem;justify-content:center;margin-top:1.1rem">
-        <button type="button" id="driver-edit-ok" style="padding:0.5rem 1.25rem;border:2px solid #000;background:#000;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Save</button>
-        <button type="button" id="driver-edit-cancel" style="padding:0.5rem 1.25rem;border:2px solid #000;background:transparent;color:#000;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Cancel</button>
-      </div>
     </div>
   </div>
 
@@ -226,6 +216,23 @@
     </div>
     <div class="card-body">
       <div class="order-reports-grid">
+        <div class="order-reports-widget order-reports-widget-momentum" id="order-reports-momentum-widget" onclick="openCurrentRestaurantReport()" style="display:none">
+          <h3 class="order-reports-widget-heading" id="order-reports-momentum-heading">This Restaurant</h3>
+          <div class="reports-momentum-body" id="order-reports-momentum-body">
+            <div class="reports-momentum-spark-wrap" id="order-reports-momentum-spark"></div>
+            <div class="reports-momentum-deltas">
+              <div class="reports-momentum-delta">
+                <div class="reports-momentum-delta-value" id="order-reports-momentum-lasttime">—</div>
+                <div class="reports-momentum-delta-label">vs Last Time</div>
+              </div>
+              <div class="reports-momentum-delta">
+                <div class="reports-momentum-delta-value" id="order-reports-momentum-alltime">—</div>
+                <div class="reports-momentum-delta-label">vs All-Time Avg</div>
+              </div>
+            </div>
+          </div>
+          <div id="order-reports-momentum-empty" class="placeholder" style="display:none"></div>
+        </div>
         <div class="order-reports-widget order-reports-widget-num" onclick="openOrderReportsDetail('satisfaction')">
           <div class="order-reports-stat-value" id="order-reports-satisfaction">—</div>
           <div class="order-reports-stat-label">Overall Satisfaction</div>
@@ -266,16 +273,6 @@
           <div id="order-reports-restaurants-empty" class="placeholder" style="display:none">No data yet</div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="report-modal" id="order-reports-detail-modal" onclick="closeOrderReportsDetail(event)">
-    <div class="report-modal-box" onclick="event.stopPropagation()">
-      <div class="report-modal-header">
-        <h2 id="order-reports-detail-title">Detail</h2>
-        <button type="button" class="report-modal-close" onclick="closeOrderReportsDetail()">&times;</button>
-      </div>
-      <div class="report-modal-body" id="order-reports-detail-body"></div>
     </div>
   </div>
 
@@ -349,8 +346,30 @@
   </footer>
 
 </div>
+
+<div id="driver-edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center">
+  <div style="background:var(--accent);border:2px solid #000;padding:1.5rem;max-width:340px;width:90%;text-align:center">
+    <p style="margin-bottom:1rem;color:#000;font-size:0.95rem;line-height:1.5;font-weight:600">Who's driving this week?</p>
+    <input type="text" id="driver-edit-input" placeholder="Driver name" autocomplete="off" style="width:100%;padding:0.6rem;border:2px solid #000;font-size:1rem;font-family:inherit;text-align:center;box-sizing:border-box">
+    <div style="display:flex;gap:0.75rem;justify-content:center;margin-top:1.1rem">
+      <button type="button" id="driver-edit-ok" style="padding:0.5rem 1.25rem;border:2px solid #000;background:#000;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Save</button>
+      <button type="button" id="driver-edit-cancel" style="padding:0.5rem 1.25rem;border:2px solid #000;background:transparent;color:#000;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="report-modal" id="order-reports-detail-modal" onclick="closeOrderReportsDetail(event)">
+  <div class="report-modal-box" onclick="event.stopPropagation()">
+    <div class="report-modal-header">
+      <h2 id="order-reports-detail-title">Detail</h2>
+      <button type="button" class="report-modal-close" onclick="closeOrderReportsDetail()">&times;</button>
+    </div>
+    <div class="report-modal-body" id="order-reports-detail-body"></div>
+  </div>
+</div>
+
 <script src="config.js?v=1.9.1"></script>
-<script src="app.v1.13.1.js"></script>
+<script src="app.v1.14.0.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="traffic-widget.js?v=1.13.0"></script>
@@ -481,9 +500,9 @@
 
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
-  <button class="lightbox-nav prev" onclick="event.stopPropagation();lbPrev()" hidden>&#8249;</button>
-  <img src="" alt="" onclick="event.stopPropagation()">
-  <button class="lightbox-nav next" onclick="event.stopPropagation();lbNext()" hidden>&#8250;</button>
+  <button class="lightbox-nav prev" onclick="event.stopPropagation();lbPrev()" hidden><svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 3 L5 9 L11 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></button>
+  <img src="" alt="" onclick="event.stopPropagation();lbImageClick(event)">
+  <button class="lightbox-nav next" onclick="event.stopPropagation();lbNext()" hidden><svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 3 L13 9 L7 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></button>
   <div class="lightbox-counter"></div>
 </div>
 

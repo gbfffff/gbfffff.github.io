@@ -1396,6 +1396,24 @@
     }
     .rating-item-row:last-child { border-bottom: none; }
     .rating-item-name { font-weight: 700; color: var(--text); }
+    /* Flags side dishes/appetizers as counting for less toward a
+       restaurant's combined score (see ratingWeight in app.js) -- so the
+       reduced weight is visible right where the rating is given, not just
+       buried in a report. */
+    .rating-item-weight {
+      display: inline-block;
+      font-weight: 600;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--text-muted);
+      background: rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.1rem 0.5rem;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
     .rating-item-input-wrap { width: 100%; }
     .rating-item-scale {
       display: grid;
@@ -1701,8 +1719,6 @@
       align-items: stretch;
       gap: 0.5rem;
       overflow-x: auto;
-      grid-column: 1 / -1;
-      margin-bottom: 0.5rem;
       scroll-snap-type: x proximity;
       scrollbar-width: thin;
       scrollbar-color: var(--border-2) transparent;
@@ -2026,7 +2042,7 @@
       border-radius: 4px;
       border: 1px solid var(--border-2);
       box-shadow: 0 0 60px rgba(0,0,0,0.8);
-      cursor: default;
+      cursor: pointer;
     }
     .lightbox-close {
       position: absolute;
@@ -2043,24 +2059,29 @@
     }
     .lightbox-close:hover { color: var(--text); }
     .lightbox-nav {
+      /* Fixed light-on-dark colors, not var(--text)/var(--border) -- the
+         lightbox backdrop is always near-black regardless of the active
+         theme or light/dark toggle, and those variables can resolve to
+         black in plenty of themes, making the arrows all but invisible
+         against it (the bug this replaced). */
       position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(0,0,0,0.5);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-size: 1.6rem;
-      line-height: 1;
-      width: 2.6rem;
-      height: 2.6rem;
+      bottom: 1.35rem;
+      top: auto;
+      transform: none;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.55);
+      color: #fff;
+      width: 2.75rem;
+      height: 2.75rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 4px;
+      border-radius: 999px;
       cursor: pointer;
       z-index: 1;
+      -webkit-tap-highlight-color: transparent;
     }
-    .lightbox-nav:hover { background: rgba(196,152,36,0.2); border-color: var(--border-2); }
+    .lightbox-nav:hover { background: rgba(255,255,255,0.28); border-color: #fff; }
     .lightbox-nav.prev { left: 1rem; }
     .lightbox-nav.next { right: 1rem; }
     .lightbox-nav[hidden] { display: none; }
@@ -2203,15 +2224,15 @@
     .driver-edit-btn:hover { opacity: 1; }
     /* Same stamped treatment the Drop Game's win comment / Wheel result use
        (thick stroke + a directional block drop-shadow, not a symmetric
-       outline) -- uppercase, bold, theme-tinted fill so it stays readable
-       against a --bg that's identical to plain --accent for every theme. */
+       outline) -- uppercase, bold. Color matches .mpi-section-label (the
+       category heading text) exactly, for every theme. */
     .driver-name-stamp {
       font-size: 2.2rem;
       font-weight: 900;
       line-height: 1.3;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      color: var(--theme-arrow-light, var(--accent));
+      color: var(--accent);
       -webkit-text-stroke: 4px #000;
       paint-order: stroke fill;
       text-shadow:
@@ -2461,6 +2482,11 @@
       grid-column: 1 / -1;
       border-bottom: 2px solid #000;
     }
+    .menu-panel-images {
+      padding: 1rem 1.75rem 1.1rem;
+      border-bottom: 2px solid #000;
+    }
+    .menu-panel-images:empty { display: none; padding: 0; border-bottom: none; }
     .menu-panel-shortcuts {
       display: flex;
       flex-wrap: wrap;
@@ -2839,6 +2865,7 @@
     body.dark .worksheet-reset-notice-text { background: var(--ink); color: var(--bg); }
     body.dark .grouped-item-row { border-bottom-color: var(--ink); }
     body.dark .rating-item-row { border-bottom-color: var(--ink); }
+    body.dark .rating-item-weight { background: rgba(255,255,255,0.12); }
     body.dark .rating-date-header { border-bottom-color: var(--ink); }
     body.dark .rating-name-row { border-bottom-color: var(--ink); }
     body.dark .rating-name-row.active { background: var(--ink); }
@@ -2889,7 +2916,9 @@
     body.dark .mpi-cat-block,
     body.dark .mpi-dislike-block,
     body.dark .mpi-controversial-block { border-color: var(--ink); }
+    body.dark .menu-panel-images { border-color: var(--ink); }
     body.dark .menu-panel-shortcuts { border-color: var(--ink); }
+    body.dark .driver-name-stamp { color: var(--ink); }
     body.dark .resize-grip { border-color: var(--ink); background: var(--bg); }
     body.dark .resize-grip::before { background: var(--ink); }
     body.dark .menu-title-btn { background: var(--ink); color: var(--bg); }
@@ -3001,9 +3030,18 @@
       font-family: inherit;
       font-size: 0.75rem;
       border: 2px solid #000;
-      background: var(--bg);
-      color: var(--text);
-      padding: 0.3rem;
+      /* Fixed white/black instead of the theme's --bg/--text: mobile
+         browsers render this input's native date/time digits in their own
+         OS-level color that our `color` can't always override, while still
+         honoring a custom `background` -- so a dark or saturated theme --bg
+         (dark mode is #3a3a3a) could swallow the digits entirely depending
+         on which theme happens to be active. color-scheme: light keeps the
+         native picker UI (calendar icon, spinners) assuming a light
+         surface too, instead of guessing from the OS's own dark mode. */
+      background: #fff;
+      color: #000;
+      color-scheme: light;
+      padding: 0.45rem 0.5rem;
     }
     .debug-clock-actions { display: flex; gap: 0.4rem; }
     .debug-clock-actions button {
@@ -3228,9 +3266,52 @@
     .order-reports-widget:hover { background: rgba(0,0,0,0.05); }
     .order-reports-widget-num { display: flex; flex-direction: column; justify-content: center; }
     .order-reports-widget-foodchart,
-    .order-reports-widget-restaurants {
+    .order-reports-widget-restaurants,
+    .order-reports-widget-momentum {
       grid-column: 1 / -1;
       text-align: left;
+    }
+    .reports-momentum-body {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .reports-momentum-spark-wrap {
+      flex: 1 1 14rem;
+      min-width: 9rem;
+      color: var(--ink);
+    }
+    /* width:100% + height:auto (not height:100%) lets the SVG scale down
+       on a narrow card while keeping its own aspect ratio uniform, since
+       it now carries real width/height attributes to scale from. */
+    .reports-momentum-spark-wrap svg { display: block; width: 100%; height: auto; max-width: 22rem; }
+    .reports-momentum-deltas {
+      display: flex;
+      gap: 1.5rem;
+      flex-shrink: 0;
+    }
+    .reports-momentum-delta { text-align: center; min-width: 5.5rem; }
+    .reports-momentum-delta-value {
+      font-size: 1.3rem;
+      font-weight: 900;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+    }
+    .reports-momentum-delta-value.up   { color: var(--green); }
+    .reports-momentum-delta-value.down { color: var(--red); }
+    .reports-momentum-delta-label {
+      font-size: 0.6rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+    @media (max-width: 500px) {
+      .reports-momentum-body { flex-direction: column; align-items: stretch; }
+      .reports-momentum-deltas { justify-content: space-around; }
     }
     .order-reports-widget-heading {
       margin: 0 0 0.6rem;

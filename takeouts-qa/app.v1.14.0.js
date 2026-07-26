@@ -40,8 +40,23 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.13.1";
+const APP_VERSION = "1.14.0";
 const CHANGELOG = [
+  { version: "1.14.0", date: "2026-07-25", notes: [
+    "Menu photos moved above the category shortcut buttons and out of the scrollable item list -- they used to be the first thing in that scroll area, so they'd scroll out of sight and stay hidden while reading further down the menu",
+    "Driver This Week's name now uses the same color as a menu category heading (e.g. \"CURRY\", \"RICE\"), for every theme, instead of its own separate tint",
+    "Test Clock's date/time input on mobile now forces a fixed white background, black text, and a light color scheme instead of following the active theme -- some themes' colors made the native picker's digits nearly unreadable on mobile",
+    "Rate Your Order: side dishes and appetizers now count for less toward a restaurant's combined rating (30% and 70% of a full-weight item, respectively) instead of pulling the average up or down exactly as much as an entree -- a badly-rated (or perfectly-rated) side of rice no longer swings a restaurant's score the way a bad entree should; every item still shows its own true, unweighted average everywhere it's shown by itself. Applies to Restaurant Popularity, Overall Satisfaction, and both Performance Trend charts. Items rated at reduced weight now show a \"counts N%\" badge right on the rating row",
+    "Fixed Rate Your Order showing the same person twice with the same pending items whenever they'd typed their name with different capitalization across two orders (e.g. \"edward\" one week, \"Edward\" another) -- names are now matched case-insensitively when building that list, same as everywhere else a name gets matched",
+    "Every popup (Order History & Ratings, Food Chart, Item Detail, the image lightbox, Random Pick, and the driver/PIN/override dialogs) now locks the page behind it -- the background no longer scrolls or responds to clicks/Tab while a popup is open, only the popup itself does",
+    "Image lightbox: nav arrows are now solid, fixed-color icons (they were rendering as barely-visible thin theme-colored text against the always-dark backdrop) and moved down near the photo counter instead of floating mid-image; swipe left/right now works too, and clicking the left/right half of the photo itself steps prev/next, not just tapping the arrows",
+    "New \"This Restaurant\" tile in Reports and Stats: how this week's restaurant's latest rating compares to the time before it and to its own all-time average (excluding that latest date, so it's not comparing the score to an average that already includes itself), with a small trend sparkline and a +/- delta for each",
+    "Fixed that new sparkline rendering as a thick, lopsided blob instead of a line -- redrawn thinner with proper aspect-ratio scaling and light 0/5/10 reference gridlines",
+    "Fixed Sardis chicken orders silently getting billed an extra $1 (per sauce chosen, so usually $2) -- the free sauce picked with a chicken meal was fuzzy-matching against the unrelated, actually-priced standalone \"Sauce\" a-la-carte extra when the order total was calculated",
+    "Fixed Sardis's Family Special listing 6 included large sides instead of the 5 actually included",
+    "Sardis Half Chicken and the Half Chicken Lunch Special now have an optional \"Both Dark Meat\" / \"Both White Meat\" choice (leave it blank for the regular mixed split)",
+    "Sardis Whole Chicken and bigger orders now pick sauces by quantity-per-flavor (e.g. \"5x Aji Amarillo, 2x Mumbo\") within a required total range, instead of one-of-each checkboxes -- 6-8 total for Whole Chicken and Whole Chicken Special (with or without the 2-liter), 8-12 total for One Whole and a Half Chicken (with or without the 2-liter). Half Chicken and the smaller plates are unchanged (still exactly 2)",
+  ]},
   { version: "1.13.1", date: "2026-07-22", notes: [
     "Full menus added for Wai Kee (Traditional Chinese), Pollo Cabana, Taco Madre, and Big Greek, scraped directly from each restaurant's own ordering platform for exact modifiers/pricing",
     "Extras reworked from single-pick buttons to independent multi-select checkboxes -- any number can apply at once (e.g. \"No Cilantro\" and \"No Onions\" together), with +/- quantity steppers for repeatable add-ons (e.g. up to 3 Extra Pita) and pre-checked boxes for ingredients a dish includes by default (unchecking one records \"No {item}\")",
@@ -173,6 +188,44 @@ let currentFriday = null;
 let takenItems    = {};
 let allMenuItems  = [];
 let selectedItems = [];
+
+// ── Modal/lightbox overlay lock ────────────────────────────────────────
+// Every modal and lightbox calls markOverlayOpen(id)/markOverlayClosed(id)
+// with its own element id. A Set (not a counter) so redundant open/close
+// calls -- e.g. Food Chart closing itself before Item Detail opens on top
+// of it -- can't desync a count; only an actual change in membership can
+// trigger the lock/unlock. While anything is open: the page behind is
+// pinned in place (the position:fixed/negative-top trick, not just
+// overflow:hidden, since iOS Safari still rubber-bands a merely
+// overflow-hidden body) and #app-content is marked inert so Tab/click
+// can't reach any control behind the popup -- only the popup box itself
+// (with its own internal overflow) stays live.
+const _openOverlays = new Set();
+let _overlayScrollY = 0;
+function markOverlayOpen(id) {
+  if (_openOverlays.size === 0) {
+    _overlayScrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${_overlayScrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    const content = document.getElementById("app-content");
+    if (content) content.inert = true;
+  }
+  _openOverlays.add(id);
+}
+function markOverlayClosed(id) {
+  _openOverlays.delete(id);
+  if (_openOverlays.size === 0) {
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    window.scrollTo(0, _overlayScrollY);
+    const content = document.getElementById("app-content");
+    if (content) content.inert = false;
+  }
+}
 
 // ── Date helpers ────────────────────────────────────────────────────
 
@@ -479,11 +532,13 @@ document.getElementById("driver-edit-btn")?.addEventListener("click", () => {
   if (!modal || !input) return;
   input.value = getDriverSwap(currentFriday) || DRIVER_DEFAULTS[currentRestaurantObj?.name] || "";
   modal.style.display = "flex";
+  markOverlayOpen("driver-edit-modal");
   input.focus();
   input.select();
 });
 document.getElementById("driver-edit-cancel")?.addEventListener("click", () => {
   document.getElementById("driver-edit-modal").style.display = "none";
+  markOverlayClosed("driver-edit-modal");
 });
 document.getElementById("driver-edit-input")?.addEventListener("keydown", e => {
   if (e.key === "Enter") document.getElementById("driver-edit-ok")?.click();
@@ -493,6 +548,7 @@ document.getElementById("driver-edit-ok")?.addEventListener("click", async () =>
   const name = input.value.trim();
   if (!name) return;
   document.getElementById("driver-edit-modal").style.display = "none";
+  markOverlayClosed("driver-edit-modal");
   try {
     if (MOCK_MODE) {
       _mockDrivers.push([new Date().toISOString(), currentFriday, name]);
@@ -567,6 +623,7 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
   const card      = document.getElementById("menu-panel-card");
   const panel     = document.getElementById("menu-panel");
   const title     = document.getElementById("menu-panel-title");
+  const imagesEl  = document.getElementById("menu-panel-images");
   const shortcuts = document.getElementById("menu-panel-shortcuts");
   favSet     = favSet     || new Set();
   dislikeMap = dislikeMap || new Map();
@@ -590,13 +647,18 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
         </div>`
       ).join("")}</div>`
     : "";
+  // Pinned above the category shortcuts, outside the scrollable menu list --
+  // stays visible instead of scrolling out of view while reading items.
+  imagesEl.innerHTML = imgHtml;
 
   function mpiHtml(item) {
     const price       = item.price ? `<span class="mpi-price">$${Number(item.price).toFixed(2)}</span>`
       : (item.sizes ? `<span class="mpi-price">$${Math.min(...Object.values(item.sizes).map(Number)).toFixed(2)}+</span>` : "");
     const orHint      = item.orOptions?.length ? `<span class="mpi-protein-hint">choose 1: ${esc(item.orOptions.join(" or "))}</span>` : "";
     const sidesHint   = item.sidesPick ? `<span class="mpi-protein-hint">+ ${item.sidesPick.count} sides</span>` : "";
-    const sauceHint   = item.saucePick ? `<span class="mpi-protein-hint">+ ${item.saucePick.count} sauces</span>` : "";
+    const sauceHint   = item.saucePick
+      ? `<span class="mpi-protein-hint">+ ${item.saucePick.min != null ? `${item.saucePick.min}-${item.saucePick.max}` : item.saucePick.count} sauces</span>`
+      : "";
     const sizeHint    = item.sizes ? `<span class="mpi-protein-hint">choose ${Object.keys(item.sizes).join("/")}</span>` : "";
     const proteinHint = (!item.orOptions?.length && item.protein) ? `<span class="mpi-protein-hint">+ protein</span>` : "";
     const desc        = item.desc ? `<span class="mpi-desc">${esc(item.desc)}</span>` : "";
@@ -676,7 +738,7 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     bodyHtml = `<div class="mpi-grid">${items.map(mpiHtml).join("")}</div>`;
   }
 
-  panel.innerHTML = imgHtml + favsSection + dislikesSection + controversialSection + bodyHtml;
+  panel.innerHTML = favsSection + dislikesSection + controversialSection + bodyHtml;
 
   // Random Pick always shows (even with just one/no category) -- it's a
   // standalone tool, not a category jump link, so it doesn't depend on
@@ -775,7 +837,7 @@ function buildMenu(items) {
 
     focusedIdx = -1;
     dropdown.innerHTML = matches.map(m => {
-      const takers  = takenItems[m.item.toLowerCase()] || [];
+      const takers  = takersFor(m.item);
       const taken   = selectedItems.includes(m.item);
       const price   = m.price ? `<span class="dd-price">$${Number(m.price).toFixed(2)}</span>`
         : (m.sizes ? `<span class="dd-price">$${Math.min(...Object.values(m.sizes).map(Number)).toFixed(2)}+</span>` : "");
@@ -1139,8 +1201,22 @@ function showSidesPickPrompt(baseName, meta) {
   // no saucePick to chain into afterward -- keeps this to two sections, not
   // three, in the one case that actually occurs.
   const hasExtras = !meta.saucePick && meta.extras && meta.extras.length;
-  const el = mountPrompt(`
-    <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose ${n} sides for <strong>${esc(baseName)}</strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
+  // Optional, mutually-exclusive (not required -- leaving both unchecked
+  // just means the normal mixed split), e.g. Sardis's Half Chicken letting
+  // you request all dark or all white meat instead of the usual mix.
+  const meatChoiceHtml = meta.meatChoice ? `
+    <div style="color:var(--text-muted);margin-bottom:0.5rem">${esc(meta.meatChoice.label || "Meat")} <span style="font-size:0.72rem;opacity:0.7">(optional -- leave blank for the regular mix)</span></div>
+    <div class="meat-choice-list" style="display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.6rem">
+      ${meta.meatChoice.options.map(opt =>
+        `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+          <input type="checkbox" class="meat-choice-checkbox" data-option="${escAttr(opt)}" style="accent-color:var(--gold);width:15px;height:15px">
+          ${esc(opt)}
+        </label>`
+      ).join("")}
+    </div>` : "";
+  const el = mountPrompt(
+    meatChoiceHtml +
+    `<div style="color:var(--text-muted);margin-bottom:0.5rem">Choose ${n} sides for <strong>${esc(baseName)}</strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
     <div class="sides-pick-list" style="display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.6rem;max-height:220px;overflow-y:auto">
       ${meta.sidesPick.options.map(opt =>
         `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
@@ -1155,11 +1231,21 @@ function showSidesPickPrompt(baseName, meta) {
     </div>`);
   if (!el) return;
 
-  const listEl   = el.querySelector(".sides-pick-list");
-  const addBtn   = el.querySelector(".sides-pick-add-btn");
-  const closeBtn = el.querySelector(".prompt-close-btn");
-  const boxes    = [...listEl.querySelectorAll(".sides-pick-checkbox")];
+  const listEl    = el.querySelector(".sides-pick-list");
+  const addBtn    = el.querySelector(".sides-pick-add-btn");
+  const closeBtn  = el.querySelector(".prompt-close-btn");
+  const boxes     = [...listEl.querySelectorAll(".sides-pick-checkbox")];
   const collectExtras = hasExtras ? wireExtras(el) : () => [];
+
+  const meatListEl = el.querySelector(".meat-choice-list");
+  const meatBoxes  = meatListEl ? [...meatListEl.querySelectorAll(".meat-choice-checkbox")] : [];
+  if (meatListEl) {
+    meatListEl.addEventListener("change", e => {
+      const box = e.target.closest(".meat-choice-checkbox");
+      if (!box) return;
+      if (box.checked) meatBoxes.forEach(b => { if (b !== box) b.checked = false; });
+    });
+  }
 
   listEl.addEventListener("change", e => {
     const box = e.target.closest(".sides-pick-checkbox");
@@ -1171,7 +1257,9 @@ function showSidesPickPrompt(baseName, meta) {
   addBtn.addEventListener("click", () => {
     const chosen = boxes.filter(b => b.checked).map(b => b.dataset.option);
     if (chosen.length !== n) return;
-    const finalName = `${baseName} (${chosen.join(", ")})`;
+    const meatChosen = meatBoxes.find(b => b.checked);
+    const picks = meatChosen ? [meatChosen.dataset.option, ...chosen] : chosen;
+    const finalName = `${baseName} (${picks.join(", ")})`;
     el.remove();
     if (meta.saucePick) {
       showSaucePickPrompt(finalName, meta);
@@ -1190,6 +1278,12 @@ function showSidesPickPrompt(baseName, meta) {
 // Worksheet's "Group Duplicates" view can tally them across everyone's
 // orders, e.g. "6x Sauce: Aji Amarillo Aoli".
 function showSaucePickPrompt(finalDishName, meta) {
+  // Bigger orders (whole chicken and up) get a min-max total instead of a
+  // single fixed count -- e.g. a whole chicken feeding 3-4 people needs
+  // more than the 2 sauces a half chicken gets, but not a hard single
+  // number either, so it's a quantity-per-flavor picker within a range
+  // rather than "pick exactly N distinct flavors."
+  if (meta.saucePick.min != null) return showSauceQtyPrompt(finalDishName, meta);
   const n = meta.saucePick.count || 2;
   const el = mountPrompt(`
     <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose ${n} sauces for <strong>${esc(finalDishName)}</strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
@@ -1234,6 +1328,82 @@ function showSaucePickPrompt(finalDishName, meta) {
     // combines sidesPick+saucePick with extras too, but handle it if one
     // ever does rather than silently dropping the extras group.)
     chosen.forEach(sauce => selectedItems.push(`Sauce: ${sauce}`));
+    el.remove();
+    if (meta.extras && meta.extras.length) {
+      showExtrasPrompt(finalDishName, meta);
+      return;
+    }
+    selectedItems.push(finalDishName);
+    renderPills();
+    checkDuplicates();
+  });
+  closeBtn.addEventListener("click", () => el.remove());
+}
+
+// Quantity-per-flavor version of the sauce picker, for orders whose
+// saucePick gives a {min, max} range instead of a fixed count -- a stepper
+// per flavor instead of a checkbox per flavor, so e.g. a whole chicken can
+// come back "5x Aji Amarillo, 3x Mumbo" instead of being capped at one of
+// each. Total across all flavors must land within [min, max] to submit.
+function showSauceQtyPrompt(finalDishName, meta) {
+  const { min, max, options } = meta.saucePick;
+  const el = mountPrompt(`
+    <div style="color:var(--text-muted);margin-bottom:0.3rem">Choose ${min}-${max} sauces (total) for <strong>${esc(finalDishName)}</strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
+    <div class="sauce-qty-list" style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:0.4rem;max-height:260px;overflow-y:auto">
+      ${options.map(opt => `
+        <div class="sauce-qty-row" data-option="${escAttr(opt)}" data-qty="0" style="display:flex;align-items:center;gap:0.5rem;color:var(--text)">
+          <button type="button" class="protein-btn sauce-qty-minus" style="padding:0.15rem 0.55rem" aria-label="Decrease">&minus;</button>
+          <span class="sauce-qty-value" style="min-width:1.4em;text-align:center;font-weight:700">0</span>
+          <button type="button" class="protein-btn sauce-qty-plus" style="padding:0.15rem 0.55rem" aria-label="Increase">+</button>
+          <span>${esc(opt)}</span>
+        </div>`).join("")}
+    </div>
+    <div class="sauce-qty-total" style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.6rem"></div>
+    <div style="display:flex;gap:0.5rem">
+      <button type="button" class="protein-btn protein-btn-add sauce-qty-add-btn" disabled>Add to Order</button>
+    </div>`);
+  if (!el) {
+    selectedItems.push(finalDishName);
+    renderPills();
+    checkDuplicates();
+    return;
+  }
+
+  const rows     = [...el.querySelectorAll(".sauce-qty-row")];
+  const totalEl  = el.querySelector(".sauce-qty-total");
+  const addBtn   = el.querySelector(".sauce-qty-add-btn");
+  const closeBtn = el.querySelector(".prompt-close-btn");
+
+  const total = () => rows.reduce((sum, row) => sum + Number(row.dataset.qty), 0);
+  function refresh() {
+    const t = total();
+    totalEl.textContent = `Total: ${t} (choose ${min}-${max})`;
+    addBtn.disabled = t < min || t > max;
+  }
+  rows.forEach(row => {
+    const valueEl = row.querySelector(".sauce-qty-value");
+    row.querySelector(".sauce-qty-minus").addEventListener("click", () => {
+      if (Number(row.dataset.qty) === 0) return;
+      row.dataset.qty = Number(row.dataset.qty) - 1;
+      valueEl.textContent = row.dataset.qty;
+      refresh();
+    });
+    row.querySelector(".sauce-qty-plus").addEventListener("click", () => {
+      if (total() >= max) return;
+      row.dataset.qty = Number(row.dataset.qty) + 1;
+      valueEl.textContent = row.dataset.qty;
+      refresh();
+    });
+  });
+  refresh();
+
+  addBtn.addEventListener("click", () => {
+    const t = total();
+    if (t < min || t > max) return;
+    rows.forEach(row => {
+      const qty = Number(row.dataset.qty);
+      for (let i = 0; i < qty; i++) selectedItems.push(`Sauce: ${row.dataset.option}`);
+    });
     el.remove();
     if (meta.extras && meta.extras.length) {
       showExtrasPrompt(finalDishName, meta);
@@ -1339,16 +1509,23 @@ function updateMenuIndicators() {
   if (input?.value.trim()) input.dispatchEvent(new Event("input"));
 }
 
+// Looks up who ordered a given menu item. Order text can carry a
+// protein/size choice or extras suffix beyond the catalog name (e.g.
+// "Green Curry Fried Rice (Chicken)", "Gyro + (Fries, Sprite)"), so a taken
+// key that starts with itemName followed by " (" or " +" counts too. A
+// same-prefix but genuinely different dish -- e.g. "Green Curry" vs "Green
+// Curry Fried Rice" -- must NOT match; requiring that exact boundary is what
+// keeps those apart.
+function takersFor(itemName) {
+  const key = itemName.toLowerCase();
+  if (takenItems[key]) return takenItems[key];
+  const matchKey = Object.keys(takenItems).find(k => k.startsWith(key + " (") || k.startsWith(key + " +"));
+  return matchKey ? takenItems[matchKey] : [];
+}
+
 function applyMenuTakenMarks() {
   document.querySelectorAll(".mpi").forEach(el => {
-    const key    = (el.dataset.name || "").toLowerCase();
-    // Exact match, or a takenItems key that is a prefix of this menu item name
-    // (handles menu items whose names contain commas, e.g. "Basil Chicken, Thai Style")
-    let takers = takenItems[key];
-    if (!takers) {
-      const matchKey = Object.keys(takenItems).find(k => key.startsWith(k) || k.startsWith(key));
-      takers = matchKey ? takenItems[matchKey] : [];
-    }
+    const takers = takersFor(el.dataset.name || "");
     let badge = el.querySelector(".mpi-taken-badge");
     if (takers.length) {
       if (!badge) {
@@ -1500,8 +1677,10 @@ function confirmModal(message, opts = {}) {
     okBtn.style.background   = okColor;
     okBtn.style.borderColor  = okColor;
     modal.style.display = "flex";
+    markOverlayOpen("confirm-modal");
     function close(result) {
       modal.style.display = "none";
+      markOverlayClosed("confirm-modal");
       okBtn.removeEventListener("click", onOk);
       cancel.removeEventListener("click", onCancel);
       resolve(result);
@@ -1782,6 +1961,32 @@ async function loadRatings() {
 // is currently on screen -- a Fav is anything ordered more than twice
 // total (by anyone, ever); a Dislike is anything averaging below 3.
 
+// How much an item's rating counts toward a COMBINED score -- a restaurant's
+// overall avg, the cross-restaurant Overall Satisfaction number, or a
+// Performance Trend point. A single dish's own displayed average is always
+// the plain mean of its own votes (weighting one item against itself makes
+// no sense); this only matters once different items get mixed together,
+// where a side dish or appetizer rated at full strength could swing a
+// restaurant's score as much as an entree -- nobody rates an extra rice the
+// way they rate the entree it came with. Weighted average formula used
+// everywhere this applies: sum(rating * weight) / sum(weight).
+const RATING_WEIGHT_SIDE      = 0.3;
+const RATING_WEIGHT_APPETIZER = 0.7;
+const _ratingWeightCache = new Map(); // "restaurant|item" (lowercased) -> weight
+function ratingWeight(restaurant, item) {
+  const key = `${restaurant}|${item}`.toLowerCase();
+  if (_ratingWeightCache.has(key)) return _ratingWeightCache.get(key);
+  const menu = findRestaurantByName(restaurant)?.menu;
+  const cat  = menu ? (findMenuItem(item, menu)?.category || "").toLowerCase() : "";
+  // "Add-Ons" (e.g. Pollo Cabana's a la carte grilled proteins) gets the
+  // same treatment as a side -- ordered alongside a main, not as one.
+  const w = /\bside|\badd-on/.test(cat) || cat === "extras" ? RATING_WEIGHT_SIDE
+    : /\bappetizer|\bstarter|\bdip\b/.test(cat)              ? RATING_WEIGHT_APPETIZER
+    : 1;
+  _ratingWeightCache.set(key, w);
+  return w;
+}
+
 function computeItemStats(restaurantName) {
   const stats = new Map(); // key: lowercase item -> { label, qty, weeksOrdered, ratingSum, ratingCount }
   const name  = (restaurantName || "").trim().toLowerCase();
@@ -1829,11 +2034,11 @@ function computeItemStats(restaurantName) {
 // two different restaurants could otherwise share an item name and get
 // wrongly merged into one row.
 function computeAllItemStats() {
-  const stats = new Map(); // key: "restaurant|item" lowercase -> { restaurant, label, qty, weeksOrdered, ratingSum, ratingCount }
+  const stats = new Map(); // key: "restaurant|item" lowercase -> { restaurant, label, qty, weeksOrdered, ratingSum, ratingCount, weightedSum, weight }
 
   function entryFor(restaurant, label) {
     const key = `${restaurant}|${label}`.toLowerCase();
-    if (!stats.has(key)) stats.set(key, { restaurant, label, qty: 0, weeksOrdered: new Set(), ratingSum: 0, ratingCount: 0 });
+    if (!stats.has(key)) stats.set(key, { restaurant, label, qty: 0, weeksOrdered: new Set(), ratingSum: 0, ratingCount: 0, weightedSum: 0, weight: 0 });
     return stats.get(key);
   }
 
@@ -1847,6 +2052,11 @@ function computeAllItemStats() {
     if (week) e.weeksOrdered.add(week);
   });
 
+  // ratingSum/ratingCount stay a plain unweighted mean -- every per-item
+  // consumer (Food Chart, GBF Favs/Hates/Controversies, item detail) wants
+  // this dish's own true average. weightedSum/weight are the same data with
+  // ratingWeight() applied, for consumers that combine several different
+  // items into one restaurant-level score (see computeRestaurantStats).
   _allRatingRows.forEach(r => {
     const restaurant = (r[2] || "").trim();
     const item = (r[3] || "").trim();
@@ -1855,6 +2065,9 @@ function computeAllItemStats() {
     const e = entryFor(restaurant, item);
     e.ratingSum += rating;
     e.ratingCount += 1;
+    const w = ratingWeight(restaurant, item);
+    e.weightedSum += rating * w;
+    e.weight += w;
   });
 
   return stats;
@@ -1868,9 +2081,17 @@ function computeAllItemStats() {
 // cramming everything into a single chart no one metric owns.
 
 function computeOverallSatisfaction() {
-  const ratings = _allRatingRows.map(r => Number(r[r.length - 1])).filter(n => !isNaN(n));
-  if (!ratings.length) return null;
-  return { avg: ratings.reduce((a, b) => a + b, 0) / ratings.length, count: ratings.length };
+  let weightedSum = 0, weight = 0, count = 0;
+  _allRatingRows.forEach(r => {
+    const rating = Number(r[r.length - 1]);
+    if (isNaN(rating)) return;
+    const w = ratingWeight((r[2] || "").trim(), (r[3] || "").trim());
+    weightedSum += rating * w;
+    weight += w;
+    count += 1;
+  });
+  if (!count) return null;
+  return { avg: weightedSum / weight, count };
 }
 
 // Global equivalent of refreshMenuInsights' per-restaurant Favs/Dislikes:
@@ -1903,9 +2124,9 @@ function computeRestaurantStats() {
     totals.set(restaurant, (totals.get(restaurant) || 0) + (Number(r[4]) || 0));
   });
   return [...totals.entries()].map(([restaurant, qty]) => {
-    let ratingSum = 0, ratingCount = 0;
-    stats.forEach(s => { if (s.restaurant === restaurant) { ratingSum += s.ratingSum; ratingCount += s.ratingCount; } });
-    return { restaurant, qty, avg: ratingCount ? ratingSum / ratingCount : null };
+    let weightedSum = 0, weight = 0;
+    stats.forEach(s => { if (s.restaurant === restaurant) { weightedSum += s.weightedSum; weight += s.weight; } });
+    return { restaurant, qty, avg: weight ? weightedSum / weight : null };
   }).sort((a, b) => b.qty - a.qty);
 }
 
@@ -1994,6 +2215,87 @@ function renderOrderReportsCard() {
   renderFoodChartPreview(computeFoodChartPreview());
   renderFavsAndHates(computeGlobalFavsAndHates());
   renderRestaurantStatsPreview(restStats);
+  renderRestaurantMomentum(computeRestaurantMomentum());
+}
+
+function openCurrentRestaurantReport() {
+  if (currentRestaurantObj?.name) openMenuReport(currentRestaurantObj.name);
+}
+
+// Tiny inline trend line -- deliberately no axes/gridlines/tooltip (that's
+// what the full Performance Trend chart in the report modal is for); this
+// one only needs to read as "the shape of recent history" at a glance.
+function renderMomentumSparkline(trend) {
+  // Explicit width/height attributes (not just viewBox + CSS) so the SVG
+  // has an unambiguous intrinsic size and scales down uniformly -- the
+  // previous version relied on preserveAspectRatio="none" stretching a
+  // sizeless SVG to fill its flex container, which could scale the X and Y
+  // axes by wildly different factors and blow the stroke/dot up into a
+  // thick, lopsided blob instead of a thin line.
+  const W = 300, H = 72, padL = 6, padR = 6, padT = 6, padB = 6;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const n = trend.length;
+  const xAt = i => n === 1 ? padL + plotW / 2 : padL + (i / (n - 1)) * plotW;
+  const yAt = v => padT + (1 - v / 10) * plotH;
+
+  // Faint 0/5/10 reference lines plus a left axis edge -- just enough grid
+  // to read as a real chart, not so much it competes with the line itself.
+  let gridSvg = "";
+  [0, 5, 10].forEach(v => {
+    const y = yAt(v).toFixed(1);
+    gridSvg += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="currentColor" stroke-opacity="0.15" stroke-width="1"/>`;
+  });
+  gridSvg += `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}" stroke="currentColor" stroke-opacity="0.22" stroke-width="1"/>`;
+
+  const pathD = trend.map((p, i) => `${i === 0 ? "M" : "L"} ${xAt(i).toFixed(1)} ${yAt(p.avg).toFixed(1)}`).join(" ");
+  const lx = xAt(n - 1).toFixed(1), ly = yAt(trend[n - 1].avg).toFixed(1);
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
+    ${gridSvg}
+    <path d="${pathD}" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${lx}" cy="${ly}" r="3" fill="currentColor"/>
+  </svg>`;
+}
+
+// Formats a delta as a signed one-decimal number + direction class -- "how
+// much better/worse than the comparison point," not the raw score itself.
+function fmtMomentumDelta(d) {
+  if (d === null) return { text: "—", cls: "flat" };
+  const rounded = Math.round(d * 10) / 10;
+  if (Math.abs(rounded) < 0.05) return { text: "±0.0", cls: "flat" };
+  return { text: `${rounded > 0 ? "+" : ""}${rounded.toFixed(1)}`, cls: rounded > 0 ? "up" : "down" };
+}
+
+function renderRestaurantMomentum(momentum) {
+  const widget = document.getElementById("order-reports-momentum-widget");
+  if (!widget) return;
+  const empty = document.getElementById("order-reports-momentum-empty");
+  const body  = document.getElementById("order-reports-momentum-body");
+
+  if (!momentum) { widget.style.display = "none"; return; }
+  widget.style.display = "block";
+
+  document.getElementById("order-reports-momentum-heading").textContent = `${momentum.restaurant} — Last Rated ${fmtRatingDate(momentum.latestDate)}`;
+
+  // Fewer than 2 rated dates means there's nothing to compare against yet
+  // (no "last time", and vs-all-time would just be comparing it to itself).
+  if (momentum.trend.length < 2) {
+    if (body) body.style.display = "none";
+    if (empty) { empty.style.display = "block"; empty.textContent = "Not enough rated history yet to compare -- check back after next time."; }
+    return;
+  }
+  if (body) body.style.display = "flex";
+  if (empty) empty.style.display = "none";
+
+  document.getElementById("order-reports-momentum-spark").innerHTML = renderMomentumSparkline(momentum.trend);
+
+  const lastTime = fmtMomentumDelta(momentum.vsLastTime);
+  const allTime  = fmtMomentumDelta(momentum.vsAllTime);
+  const lastEl = document.getElementById("order-reports-momentum-lasttime");
+  const allEl  = document.getElementById("order-reports-momentum-alltime");
+  lastEl.textContent = lastTime.text;
+  lastEl.className = `reports-momentum-delta-value ${lastTime.cls}`;
+  allEl.textContent = allTime.text;
+  allEl.className = `reports-momentum-delta-value ${allTime.cls}`;
 }
 
 function setStatTile(key, value, sub) {
@@ -2068,11 +2370,13 @@ function openOrderReportsDetail(kind) {
   }
 
   modal.classList.add("open");
+  markOverlayOpen("order-reports-detail-modal");
   bindOrderReportsDetailEvents(kind);
 }
 function closeOrderReportsDetail(e) {
   if (e && e.target !== e.currentTarget) return;
   document.getElementById("order-reports-detail-modal")?.classList.remove("open");
+  markOverlayClosed("order-reports-detail-modal");
 }
 
 function renderRestaurantStatsDetailHtml(stats) {
@@ -2177,10 +2481,12 @@ function openFoodChart() {
   _foodChartPage = 1;
   renderFoodChart();
   document.getElementById("food-chart-modal")?.classList.add("open");
+  markOverlayOpen("food-chart-modal");
 }
 function closeFoodChart(e) {
   if (e && e.target !== e.currentTarget) return;
   document.getElementById("food-chart-modal")?.classList.remove("open");
+  markOverlayClosed("food-chart-modal");
 }
 // Shared by both sortable headers -- clicking the column already driving
 // the sort just flips direction; clicking the OTHER column switches to it
@@ -2297,38 +2603,89 @@ function computeItemRatingTrend(restaurant, item) {
 // already excluded rather than needing to be filtered out separately.
 function computeRestaurantRatingTrend(restaurant) {
   const name = (restaurant || "").trim().toLowerCase();
-  const byDate = new Map(); // date -> { sum, count }
+  const byDate = new Map(); // date -> { weightedSum, weight }
   _allRatingRows.forEach(r => {
-    if ((r[2] || "").trim().toLowerCase() !== name) return;
+    const rowRestaurant = (r[2] || "").trim();
+    if (rowRestaurant.toLowerCase() !== name) return;
     const date = (r[1] || "").trim();
+    const item = (r[3] || "").trim();
     const rating = Number(r[r.length - 1]);
     if (!date || isNaN(rating)) return;
-    if (!byDate.has(date)) byDate.set(date, { sum: 0, count: 0 });
+    if (!byDate.has(date)) byDate.set(date, { weightedSum: 0, weight: 0 });
     const e = byDate.get(date);
-    e.sum += rating;
-    e.count += 1;
+    const w = ratingWeight(rowRestaurant, item);
+    e.weightedSum += rating * w;
+    e.weight += w;
   });
   return [...byDate.entries()]
-    .map(([date, e]) => ({ date, avg: e.sum / e.count }))
+    .map(([date, e]) => ({ date, avg: e.weightedSum / e.weight }))
     .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+// This restaurant's weighted avg rating, restricted to dates OTHER than
+// excludeDate -- the "historically how has it done" baseline a fresh
+// comparison stacks the latest date against, so that latest score isn't
+// diluting the very average it's being measured against.
+function computeRestaurantAvgExcludingDate(restaurant, excludeDate) {
+  const name = (restaurant || "").trim().toLowerCase();
+  let weightedSum = 0, weight = 0;
+  _allRatingRows.forEach(r => {
+    const rowRestaurant = (r[2] || "").trim();
+    if (rowRestaurant.toLowerCase() !== name) return;
+    const date = (r[1] || "").trim();
+    if (!date || date === excludeDate) return;
+    const item = (r[3] || "").trim();
+    const rating = Number(r[r.length - 1]);
+    if (isNaN(rating)) return;
+    const w = ratingWeight(rowRestaurant, item);
+    weightedSum += rating * w;
+    weight += w;
+  });
+  return weight ? weightedSum / weight : null;
+}
+
+// "How is THIS restaurant doing" -- the currently active restaurant's most
+// recently rated date, stacked against the time before that and against
+// its own all-time track record (see computeRestaurantAvgExcludingDate).
+// Reports and Stats is cross-restaurant everywhere else; this is the one
+// tile that's about whoever's on the menu THIS week specifically.
+function computeRestaurantMomentum() {
+  if (!currentRestaurantObj?.name) return null;
+  const restaurant = currentRestaurantObj.name;
+  const trend = computeRestaurantRatingTrend(restaurant);
+  if (!trend.length) return null;
+  const latest   = trend[trend.length - 1];
+  const previous = trend.length > 1 ? trend[trend.length - 2] : null;
+  const allTimeAvg = computeRestaurantAvgExcludingDate(restaurant, latest.date);
+  return {
+    restaurant,
+    trend,
+    latest: latest.avg,
+    latestDate: latest.date,
+    vsLastTime: previous ? latest.avg - previous.avg : null,
+    vsAllTime: allTimeAvg !== null ? latest.avg - allTimeAvg : null,
+  };
 }
 
 // Same idea as computeRestaurantRatingTrend, but across every restaurant
 // at once -- "how did satisfaction trend over time" for the Reports and
 // Stats Overall Satisfaction widget, one point per order date.
 function computeGlobalRatingTrend() {
-  const byDate = new Map(); // date -> { sum, count }
+  const byDate = new Map(); // date -> { weightedSum, weight }
   _allRatingRows.forEach(r => {
+    const restaurant = (r[2] || "").trim();
+    const item = (r[3] || "").trim();
     const date = (r[1] || "").trim();
     const rating = Number(r[r.length - 1]);
     if (!date || isNaN(rating)) return;
-    if (!byDate.has(date)) byDate.set(date, { sum: 0, count: 0 });
+    if (!byDate.has(date)) byDate.set(date, { weightedSum: 0, weight: 0 });
     const e = byDate.get(date);
-    e.sum += rating;
-    e.count += 1;
+    const w = ratingWeight(restaurant, item);
+    e.weightedSum += rating * w;
+    e.weight += w;
   });
   return [...byDate.entries()]
-    .map(([date, e]) => ({ date, avg: e.sum / e.count }))
+    .map(([date, e]) => ({ date, avg: e.weightedSum / e.weight }))
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
@@ -2469,7 +2826,18 @@ function renderRatingCard() {
   // Only people with something left to rate appear -- once someone's fully
   // rated, their row disappears too, and with no one pending the whole card
   // hides. Rated data lives on in the sheet for the Rotation & Data reports.
-  const names = [...new Set(_historyRows.flatMap(r => (r[5] || "").split(",").map(n => n.trim()).filter(Boolean)))]
+  // Deduped case-insensitively -- getPendingRatings/pendingCountFor already
+  // match a name regardless of case, so "edward" and "Edward" from two
+  // differently-typed submissions must collapse to one row here too, or
+  // both show up separately claiming the exact same pending items.
+  const namesByLower = new Map(); // lowercased -> first-seen original spelling
+  _historyRows.forEach(r => {
+    (r[5] || "").split(",").map(n => n.trim()).filter(Boolean).forEach(n => {
+      const key = n.toLowerCase();
+      if (!namesByLower.has(key)) namesByLower.set(key, n);
+    });
+  });
+  const names = [...namesByLower.values()]
     .map(n => ({ name: n, pending: pendingCountFor(n) }))
     .filter(n => n.pending > 0)
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -2543,8 +2911,14 @@ function renderRatingItemsHtml(name) {
       const scaleBtns = Array.from({ length: 10 }, (_, i) => i + 1)
         .map(n => `<button type="button" class="rating-item-btn${String(n) === savedValue ? " active" : ""}" data-value="${n}">${n}</button>`)
         .join("");
+      // Side dishes/appetizers count for less toward a restaurant's combined
+      // score (see ratingWeight) -- flagged here so the reduced weight isn't
+      // a silent surprise buried in a report somewhere.
+      const weight = ratingWeight(restaurant, item);
+      const weightLabel = weight < 1
+        ? `<span class="rating-item-weight">counts ${Math.round(weight * 100)}%</span>` : "";
       return `<div class="rating-item-row" data-date="${escAttr(date)}" data-restaurant="${escAttr(restaurant)}" data-item="${escAttr(item)}">
-        <span class="rating-item-name">${esc(item)}</span>
+        <span class="rating-item-name">${esc(item)}${weightLabel}</span>
         <div class="rating-item-input-wrap">
           <input type="hidden" class="rating-item-slider" data-key="${escAttr(key)}" value="${escAttr(savedValue || "")}">
           <div class="rating-item-scale">${scaleBtns}</div>
@@ -2670,6 +3044,14 @@ async function submitRatings(btn) {
 
 function findMenuItem(name, menu) {
   menu = menu || allMenuItems;
+  // "Sauce: X" tally lines (see showSaucePickPrompt) are never a real
+  // catalog item -- they're always free, bundled with whatever dish the
+  // sauce was chosen for. Without this guard, a flavor name here can
+  // fuzzy-match the "order text starts with this menu item" fallback below
+  // against an unrelated priced item whose name happens to be a prefix --
+  // e.g. Sardis's standalone $1 a-la-carte "Sauce" extra -- silently
+  // billing for a sauce that was never separately ordered.
+  if (name.startsWith("Sauce: ")) return null;
   // Exact match first
   let m = menu.find(i => i.item === name);
   if (m) return m;
@@ -2725,6 +3107,32 @@ function splitTopLevel(str) {
   }
   if (cur.trim()) parts.push(cur.trim());
   return parts.filter(Boolean);
+}
+
+// A few menu items have a literal top-level comma in their own name (e.g.
+// "Red Dates, Chicken, & Mushroom Congee"), which splitTopLevel can't tell
+// apart from the separator between two different order items. Re-merge
+// consecutive parts back into one whenever that matches a real item on the
+// restaurant's menu, so those dishes don't get shredded into unrelated
+// taken-item entries.
+function reconcileOrderParts(parts, menu) {
+  const names = (menu || []).map(m => m.item.toLowerCase());
+  const baseOf = s => s.replace(/\s*\+.*$/, "").trim().toLowerCase();
+  const merged = [];
+  let i = 0;
+  while (i < parts.length) {
+    let candidate = parts[i];
+    let j = i;
+    while (j + 1 < parts.length &&
+           !names.includes(baseOf(candidate)) &&
+           names.some(n => n.startsWith(baseOf(candidate) + ", "))) {
+      j++;
+      candidate += ", " + parts[j];
+    }
+    merged.push(candidate);
+    i = j + 1;
+  }
+  return merged;
 }
 
 // orOptions/sidesPick have no native per-choice pricing, so a choice that
@@ -2872,18 +3280,11 @@ async function loadOrders() {
     takenItems = {};
     rows.forEach(r => {
       const name  = (r[1] ?? "").trim();
-      // Split on commas that are NOT inside parentheses (handles "Gyro + Combo (Fries, Sprite)")
+      // Split on commas that are NOT inside parentheses (handles "Gyro + Combo (Fries, Sprite)"),
+      // then re-merge any menu items whose own name contains a comma.
       const orderText = (r[2] ?? "").replace(/ \| Notes:.*$/, ""); // strip notes suffix
-      const parts = [];
-      let depth = 0, cur = "";
-      for (const ch of orderText) {
-        if (ch === "(") { depth++; cur += ch; }
-        else if (ch === ")") { depth--; cur += ch; }
-        else if (ch === "," && depth === 0) { parts.push(cur.trim()); cur = ""; }
-        else { cur += ch; }
-      }
-      if (cur.trim()) parts.push(cur.trim());
-      parts.filter(Boolean).forEach(item => {
+      const parts = reconcileOrderParts(splitTopLevel(orderText), allMenuItems);
+      parts.forEach(item => {
         if (item.startsWith("Sauce: ")) return; // free sauce picks aren't order collisions
         // Strip "+ extras/combo suffix" to get base menu item name
         const base = item.replace(/\s*\+.*$/, "").trim();
@@ -3725,10 +4126,12 @@ function promptPin(message) {
     input.value = "";
     error.style.display = "none";
     modal.style.display = "flex";
+    markOverlayOpen("pin-modal");
     input.focus();
 
     function close(result) {
       modal.style.display = "none";
+      markOverlayClosed("pin-modal");
       okBtn.removeEventListener("click", onOk);
       cancel.removeEventListener("click", onCancel);
       input.removeEventListener("keydown", onKeydown);
@@ -3775,9 +4178,11 @@ function promptOverridePicker() {
     `;
 
     modal.style.display = "flex";
+    markOverlayOpen("override-modal");
 
     function close(result) {
       modal.style.display = "none";
+      markOverlayClosed("override-modal");
       list.removeEventListener("click", onItemClick);
       cancel.removeEventListener("click", onCancel);
       resolve(result);
@@ -3805,10 +4210,12 @@ function promptOverrideReason(label) {
     msg.textContent = `Override this week's restaurant to ${label}? Everyone will see this change.`;
     input.value = "";
     modal.style.display = "flex";
+    markOverlayOpen("override-reason-modal");
     input.focus();
 
     function close(result) {
       modal.style.display = "none";
+      markOverlayClosed("override-reason-modal");
       okBtn.removeEventListener("click", onOk);
       cancel.removeEventListener("click", onCancel);
       resolve(result);
@@ -3877,6 +4284,7 @@ function openMenuReport(restaurantName) {
   refreshReportModal();
   renderRestaurantTrendChart(computeRestaurantRatingTrend(restaurantName));
   modal.classList.add("open");
+  markOverlayOpen("report-modal");
 
   // Item Stats opens expanded by default now, instead of requiring a click
   // every time the report is opened.
@@ -4054,6 +4462,7 @@ function ensureReportListeners() {
 function closeMenuReport(e) {
   if (e && e.target !== e.currentTarget) return;
   document.getElementById("report-modal").classList.remove("open");
+  markOverlayClosed("report-modal");
 }
 
 // ── Item detail: rating trend chart ─────────────────────────────────────
@@ -4082,11 +4491,13 @@ function openItemDetail(restaurant, item, fromFoodChart) {
 
   renderItemTrendChart(trend);
   document.getElementById("item-detail-modal").classList.add("open");
+  markOverlayOpen("item-detail-modal");
 }
 
 function closeItemDetail(e) {
   if (e && e.target !== e.currentTarget) return;
   document.getElementById("item-detail-modal").classList.remove("open");
+  markOverlayClosed("item-detail-modal");
 }
 
 function backToFoodChart() {
@@ -4196,6 +4607,7 @@ function openLightbox(index) {
   _lbIndex  = index;
   _renderLightbox();
   document.getElementById("lightbox").classList.add("open");
+  markOverlayOpen("lightbox");
 }
 function _renderLightbox() {
   const lb  = document.getElementById("lightbox");
@@ -4212,9 +4624,45 @@ function _renderLightbox() {
 }
 function closeLightbox() {
   document.getElementById("lightbox").classList.remove("open");
+  markOverlayClosed("lightbox");
 }
 function lbPrev() { _lbIndex = (_lbIndex - 1 + _lbImages.length) % _lbImages.length; _renderLightbox(); }
 function lbNext() { _lbIndex = (_lbIndex + 1) % _lbImages.length; _renderLightbox(); }
+
+// Tapping/clicking the photo itself steps to the prev/next image depending
+// on which half was hit -- the arrow buttons are still there, but on a
+// wide desktop image they're a long reach from wherever the cursor
+// actually is.
+function lbImageClick(e) {
+  if (_lbImages.length < 2) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  if (clickX < rect.width / 2) lbPrev(); else lbNext();
+}
+
+// Swipe left/right to move between photos, same as tapping the arrows --
+// the arrows alone are a small target to keep hitting on a phone when the
+// whole image is right there under your thumb.
+let _lbTouchX = null;
+let _lbTouchY = null;
+document.getElementById("lightbox")?.addEventListener("touchstart", e => {
+  if (e.touches.length !== 1) return;
+  _lbTouchX = e.touches[0].clientX;
+  _lbTouchY = e.touches[0].clientY;
+}, { passive: true });
+document.getElementById("lightbox")?.addEventListener("touchend", e => {
+  if (_lbTouchX === null) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - _lbTouchX;
+  const dy = t.clientY - _lbTouchY;
+  _lbTouchX = null;
+  // Require a real, mostly-horizontal drag -- short taps still just close
+  // the lightbox (or stay put on the image) as before, and a mostly-
+  // vertical drag is someone trying to scroll, not flip photos.
+  if (_lbImages.length < 2 || Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+  e.preventDefault();
+  if (dx < 0) lbNext(); else lbPrev();
+});
 
 // ── Random Pick lightbox ─────────────────────────────────────────────
 // Slot-machine-style picker scoped to whatever menu it was opened with --
@@ -4252,6 +4700,7 @@ function openRandomPickLightbox(items) {
   labelEl.textContent = "Picking something for you…";
   nameEl.classList.remove("settled");
   document.getElementById("random-pick-lightbox").classList.add("open");
+  markOverlayOpen("random-pick-lightbox");
 
   _runRandomPickSpin();
 }
@@ -4314,6 +4763,7 @@ function _runRandomPickSpin() {
 function closeRandomPickLightbox() {
   clearTimeout(_randomPickTimer);
   document.getElementById("random-pick-lightbox").classList.remove("open");
+  markOverlayClosed("random-pick-lightbox");
 }
 
 // Wired via inline onclick (not addEventListener) -- this script tag loads
