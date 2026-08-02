@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中國象棋 Chinese Chess</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <button id="menuToggle" class="hamburger-btn" aria-label="Toggle menu" aria-expanded="true">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="app">
+    <header class="app-header">
+      <h1>中國象棋</h1>
+    </header>
+
+    <main class="layout">
+      <section class="board-wrap">
+        <div class="turn-banner" id="turnBanner">
+          <span class="turn-dot" id="turnDot"></span>
+          <span id="turnText">Red to move</span>
+          <span id="modeBadge" class="mode-badge" hidden>暗棋 Blind</span>
+        </div>
+        <canvas id="board" tabindex="0"></canvas>
+        <div class="status-line" id="statusLine"></div>
+      </section>
+
+      <aside class="side-panel" id="sidePanel">
+        <div class="panel-section online-section">
+          <h2>Online (2 Devices)</h2>
+          <p class="online-status" id="onlineStatus">Not connected — play locally, or connect to a friend.</p>
+
+          <div id="onlineSetup" class="online-setup">
+            <button id="hostBtn" class="btn btn-primary btn-full">Host Game</button>
+            <div class="online-join-row">
+              <input type="text" id="joinCodeInput" placeholder="Enter code" maxlength="10" autocomplete="off">
+              <button id="joinBtn" class="btn">Join</button>
+            </div>
+          </div>
+
+          <div id="onlineRoomInfo" class="online-room-info" hidden>
+            <span class="room-code-label">Room code — share with your opponent</span>
+            <div class="room-code-row">
+              <code id="roomCodeText"></code>
+              <button id="copyCodeBtn" class="btn-small">Copy</button>
+            </div>
+          </div>
+
+          <button id="disconnectBtn" class="btn btn-full" hidden>Disconnect</button>
+        </div>
+
+        <div class="panel-section mode-section">
+          <h2>Game Mode</h2>
+          <div class="mode-toggle">
+            <button class="mode-btn active" data-mode="classic">Classic</button>
+            <button class="mode-btn" data-mode="blind">Blind 暗棋</button>
+            <button class="mode-btn" data-mode="semiblind">Semi-Blind 半盲棋</button>
+          </div>
+          <p class="mode-desc" id="modeDesc">Standard Xiangqi — all pieces are visible from the start.</p>
+          <button id="shuffleBtn" class="btn btn-shuffle" hidden>&#128256; Shuffle Pieces</button>
+        </div>
+
+        <div class="panel-section controls">
+          <button id="undoBtn" class="btn" disabled>&#8630; Undo</button>
+          <button id="restartBtn" class="btn btn-primary">&#8635; Restart</button>
+        </div>
+
+        <div class="panel-section settings">
+          <h2>Settings</h2>
+          <div class="setting-row">
+            <label for="sizeSlider">Board size</label>
+            <input type="range" id="sizeSlider" min="40" max="140" step="2" value="66">
+            <span id="sizeValue" class="setting-value">66px</span>
+          </div>
+          <label class="setting-row checkbox-row">
+            <input type="checkbox" id="showMovesToggle" checked>
+            <span>Show legal moves</span>
+          </label>
+        </div>
+
+        <div class="panel-section captured">
+          <h2>Captured</h2>
+          <div class="captured-row">
+            <span class="captured-label captured-label--red">Red lost</span>
+            <div id="capturedRed" class="captured-pieces"></div>
+          </div>
+          <div class="captured-row">
+            <span class="captured-label captured-label--black">Black lost</span>
+            <div id="capturedBlack" class="captured-pieces"></div>
+          </div>
+        </div>
+
+        <div class="panel-section history">
+          <h2>Move History</h2>
+          <ol id="moveLog" class="move-log"></ol>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="js/cchess.js"></script>
+</body>
+</html>

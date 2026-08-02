@@ -115,7 +115,14 @@ async function loadRestaurantsConfig() {
   const swatches   = document.querySelectorAll(".theme-swatch");
   const themeColorMeta = document.getElementById("theme-color-meta");
 
-  if (switcher && window.visualViewport) {
+  // visualViewport's mobile-address-bar compensation is only meaningful on
+  // the real top-level page -- inside the games/ hub's fixed-size iframe,
+  // some browsers report visualViewport dimensions that don't match the
+  // iframe's own (much smaller) box at all, which pushed bottomGap deeply
+  // negative and sank the whole switcher off-screen below the iframe.
+  // Plain CSS position:fixed within the iframe's own box is already
+  // correct there, so just skip the JS repositioning when embedded.
+  if (switcher && window.visualViewport && window.top === window) {
     const MARGIN = 20;
     const vv = window.visualViewport;
     function pinToVisualViewport() {
@@ -176,6 +183,20 @@ async function loadRestaurantsConfig() {
   document.addEventListener("click", () => switcher.classList.remove("open"));
 })();
 
+// Keeps the games/ hub's own chrome (header, tabs, page background) in
+// sync with whichever theme/dark-mode is active in here -- otherwise the
+// hub stayed a fixed color while only the embedded game followed the
+// theme switcher ("theme colors apply to the whole page, not just
+// sections").
+function notifyHubOfTheme() {
+  if (window.top === window) return; // opened directly, not embedded
+  const bg  = getComputedStyle(document.body).getPropertyValue("--bg").trim();
+  const ink = getComputedStyle(document.body).getPropertyValue("--ink").trim();
+  window.top.postMessage({ type: "gbf-theme", bg, ink }, "*");
+}
+document.addEventListener("themechange", notifyHubOfTheme);
+notifyHubOfTheme();
+
 // Exposes the current theme's true color-wheel complement (same HSL
 // hue+180 math as the takeout app's version) as a CSS custom property, so
 // Plinko's colored slots and the Wheel's wedges/pointer glow can key off
@@ -222,6 +243,52 @@ async function loadRestaurantsConfig() {
 })();
 
 loadRestaurantsConfig();
+
+// ── Game mode toggle (Drop Game <-> Wheel of Fortune) ───────────────────
+// Both boards/control sets live in the DOM together; only one shows
+// at a time, picked by [data-mode] on the card. Kept as its own tiny IIFE
+// since it only needs to know about the arrow button and the card, not
+// any of the three games' internals.
+//
+// Runs BEFORE the Drop Game / Wheel setup below on purpose: both of those
+// size their canvas off the board's current clientWidth/Height at init
+// time, and the CSS that shows/hides each board keys off [data-mode] --
+// until this sets that attribute, the card matches neither mode's CSS and
+// #plinko-board silently sits at 0x0 (`:not([data-mode="plinko"])` is true
+// when the attribute is simply absent), so the canvas below would size
+// itself against a hidden, dimension-less board. That's what "Plinko
+// machine fails to load" was.
+//
+// The games/ hub lists Plinko and Wheel as two separate tabs, each loading
+// this same page with a ?mode= param to force+lock which board shows --
+// switching games is the hub's job now, so the in-page toggle arrow hides
+// itself whenever a mode was forced from outside. Visited with no ?mode=
+// (e.g. directly), Wheel is the default on first load.
+(function() {
+  const card = document.getElementById("plinko-card");
+  const btn  = document.getElementById("game-mode-toggle-btn");
+  if (!card || !btn) return;
+
+  const MODES = ["plinko", "wheel"];
+  const NEXT_LABEL = { plinko: "Wheel", wheel: "Drop Game" };
+  const forcedMode = new URLSearchParams(location.search).get("mode");
+  card.dataset.mode = MODES.includes(forcedMode) ? forcedMode : "wheel";
+
+  if (forcedMode) {
+    btn.style.display = "none";
+  } else {
+    btn.addEventListener("click", () => {
+      const i = MODES.indexOf(card.dataset.mode);
+      const mode = MODES[(i + 1) % MODES.length];
+      card.dataset.mode = mode;
+      btn.title = NEXT_LABEL[mode];
+      // Home (Drop Game) points forward, into Wheel/Roulette; anywhere else
+      // points back, signaling the cycle leads back to Drop Game.
+      btn.innerHTML = mode === "plinko" ? "&#8594;" : "&#8592;";
+      document.dispatchEvent(new CustomEvent("gamemodechange", { detail: { mode } }));
+    });
+  }
+})();
 
 // ── Drop Game (Plinko) ──────────────────────────────────────────────────
 // A Galton board: drag the ball along the top and release it anywhere to
@@ -1671,43 +1738,6 @@ loadRestaurantsConfig();
   window.submitPlinkoScore = submitPlinkoScore;
   window.closePlinkoGameOver = closePlinkoGameOver;
   window.openPlinkoLeaderboard = openPlinkoLeaderboard;
-})();
-
-// ── Game mode toggle (Drop Game <-> Wheel of Fortune) ───────────────────
-// Both boards/control sets live in the DOM together; only one shows
-// at a time, picked by [data-mode] on the card. Kept as its own tiny IIFE
-// since it only needs to know about the arrow button and the card, not
-// any of the three games' internals.
-//
-// The games/ hub lists Plinko and Wheel as two separate tabs, each loading
-// this same page with a ?mode= param to force+lock which board shows --
-// switching games is the hub's job now, so the in-page toggle arrow hides
-// itself whenever a mode was forced from outside. Visited with no ?mode=
-// (e.g. directly), Wheel is the default on first load.
-(function() {
-  const card = document.getElementById("plinko-card");
-  const btn  = document.getElementById("game-mode-toggle-btn");
-  if (!card || !btn) return;
-
-  const MODES = ["plinko", "wheel"];
-  const NEXT_LABEL = { plinko: "Wheel", wheel: "Drop Game" };
-  const forcedMode = new URLSearchParams(location.search).get("mode");
-  card.dataset.mode = MODES.includes(forcedMode) ? forcedMode : "wheel";
-
-  if (forcedMode) {
-    btn.style.display = "none";
-  } else {
-    btn.addEventListener("click", () => {
-      const i = MODES.indexOf(card.dataset.mode);
-      const mode = MODES[(i + 1) % MODES.length];
-      card.dataset.mode = mode;
-      btn.title = NEXT_LABEL[mode];
-      // Home (Drop Game) points forward, into Wheel/Roulette; anywhere else
-      // points back, signaling the cycle leads back to Drop Game.
-      btn.innerHTML = mode === "plinko" ? "&#8594;" : "&#8592;";
-      document.dispatchEvent(new CustomEvent("gamemodechange", { detail: { mode } }));
-    });
-  }
 })();
 
 // ── Wheel of Fortune ─────────────────────────────────────────────────────

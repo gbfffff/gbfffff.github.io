@@ -484,6 +484,7 @@ init();
     localStorage.setItem("theme", theme);
     switcher.classList.remove("open");
     syncThemeColorMeta();
+    document.dispatchEvent(new CustomEvent("themechange"));
   }
 
   function applyDark(on) {
@@ -491,6 +492,7 @@ init();
     darkBtn.textContent = on ? "☀" : "☾";
     localStorage.setItem("darkMode", on ? "1" : "0");
     syncThemeColorMeta();
+    document.dispatchEvent(new CustomEvent("themechange"));
   }
 
   const themeNames = Object.keys(SWATCH_COLORS);
@@ -512,3 +514,17 @@ init();
 
   document.addEventListener("click", () => switcher.classList.remove("open"));
 })();
+
+// Keeps the games/ hub's own chrome (header, tabs, page background) in
+// sync with whichever theme/dark-mode is active in here -- otherwise the
+// hub stayed a fixed color while only the embedded game followed the
+// theme switcher ("theme colors apply to the whole page, not just
+// sections").
+function notifyHubOfTheme() {
+  if (window.top === window) return; // opened directly, not embedded
+  const bg  = getComputedStyle(document.body).getPropertyValue("--bg").trim();
+  const ink = getComputedStyle(document.body).getPropertyValue("--ink").trim();
+  window.top.postMessage({ type: "gbf-theme", bg, ink }, "*");
+}
+document.addEventListener("themechange", notifyHubOfTheme);
+notifyHubOfTheme();

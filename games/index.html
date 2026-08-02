@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GBF Games</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=EB+Garamond:ital,wght@0,500;0,700;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
   <header class="hub-header">
@@ -14,15 +14,17 @@
   </header>
 
   <nav class="hub-tabs" id="hub-tabs">
-    <button type="button" class="hub-tab active" data-game="polls">Polls</button>
-    <button type="button" class="hub-tab" data-game="plinko-wheel">Plinko / Wheel</button>
+    <button type="button" class="hub-tab active" data-game="wheel">Wheel</button>
+    <button type="button" class="hub-tab" data-game="plinko">Plinko</button>
+    <button type="button" class="hub-tab" data-game="polls">Polls</button>
   </nav>
 
   <main class="hub-frame-wrap">
-    <iframe id="frame-polls" class="hub-frame active" title="Polls"></iframe>
-    <iframe id="frame-plinko-wheel" class="hub-frame" title="Plinko / Wheel"></iframe>
+    <iframe id="frame-wheel" class="hub-frame active" title="Wheel of Fortune"></iframe>
+    <iframe id="frame-plinko" class="hub-frame" title="Plinko"></iframe>
+    <iframe id="frame-polls" class="hub-frame" title="Polls"></iframe>
   </main>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
