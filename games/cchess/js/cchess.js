@@ -1055,6 +1055,17 @@ document.addEventListener('keydown', e => {
    for Blind/Semi-Blind's randomized setup, which only the host generates. */
 
 const ROOM_PREFIX = 'cchess-';
+// Direct browser-to-browser connections don't always find a path to each
+// other (seen between Brave and Safari even on the same machine). This adds
+// a free public relay (Open Relay Project) as a fallback so the connection
+// still goes through when a direct route can't be found.
+const ICE_SERVERS = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:openrelay.metered.ca:80' },
+  { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+];
 let peer = null;
 let conn = null;
 let onlineRole = null; // null | 'host' | 'joiner'
@@ -1198,7 +1209,7 @@ hostBtn.addEventListener('click', () => {
   joinBtn.disabled = true;
   setOnlineStatus('Setting up room…');
   const code = ROOM_PREFIX + randomRoomCode(5);
-  peer = new Peer(code);
+  peer = new Peer(code, { config: { iceServers: ICE_SERVERS } });
 
   peer.on('open', id => {
     roomCodeText.textContent = id.replace(ROOM_PREFIX, '');
@@ -1221,7 +1232,7 @@ joinBtn.addEventListener('click', () => {
   hostBtn.disabled = true;
   joinBtn.disabled = true;
   setOnlineStatus('Connecting…');
-  peer = new Peer();
+  peer = new Peer({ config: { iceServers: ICE_SERVERS } });
 
   peer.on('open', () => {
     const c = peer.connect(ROOM_PREFIX + code, { reliable: true });
