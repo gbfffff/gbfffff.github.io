@@ -56,6 +56,9 @@ const CHANGELOG = [
     "Fixed Sardis's Family Special listing 6 included large sides instead of the 5 actually included",
     "Sardis Half Chicken and the Half Chicken Lunch Special now have an optional \"Both Dark Meat\" / \"Both White Meat\" choice (leave it blank for the regular mixed split)",
     "Sardis Whole Chicken and bigger orders now pick sauces by quantity-per-flavor (e.g. \"5x Aji Amarillo, 2x Mumbo\") within a required total range, instead of one-of-each checkboxes -- 6-8 total for Whole Chicken and Whole Chicken Special (with or without the 2-liter), 8-12 total for One Whole and a Half Chicken (with or without the 2-liter). Half Chicken and the smaller plates are unchanged (still exactly 2)",
+    "Fixed Restaurant Stats (and the Food Chart/GBF Favs behind it) counting each free sauce pick as its own separate order -- a chicken meal ordered with several sauces was inflating that restaurant's order count by one per sauce instead of counting as the single order it actually was. Sauce picks still show up individually in a person's own Past Orders line items, just not in anything that tallies order counts",
+    "Menu items with a leading order code (e.g. Mi La Cay's \"P1\", \"AP3\") now show that code in its own small column in front of the name, on the menu panel and the Worksheet's grouped-duplicates view -- long names wrap on their own without dragging the code down with them. Detected automatically wherever a restaurant's menu actually uses codes, so it applies to any menu with them, not just Mi La Cay",
+    "偉記's menu now has its real order codes too (S1-S4, A1-A20, W1-W6, G1-G21, D1-D7, M1-M20, N1-N13, R1-R35, P1-P9, C1-C12, B1-B16, F1-F23, V1-V11, T1-T4, L1-L16), pulled directly off their printed menu -- previously missing entirely, so nothing showed there despite the feature already existing for Mi La Cay. Note: any past 偉記 order/rating history logged under the old code-less names won't link back to these renamed catalog entries for pricing/weighting lookups; the ratings themselves aren't lost",
   ]},
   { version: "1.13.1", date: "2026-07-22", notes: [
     "Full menus added for Wai Kee (Traditional Chinese), Pollo Cabana, Taco Madre, and Big Greek, scraped directly from each restaurant's own ordering platform for exact modifiers/pricing",
@@ -664,8 +667,16 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     const desc        = item.desc ? `<span class="mpi-desc">${esc(item.desc)}</span>` : "";
     const oos         = !!item.outOfStock;
     const oosBadge     = oos ? `<span class="mpi-oos-badge">Out of Stock</span>` : "";
+    const hints = `${orHint || sidesHint}${sauceHint}${!orHint && !sidesHint ? sizeHint || proteinHint : ""}`;
+    // A leading order code (e.g. "AP1") gets its own column so it stays
+    // pinned to the front instead of wrapping into the name -- the rest
+    // of the name still wraps normally on a long dish.
+    const codeSplit = splitItemCode(item.item);
+    const nameHtml = codeSplit
+      ? `<span class="mpi-code">${esc(codeSplit.code)}</span><span class="mpi-name-text">${esc(codeSplit.rest)}${hints}</span>`
+      : `${esc(item.item)}${hints}`;
     return `<div class="mpi${oos ? " mpi-out-of-stock" : ""}" data-name="${escAttr(item.item)}" data-oos="${oos ? "1" : "0"}">
-      <span class="mpi-left"><span class="mpi-name">${esc(item.item)}${orHint || sidesHint}${sauceHint}${!orHint && !sidesHint ? sizeHint || proteinHint : ""}</span>${desc}${oosBadge}</span>
+      <span class="mpi-left"><span class="mpi-name${codeSplit ? " mpi-name-coded" : ""}">${nameHtml}</span>${desc}${oosBadge}</span>
       ${price}
     </div>`;
   }
@@ -2005,7 +2016,10 @@ function computeItemStats(restaurantName) {
   _historyRows.forEach(r => {
     if ((r[2] || "").trim().toLowerCase() !== name) return;
     const item = (r[3] || "").trim();
-    if (!item) return;
+    // Free sauce picks aren't their own dish -- they ride along with
+    // whatever chicken meal they were chosen for, so counting them here
+    // would inflate that item's own order count/Fav eligibility.
+    if (!item || item.startsWith("Sauce: ")) return;
     const e = entryFor(item);
     e.qty += Number(r[4]) || 0;
     const week = (r[1] || "").trim();
@@ -2045,7 +2059,8 @@ function computeAllItemStats() {
   _historyRows.forEach(r => {
     const restaurant = (r[2] || "").trim();
     const item = (r[3] || "").trim();
-    if (!restaurant || !item) return;
+    // Same as computeItemStats -- a free sauce pick isn't a dish of its own.
+    if (!restaurant || !item || item.startsWith("Sauce: ")) return;
     const e = entryFor(restaurant, item);
     e.qty += Number(r[4]) || 0;
     const week = (r[1] || "").trim();
@@ -2120,7 +2135,12 @@ function computeRestaurantStats() {
   const totals = new Map(); // restaurant -> qty
   _historyRows.forEach(r => {
     const restaurant = (r[2] || "").trim();
-    if (!restaurant) return;
+    const item = (r[3] || "").trim();
+    // A free sauce pick isn't a paid order of its own -- it comes bundled
+    // with whatever chicken meal it was chosen for, so tallying it here
+    // would double-count that one order as several and inflate the
+    // restaurant's order total.
+    if (!restaurant || item.startsWith("Sauce: ")) return;
     totals.set(restaurant, (totals.get(restaurant) || 0) + (Number(r[4]) || 0));
   });
   return [...totals.entries()].map(([restaurant, qty]) => {
@@ -3431,11 +3451,17 @@ function renderOrdersTable(dupCount) {
           : "";
         const namesHtml = `<span class="grouped-item-names">${esc(g.names.join(", "))}</span>`;
         const notesHtml = g.notes ? `<span class="grouped-item-note">Note: ${esc(g.notes)}</span>` : "";
+        // Same order-code split as the menu panel -- stays pinned to the
+        // front instead of wrapping into the name here too.
+        const codeSplit = splitItemCode(g.label);
+        const nameHtml = codeSplit
+          ? `<span class="grouped-item-name grouped-item-name-coded"><span class="grouped-item-code">${esc(codeSplit.code)}</span><span class="grouped-item-name-text">${esc(codeSplit.rest)}</span></span>`
+          : `<span class="grouped-item-name">${esc(g.label)}</span>`;
         return `<div class="grouped-item-row">
           <span class="grouped-item-qty">${g.count}</span>
           <span class="grouped-item-sep">|</span>
           <span class="grouped-item-main">
-            <span class="grouped-item-name">${esc(g.label)}</span>${namesHtml}
+            ${nameHtml}${namesHtml}
             ${notesHtml}
           </span>
           ${priceHtml}
@@ -3576,6 +3602,20 @@ function esc(s) {
 
 function escAttr(s) {
   return esc(s).replace(/"/g, "&quot;");
+}
+
+// Detects a leading order-code prefix on a menu item's name, e.g. "AP1" in
+// "AP1 Chả Giò - Spring Roll (2)" -- some restaurants (Mi La Cay, etc.)
+// print these on their own menu as lookup references, not as part of the
+// dish's actual name. Requires a trailing digit so it can't mistake an
+// ordinary all-caps word for a code (e.g. Shanghai Taste's "BBQ Spare
+// Ribs" -- "BBQ" alone never matches). Purely a display-time split: the
+// underlying item string itself -- used everywhere for matching, pricing,
+// and History/Ratings rows -- is completely untouched.
+const ITEM_CODE_RE = /^([A-Z]{1,3}\d{1,3})\s+(.+)$/;
+function splitItemCode(name) {
+  const m = ITEM_CODE_RE.exec(name || "");
+  return m ? { code: m[1], rest: m[2] } : null;
 }
 
 async function init() {

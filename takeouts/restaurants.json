@@ -4977,7 +4977,7 @@
           ]
         },
         {
-          "item": "House Special Soup \u672c\u6a13\u4f8b\u6e6f",
+          "item": "S1 House Special Soup \u672c\u6a13\u4f8b\u6e6f",
           "category": "House Special Soups",
           "sizes": {
             "Small": 5,
@@ -4987,73 +4987,73 @@
           "popular": true
         },
         {
-          "item": "Minced Beef with Egg White Thick Soup \u897f\u6e56\u725b\u8089\u7fb9",
+          "item": "S2 Minced Beef with Egg White Thick Soup \u897f\u6e56\u725b\u8089\u7fb9",
           "category": "House Special Soups",
           "price": 12,
           "desc": "Serves 2"
         },
         {
-          "item": "Mushroom with Eggdrop Thick Soup \u8611\u83c7\u86cb\u82b1\u6e6f",
+          "item": "S3 Mushroom with Eggdrop Thick Soup \u8611\u83c7\u86cb\u82b1\u6e6f",
           "category": "House Special Soups",
           "price": 10,
           "desc": "Serves 2"
         },
         {
-          "item": "Cilantro Tofu Fish Fillet Soup \u82ab\u831c\u8c46\u8150\u9b5a\u7247\u6e6f",
+          "item": "S4 Cilantro Tofu Fish Fillet Soup \u82ab\u831c\u8c46\u8150\u9b5a\u7247\u6e6f",
           "category": "House Special Soups",
           "price": 13,
           "desc": "Serves 2"
         },
         {
-          "item": "Vegetable Spring Rolls \u7d20\u83dc\u6625\u6372",
+          "item": "A1 Vegetable Spring Rolls \u7d20\u83dc\u6625\u6372",
           "price": 4,
           "category": "Local Favorites",
           "desc": "2 pcs"
         },
         {
-          "item": "Roasted Quail \u7d05\u71d2\u9d6a\u9d89",
+          "item": "A2 Roasted Quail \u7d05\u71d2\u9d6a\u9d89",
           "price": 13,
           "category": "Local Favorites",
           "desc": "4 pcs"
         },
         {
-          "item": "Curry Fish Balls \u5496\u55b1\u9b5a\u86cb",
+          "item": "A3 Curry Fish Balls \u5496\u55b1\u9b5a\u86cb",
           "price": 6,
           "category": "Local Favorites",
           "desc": "8 pcs, Hot & Spicy"
         },
         {
-          "item": "Wei's Signature Fried Chicken Wings \u98a8\u5473\u70b8\u96de\u7ffc",
+          "item": "A4 Wei's Signature Fried Chicken Wings \u98a8\u5473\u70b8\u96de\u7ffc",
           "price": 10,
           "category": "Local Favorites",
           "desc": "6 pcs, Hot & Spicy"
         },
         {
-          "item": "Spicy Numbing Chicken \u9ebb\u9999\u96de",
+          "item": "A5 Spicy Numbing Chicken \u9ebb\u9999\u96de",
           "price": 12,
           "category": "Local Favorites",
           "desc": "Hot & Spicy, Contains peanut/sesame"
         },
         {
-          "item": "French Fries \u70b8\u85af\u689d",
+          "item": "A6 French Fries \u70b8\u85af\u689d",
           "price": 5,
           "category": "Local Favorites"
         },
         {
-          "item": "Sweet and Sour Radish (Cold) \u751c\u9178\u863f\u8514",
+          "item": "A7 Sweet and Sour Radish (Cold) \u751c\u9178\u863f\u8514",
           "price": 6,
           "category": "Local Favorites",
           "desc": "Contains peanut/sesame",
           "popular": true
         },
         {
-          "item": "Spicy and Sour Cucumber (Cold) \u6dbc\u62cc\u9752\u74dc",
+          "item": "A8 Spicy and Sour Cucumber (Cold) \u6dbc\u62cc\u9752\u74dc",
           "price": 7,
           "category": "Local Favorites",
           "desc": "Hot & Spicy, Contains peanut/sesame"
         },
         {
-          "item": "Steam Potstickers (Beef/Chicken) \u84b8\u9903\uff08\u725b\u8089/\u96de\u8089\uff09",
+          "item": "A9 Steam Potstickers (Beef/Chicken) \u84b8\u9903\uff08\u725b\u8089/\u96de\u8089\uff09",
           "price": 8,
           "category": "Local Favorites",
           "desc": "6 pcs",
@@ -5063,7 +5063,7 @@
           ]
         },
         {
-          "item": "Fried Potstickers (Beef/Chicken) \u714e\u9903\uff08\u725b\u8089/\u96de\u8089\uff09",
+          "item": "A10 Fried Potstickers (Beef/Chicken) \u714e\u9903\uff08\u725b\u8089/\u96de\u8089\uff09",
           "price": 8,
           "category": "Local Favorites",
           "desc": "6 pcs",
@@ -5073,101 +5073,101 @@
           ]
         },
         {
-          "item": "Spicy Pig Knuckles \u7d05\u6cb9\u71fb\u8e44",
+          "item": "A11 Spicy Pig Knuckles \u7d05\u6cb9\u71fb\u8e44",
           "price": 13,
           "category": "Local Favorites",
           "desc": "Hot & Spicy, Contains peanut/sesame"
         },
         {
-          "item": "Pig Knuckles (Cold) \u4f5b\u5c71\u71fb\u8e44",
+          "item": "A12 Pig Knuckles (Cold) \u4f5b\u5c71\u71fb\u8e44",
           "price": 12,
           "category": "Local Favorites",
           "popular": true
         },
         {
-          "item": "Wei's Signature Beef Entrails \u4e94\u9999\u725b\u96dc",
+          "item": "A13 Wei's Signature Beef Entrails \u4e94\u9999\u725b\u96dc",
           "price": 14,
           "category": "Local Favorites",
           "popular": true
         },
         {
-          "item": "Preserved Egg w/ Cilantro (Cold) \u6dbc\u62cc\u9999\u831c\u76ae\u86cb",
+          "item": "A14 Preserved Egg w/ Cilantro (Cold) \u6dbc\u62cc\u9999\u831c\u76ae\u86cb",
           "price": 6,
           "category": "Local Favorites",
           "desc": "Contains peanut/sesame"
         },
         {
-          "item": "Fried Mantou w/ Condensed Milk \u5976\u9999\u70b8\u9945\u982d",
+          "item": "A15 Fried Mantou w/ Condensed Milk \u5976\u9999\u70b8\u9945\u982d",
           "price": 7,
           "category": "Local Favorites"
         },
         {
-          "item": "Soy Sauce Marinated Pork Intestine \u6e2f\u5f0f\u6ef7\u6c34\u5927\u8178",
+          "item": "A16 Soy Sauce Marinated Pork Intestine \u6e2f\u5f0f\u6ef7\u6c34\u5927\u8178",
           "price": 14,
           "category": "Local Favorites",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Fried Yellow Chive Shrimp Roll \u70b8\u97ed\u9ec3\u8766\u5377",
+          "item": "A17 Fried Yellow Chive Shrimp Roll \u70b8\u97ed\u9ec3\u8766\u5377",
           "price": 7,
           "category": "Local Favorites",
           "desc": "2 pcs"
         },
         {
-          "item": "Braised Beef Shank \u6ef7\u6c34\u725b\u8171",
+          "item": "A18 Braised Beef Shank \u6ef7\u6c34\u725b\u8171",
           "price": 13,
           "category": "Local Favorites",
           "desc": "Contains peanut/sesame"
         },
         {
-          "item": "Spicy Beef Shank \u9ebb\u8fa3\u725b\u8171",
+          "item": "A19 Spicy Beef Shank \u9ebb\u8fa3\u725b\u8171",
           "price": 14,
           "category": "Local Favorites",
           "desc": "Hot & Spicy, Contains peanut/sesame"
         },
         {
-          "item": "Pickled Pepper and Lemon Chicken Feet \u6ce1\u6912\u6ab8\u6aac\u9cf3\u722a",
+          "item": "A20 Pickled Pepper and Lemon Chicken Feet \u6ce1\u6912\u6ab8\u6aac\u9cf3\u722a",
           "price": 9,
           "category": "Local Favorites",
           "desc": "Hot & Spicy, Contains peanut/sesame"
         },
         {
-          "item": "Fried Wontons \u9165\u70b8\u96f2\u541e",
+          "item": "W1 Fried Wontons \u9165\u70b8\u96f2\u541e",
           "price": 9,
           "category": "Wontons",
           "desc": "10 pcs"
         },
         {
-          "item": "Spicy Wontons \u7d05\u6cb9\u6284\u624b",
+          "item": "W2 Spicy Wontons \u7d05\u6cb9\u6284\u624b",
           "price": 9,
           "category": "Wontons",
           "desc": "10 pcs, Hot & Spicy"
         },
         {
-          "item": "Wontons w/ Sesame Oil \u9999\u6cb9\u8525\u82b1\u96f2\u541e",
+          "item": "W3 Wontons w/ Sesame Oil \u9999\u6cb9\u8525\u82b1\u96f2\u541e",
           "price": 9,
           "category": "Wontons",
           "desc": "10 pcs"
         },
         {
-          "item": "Yellow Chives Wonton Soup \u97ed\u9ec3\u4e0a\u6e6f\u96f2\u541e",
+          "item": "W4 Yellow Chives Wonton Soup \u97ed\u9ec3\u4e0a\u6e6f\u96f2\u541e",
           "price": 12,
           "category": "Wontons",
           "desc": "12 pcs"
         },
         {
-          "item": "House Special Wonton Soup \u672c\u6a13\u4f8b\u6e6f\u96f2\u541e",
+          "item": "W5 House Special Wonton Soup \u672c\u6a13\u4f8b\u6e6f\u96f2\u541e",
           "price": 12,
           "category": "Wontons",
           "desc": "12 pcs"
         },
         {
-          "item": "Mixed Sauce Wonton \u6df7\u91ac\u96f2\u541e",
+          "item": "W6 Mixed Sauce Wonton \u6df7\u91ac\u96f2\u541e",
           "price": 11,
           "category": "Wontons"
         },
         {
-          "item": "Plain Congee \u767d\u7ca5",
+          "item": "G1 Plain Congee \u767d\u7ca5",
           "price": 5,
           "category": "Congee",
           "extras": [
@@ -5214,7 +5214,7 @@
           ]
         },
         {
-          "item": "Salty Egg Mix & Vegs Congee \u9e79\u86cb\u4ec0\u83dc\u7ca5",
+          "item": "G2 Salty Egg Mix & Vegs Congee \u9e79\u86cb\u4ec0\u83dc\u7ca5",
           "price": 7,
           "category": "Congee",
           "extras": [
@@ -5261,7 +5261,7 @@
           ]
         },
         {
-          "item": "Minced Mixed Vegetable & Corn Congee \u4ec0\u83dc\u7c9f\u7c73\u7ca5",
+          "item": "G3 Minced Mixed Vegetable & Corn Congee \u4ec0\u83dc\u7c9f\u7c73\u7ca5",
           "price": 7,
           "category": "Congee",
           "extras": [
@@ -5308,7 +5308,7 @@
           ]
         },
         {
-          "item": "Bean Curd & Corn Congee \u8c46\u8150\u7c9f\u7c73\u7ca5",
+          "item": "G4 Bean Curd & Corn Congee \u8c46\u8150\u7c9f\u7c73\u7ca5",
           "price": 7,
           "category": "Congee",
           "extras": [
@@ -5355,7 +5355,7 @@
           ]
         },
         {
-          "item": "Preserved Egg Tofu Cilantro Congee \u9999\u831c\u76ae\u86cb\u8c46\u8150\u7ca5",
+          "item": "G5 Preserved Egg Tofu Cilantro Congee \u9999\u831c\u76ae\u86cb\u8c46\u8150\u7ca5",
           "price": 8,
           "category": "Congee",
           "extras": [
@@ -5402,7 +5402,7 @@
           ]
         },
         {
-          "item": "Assorted Mushrooms & Tofu Congee \u4ec0\u83cc\u8c46\u8150\u7ca5",
+          "item": "G6 Assorted Mushrooms & Tofu Congee \u4ec0\u83cc\u8c46\u8150\u7ca5",
           "price": 8,
           "category": "Congee",
           "extras": [
@@ -5449,7 +5449,7 @@
           ]
         },
         {
-          "item": "Preserved Egg & Pork Congee \u76ae\u86cb\u7626\u8089\u7ca5",
+          "item": "G7 Preserved Egg & Pork Congee \u76ae\u86cb\u7626\u8089\u7ca5",
           "price": 8,
           "category": "Congee",
           "extras": [
@@ -5496,7 +5496,7 @@
           ]
         },
         {
-          "item": "Fish Fillet Lettuce Congee \u751f\u83dc\u9b5a\u7247\u7ca5",
+          "item": "G8 Fish Fillet Lettuce Congee \u751f\u83dc\u9b5a\u7247\u7ca5",
           "price": 8,
           "category": "Congee",
           "extras": [
@@ -5543,7 +5543,7 @@
           ]
         },
         {
-          "item": "Red Dates, Chicken, & Mushroom Congee \u51ac\u83c7\u7d05\u68d7\u96de\u7ca5",
+          "item": "G9 Red Dates, Chicken, & Mushroom Congee \u51ac\u83c7\u7d05\u68d7\u96de\u7ca5",
           "price": 8,
           "category": "Congee",
           "extras": [
@@ -5590,7 +5590,7 @@
           ]
         },
         {
-          "item": "Shrimp & Corn Congee \u7c9f\u7c73\u8766\u7ca5",
+          "item": "G10 Shrimp & Corn Congee \u7c9f\u7c73\u8766\u7ca5",
           "price": 9,
           "category": "Congee",
           "extras": [
@@ -5637,7 +5637,7 @@
           ]
         },
         {
-          "item": "Sliced Beef Tender Congee w/ Egg \u7aa9\u86cb\u725b\u8089\u7ca5",
+          "item": "G11 Sliced Beef Tender Congee w/ Egg \u7aa9\u86cb\u725b\u8089\u7ca5",
           "price": 10,
           "category": "Congee",
           "extras": [
@@ -5684,7 +5684,7 @@
           ]
         },
         {
-          "item": "Shredded Pork with Preserved Egg & Salted Egg Congee \u9d1b\u9d26\u86cb\u8089\u7ca5",
+          "item": "G12 Shredded Pork with Preserved Egg & Salted Egg Congee \u9d1b\u9d26\u86cb\u8089\u7ca5",
           "price": 10,
           "category": "Congee",
           "extras": [
@@ -5731,7 +5731,7 @@
           ]
         },
         {
-          "item": "Sliced Fish Congee \u9999\u831c\u9b5a\u7247\u7ca5",
+          "item": "G13 Sliced Fish Congee \u9999\u831c\u9b5a\u7247\u7ca5",
           "price": 9,
           "category": "Congee",
           "extras": [
@@ -5778,7 +5778,7 @@
           ]
         },
         {
-          "item": "Sliced Tender Beef Congee & Preserved Mustard Congee \u69a8\u83dc\u725b\u8089\u7ca5",
+          "item": "G14 Sliced Tender Beef Congee & Preserved Mustard Congee \u69a8\u83dc\u725b\u8089\u7ca5",
           "price": 9,
           "category": "Congee",
           "extras": [
@@ -5825,7 +5825,7 @@
           ]
         },
         {
-          "item": "Sliced Fish & Beef Congee \u9b5a\u7247\u725b\u8089\u7ca5",
+          "item": "G15 Sliced Fish & Beef Congee \u9b5a\u7247\u725b\u8089\u7ca5",
           "price": 11,
           "category": "Congee",
           "extras": [
@@ -5872,7 +5872,7 @@
           ]
         },
         {
-          "item": "Seafood Congee (Fish Ball, Fish Fillet, Prawn) \u9b5a\u86cb\u9b5a\u7247\u5927\u8766\u7ca5",
+          "item": "G16 Seafood Congee (Fish Ball, Fish Fillet, Prawn) \u9b5a\u86cb\u9b5a\u7247\u5927\u8766\u7ca5",
           "price": 12,
           "category": "Congee",
           "extras": [
@@ -5919,7 +5919,7 @@
           ]
         },
         {
-          "item": "Dried Scallops & Chicken Congee \u7464\u67f1\u96de\u7d72\u7ca5",
+          "item": "G17 Dried Scallops & Chicken Congee \u7464\u67f1\u96de\u7d72\u7ca5",
           "price": 12,
           "category": "Congee",
           "extras": [
@@ -5966,7 +5966,7 @@
           ]
         },
         {
-          "item": "Scallop & Prawn Congee \u7464\u67f1\u5927\u8766\u7ca5",
+          "item": "G18 Scallop & Prawn Congee \u7464\u67f1\u5927\u8766\u7ca5",
           "price": 13,
           "category": "Congee",
           "extras": [
@@ -6013,7 +6013,7 @@
           ]
         },
         {
-          "item": "Assorted Mushrooms & Chicken Shrimp Beef Congee \u4ec0\u83cc\u4e09\u9bae\u7ca5",
+          "item": "G19 Assorted Mushrooms & Chicken Shrimp Beef Congee \u4ec0\u83cc\u4e09\u9bae\u7ca5",
           "price": 13,
           "category": "Congee",
           "extras": [
@@ -6060,7 +6060,7 @@
           ]
         },
         {
-          "item": "Abalone & Chicken Congee \u9b91\u9b5a\u96de\u7ca5",
+          "item": "G20 Abalone & Chicken Congee \u9b91\u9b5a\u96de\u7ca5",
           "price": 15,
           "category": "Congee",
           "extras": [
@@ -6107,55 +6107,55 @@
           ]
         },
         {
-          "item": "Fried Bread Stick \u6cb9\u689d",
+          "item": "G21 Fried Bread Stick \u6cb9\u689d",
           "price": 3.95,
           "category": "Congee"
         },
         {
-          "item": "Soy Sauce Rice Rolls \u8c49\u6cb9\u7687\u8c6c\u8178\u7c89",
+          "item": "D1 Soy Sauce Rice Rolls \u8c49\u6cb9\u7687\u8c6c\u8178\u7c89",
           "price": 10.95,
           "category": "Rice Rolls"
         },
         {
-          "item": "Sesame, Peanut & Hoi Sin Sauce Rice Rolls \u6df7\u91ac\u8c6c\u8178\u7c89",
+          "item": "D2 Sesame, Peanut & Hoi Sin Sauce Rice Rolls \u6df7\u91ac\u8c6c\u8178\u7c89",
           "price": 12.95,
           "category": "Rice Rolls",
           "desc": "Contains peanut/sesame"
         },
         {
-          "item": "Pork Ribs Rice Rolls \u6392\u9aa8\u84b8\u8c6c\u8178\u7c89",
+          "item": "D3 Pork Ribs Rice Rolls \u6392\u9aa8\u84b8\u8c6c\u8178\u7c89",
           "price": 13.95,
           "category": "Rice Rolls",
           "popular": true
         },
         {
-          "item": "Beef Entrails Rice Rolls \u725b\u96dc\u71dc\u8c6c\u8178\u7c89",
+          "item": "D4 Beef Entrails Rice Rolls \u725b\u96dc\u71dc\u8c6c\u8178\u7c89",
           "price": 15.95,
           "category": "Rice Rolls",
           "popular": true
         },
         {
-          "item": "Shrimp Rice Rolls \u9bae\u8766\u84b8\u8c6c\u8178\u7c89",
+          "item": "D5 Shrimp Rice Rolls \u9bae\u8766\u84b8\u8c6c\u8178\u7c89",
           "price": 13.95,
           "category": "Rice Rolls"
         },
         {
-          "item": "Minced Pork Rice Rolls \u907f\u98a8\u5858\u7092\u8c6c\u8178\u7c89",
+          "item": "D6 Minced Pork Rice Rolls \u907f\u98a8\u5858\u7092\u8c6c\u8178\u7c89",
           "price": 15.95,
           "category": "Rice Rolls"
         },
         {
-          "item": "Stir-Fried Rice Rolls w/ Satay Beef \u6c99\u7239\u725b\u8089\u7092\u8c6c\u8178\u7c89",
+          "item": "D7 Stir-Fried Rice Rolls w/ Satay Beef \u6c99\u7239\u725b\u8089\u7092\u8c6c\u8178\u7c89",
           "price": 16.95,
           "category": "Rice Rolls"
         },
         {
-          "item": "Soy Sauce Stir-Fried Egg Noodles \u8c49\u6cb9\u7687\u7092\u9eb5",
+          "item": "M1 Soy Sauce Stir-Fried Egg Noodles \u8c49\u6cb9\u7687\u7092\u9eb5",
           "price": 11.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "Lo Mein (Veg/Chicken) \u6488\u9eb5\uff08\u7d20\u83dc/\u96de\uff09",
+          "item": "M2 Lo Mein (Veg/Chicken) \u6488\u9eb5\uff08\u7d20\u83dc/\u96de\uff09",
           "price": 11.95,
           "category": "Stir-Fried Noodles",
           "orOptions": [
@@ -6164,7 +6164,7 @@
           ]
         },
         {
-          "item": "(Combination/Beef/Shrimp) Lo Mein \u6488\u9eb5\uff08\u4ec0\u9326/\u725b/\u8766\uff09",
+          "item": "M3 (Combination/Beef/Shrimp) Lo Mein \u6488\u9eb5\uff08\u4ec0\u9326/\u725b/\u8766\uff09",
           "price": 13.95,
           "category": "Stir-Fried Noodles",
           "orOptions": [
@@ -6174,7 +6174,7 @@
           ]
         },
         {
-          "item": "(Beef/Chicken/Shrimp) Chow Fun \u4e7e\u7092\u725b/\u96de/\u8766\u6cb3",
+          "item": "M4 (Beef/Chicken/Shrimp) Chow Fun \u4e7e\u7092\u725b/\u96de/\u8766\u6cb3",
           "price": 15.95,
           "category": "Stir-Fried Noodles",
           "orOptions": [
@@ -6184,7 +6184,7 @@
           ]
         },
         {
-          "item": "(Beef/Chicken/Shrimp) Chow Fun w/ Gravy \u6fd5\u7092\u725b/\u96de/\u8766\u6cb3",
+          "item": "M5 (Beef/Chicken/Shrimp) Chow Fun w/ Gravy \u6fd5\u7092\u725b/\u96de/\u8766\u6cb3",
           "price": 16.95,
           "category": "Stir-Fried Noodles",
           "orOptions": [
@@ -6194,12 +6194,12 @@
           ]
         },
         {
-          "item": "Beef Chow Fun in Black Bean Sauce \u8c49\u6912\u725b\u6cb3",
+          "item": "M6 Beef Chow Fun in Black Bean Sauce \u8c49\u6912\u725b\u6cb3",
           "price": 15.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "Chicken/Shrimp Chow Fun w/ Egg \u6ed1\u86cb\u96de/\u8766\u6cb3",
+          "item": "M7 Chicken/Shrimp Chow Fun w/ Egg \u6ed1\u86cb\u96de/\u8766\u6cb3",
           "price": 15.95,
           "category": "Stir-Fried Noodles",
           "orOptions": [
@@ -6208,12 +6208,12 @@
           ]
         },
         {
-          "item": "Satay Beef Chow Fun \u6c99\u8336\u725b\u6cb3",
+          "item": "M8 Satay Beef Chow Fun \u6c99\u8336\u725b\u6cb3",
           "price": 16.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "(Chicken/Pork) Pan Fried Noodles \u96de/\u8089\u7d72\u5169\u9762\u9ec3",
+          "item": "M9 (Chicken/Pork) Pan Fried Noodles \u96de/\u8089\u7d72\u5169\u9762\u9ec3",
           "price": 15.95,
           "category": "Stir-Fried Noodles",
           "orOptions": [
@@ -6222,7 +6222,7 @@
           ]
         },
         {
-          "item": "(Shrimp/Beef) Pan Fried Noodles \u8766/\u725b\u5169\u9762\u9ec3",
+          "item": "M10 (Shrimp/Beef) Pan Fried Noodles \u8766/\u725b\u5169\u9762\u9ec3",
           "price": 16.95,
           "category": "Stir-Fried Noodles",
           "orOptions": [
@@ -6231,57 +6231,57 @@
           ]
         },
         {
-          "item": "Stir-Fried Rice Noodles w/ Pickled Mustard & Pork \u69a8\u83dc\u8089\u7d72\u71dc\u7c73\u7c89",
+          "item": "M11 Stir-Fried Rice Noodles w/ Pickled Mustard & Pork \u69a8\u83dc\u8089\u7d72\u71dc\u7c73\u7c89",
           "price": 15.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "Singapore Chow Foon \u99ac\u4f86\u7092\u8cb4\u5201",
+          "item": "M12 Singapore Chow Foon \u99ac\u4f86\u7092\u8cb4\u5201",
           "price": 15.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "Singapore Rice Noodles \u661f\u6d32\u7092\u7c73",
+          "item": "M13 Singapore Rice Noodles \u661f\u6d32\u7092\u7c73",
           "price": 14.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "Satay Beef Fried Rice Noodle \u6c99\u8336\u725b\u8089\u7092\u7c73\u7c89",
+          "item": "M14 Satay Beef Fried Rice Noodle \u6c99\u8336\u725b\u8089\u7092\u7c73\u7c89",
           "price": 16.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "Black Pepper Shrimp Chow Fun \u9ed1\u6912\u8766\u7092\u6cb3",
+          "item": "M15 Black Pepper Shrimp Chow Fun \u9ed1\u6912\u8766\u7092\u6cb3",
           "price": 17.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "House Special Fried Rice Noodle \u4e09\u7d72\u7092\u7c73\u7c89",
+          "item": "M16 House Special Fried Rice Noodle \u4e09\u7d72\u7092\u7c73\u7c89",
           "price": 14.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "Pan Fried Noodle w/ Squid, Prawn and Fish Fillet \u6d77\u9bae\u5169\u9762\u9ec3",
+          "item": "M17 Pan Fried Noodle w/ Squid, Prawn and Fish Fillet \u6d77\u9bae\u5169\u9762\u9ec3",
           "price": 18.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "Vegetarian E-Mein \u4e7e\u71d2\u4f0a\u9eb5",
+          "item": "M18 Vegetarian E-Mein \u4e7e\u71d2\u4f0a\u9eb5",
           "price": 15.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "Stir-Fried Rice Cakes & Cabbage HK Style \u907f\u98a8\u5858\u9ad8\u9e97\u83dc\u7092\u5e74\u7cd5",
+          "item": "M19 Stir-Fried Rice Cakes & Cabbage HK Style \u907f\u98a8\u5858\u9ad8\u9e97\u83dc\u7092\u5e74\u7cd5",
           "price": 16.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "Chicken Salty Fish Yun Yeung Rice Noodle \u9e79\u9b5a\u96de\u7c92\u7092\u9d1b\u9d26\u7c73",
+          "item": "M20 Chicken Salty Fish Yun Yeung Rice Noodle \u9e79\u9b5a\u96de\u7c92\u7092\u9d1b\u9d26\u7c73",
           "price": 17.95,
           "category": "Stir-Fried Noodles"
         },
         {
-          "item": "Spam & Egg (Ho Fun/Noodles/Rice Noodles) Soup \u706b\u817f\u86cb\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
+          "item": "N1 Spam & Egg (Ho Fun/Noodles/Rice Noodles) Soup \u706b\u817f\u86cb\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
           "price": 12.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6292,7 +6292,7 @@
           ]
         },
         {
-          "item": "Curry Fish Balls (Ho Fun/Noodles/Rice Noodles) Soup \u5496\u55b1\u9b5a\u86cb\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
+          "item": "N2 Curry Fish Balls (Ho Fun/Noodles/Rice Noodles) Soup \u5496\u55b1\u9b5a\u86cb\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
           "price": 12.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6303,7 +6303,7 @@
           ]
         },
         {
-          "item": "Pickled Mustard & Pork Rice Noodles Soup \u69a8\u83dc\u8089\u7d72\u6e6f\u7c73\u7c89",
+          "item": "N3 Pickled Mustard & Pork Rice Noodles Soup \u69a8\u83dc\u8089\u7d72\u6e6f\u7c73\u7c89",
           "price": 12.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6314,7 +6314,7 @@
           ]
         },
         {
-          "item": "Pork (Ho Fun/Noodles/Rice Noodles) Soup \u8089\u7247\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
+          "item": "N4 Pork (Ho Fun/Noodles/Rice Noodles) Soup \u8089\u7247\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
           "price": 12.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6325,7 +6325,7 @@
           ]
         },
         {
-          "item": "Satay Beef Noodle in Soup \u6c99\u7239\u725b\u8089\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
+          "item": "N5 Satay Beef Noodle in Soup \u6c99\u7239\u725b\u8089\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
           "price": 13.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6336,7 +6336,7 @@
           ]
         },
         {
-          "item": "Ho Fun/Noodle w/ Beef Entrails in Soup \u725b\u4ec0\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
+          "item": "N6 Ho Fun/Noodle w/ Beef Entrails in Soup \u725b\u4ec0\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
           "price": 14.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6347,7 +6347,7 @@
           ]
         },
         {
-          "item": "Ho Fun/Noodle w/ Pork Ribs in Soup \u6392\u9aa8\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
+          "item": "N7 Ho Fun/Noodle w/ Pork Ribs in Soup \u6392\u9aa8\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
           "price": 14.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6358,7 +6358,7 @@
           ]
         },
         {
-          "item": "Vegetable & Noodle in Soup \u83dc\u9060\u4e0a\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
+          "item": "N8 Vegetable & Noodle in Soup \u83dc\u9060\u4e0a\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
           "price": 10.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6369,7 +6369,7 @@
           ]
         },
         {
-          "item": "Deep Fried Pork Chop Noodle in Soup \u8c6c\u6252\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
+          "item": "N9 Deep Fried Pork Chop Noodle in Soup \u8c6c\u6252\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
           "price": 14.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6380,7 +6380,7 @@
           ]
         },
         {
-          "item": "Sliced Fish & Preserved Egg in Soup \u76ae\u86cb\u9b5a\u7247\u6e6f\u7c73\u7c89",
+          "item": "N10 Sliced Fish & Preserved Egg in Soup \u76ae\u86cb\u9b5a\u7247\u6e6f\u7c73\u7c89",
           "price": 15.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6391,7 +6391,7 @@
           ]
         },
         {
-          "item": "Wonton (Ho Fun/Noodles/Rice Noodles) Soup \u96f2\u541e\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
+          "item": "N11 Wonton (Ho Fun/Noodles/Rice Noodles) Soup \u96f2\u541e\u6e6f\u6cb3\u7c89/\u9eb5/\u7c73\u7c89",
           "price": 14.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6402,7 +6402,7 @@
           ]
         },
         {
-          "item": "Curry Fish Ball & Fish Fillet Noodles Soup \u5496\u55b1\u9b5a\u86cb\u9b5a\u7247\u6e6f\u9eb5",
+          "item": "N12 Curry Fish Ball & Fish Fillet Noodles Soup \u5496\u55b1\u9b5a\u86cb\u9b5a\u7247\u6e6f\u9eb5",
           "price": 15.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6413,7 +6413,7 @@
           ]
         },
         {
-          "item": "Yellow Chives & Chicken Noodle Soup \u97ed\u9ec3\u96de\u7d72\u6e6f\u9eb5",
+          "item": "N13 Yellow Chives & Chicken Noodle Soup \u97ed\u9ec3\u96de\u7d72\u6e6f\u9eb5",
           "price": 16.95,
           "category": "Noodle Soup",
           "extras": [
@@ -6424,87 +6424,87 @@
           ]
         },
         {
-          "item": "Ginger & Egg Fried Rice \u8591\u86cb\u7092\u98ef",
+          "item": "R1 Ginger & Egg Fried Rice \u8591\u86cb\u7092\u98ef",
           "price": 11.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Mix Vegetable Fried Rice \u96dc\u83dc\u7092\u98ef",
+          "item": "R2 Mix Vegetable Fried Rice \u96dc\u83dc\u7092\u98ef",
           "price": 12.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Chicken Fried Rice \u96de\u8089\u7092\u98ef",
+          "item": "R3 Chicken Fried Rice \u96de\u8089\u7092\u98ef",
           "price": 13.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Pork Fried Rice \u8c6c\u8089\u7092\u98ef",
+          "item": "R4 Pork Fried Rice \u8c6c\u8089\u7092\u98ef",
           "price": 13.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Beef Fried Rice \u725b\u8089\u7092\u98ef",
+          "item": "R5 Beef Fried Rice \u725b\u8089\u7092\u98ef",
           "price": 14.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Spam & Egg Fried Rice \u706b\u817f\u86cb\u7092\u98ef",
+          "item": "R6 Spam & Egg Fried Rice \u706b\u817f\u86cb\u7092\u98ef",
           "price": 13.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Salty Fish & Chicken Fried Rice \u9e79\u9b5a\u96de\u7c92\u7092\u98ef",
+          "item": "R7 Salty Fish & Chicken Fried Rice \u9e79\u9b5a\u96de\u7c92\u7092\u98ef",
           "price": 16.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Tri-Pepper Shrimp Fried Rice \u4e09\u6912\u8766\u7092\u98ef",
+          "item": "R8 Tri-Pepper Shrimp Fried Rice \u4e09\u6912\u8766\u7092\u98ef",
           "price": 15.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Minced w/ Olive & Green Bean Fried Rice \u6b16\u83dc\u8089\u788e\u56db\u5b63\u8c46\u7092\u98ef",
+          "item": "R9 Minced w/ Olive & Green Bean Fried Rice \u6b16\u83dc\u8089\u788e\u56db\u5b63\u8c46\u7092\u98ef",
           "price": 15.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Shrimp & Egg Fried Rice \u8766\u4ec1\u7092\u98ef",
+          "item": "R10 Shrimp & Egg Fried Rice \u8766\u4ec1\u7092\u98ef",
           "price": 14.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Combination Fried Rice \u4ec0\u9326\u7092\u98ef",
+          "item": "R11 Combination Fried Rice \u4ec0\u9326\u7092\u98ef",
           "price": 14.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Yeung Chow Fried Rice \u694a\u5dde\u7092\u98ef",
+          "item": "R12 Yeung Chow Fried Rice \u694a\u5dde\u7092\u98ef",
           "price": 15.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Lao Gan Ma Minced Pork Fried Rice \u8001\u4e7e\u5abd\u8089\u788e\u7092\u98ef",
+          "item": "R13 Lao Gan Ma Minced Pork Fried Rice \u8001\u4e7e\u5abd\u8089\u788e\u7092\u98ef",
           "price": 14.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Fried Glutinous Rice with Preserved Meat \u751f\u7092\u81d8\u5473\u7cef\u7c73\u98ef",
+          "item": "R14 Fried Glutinous Rice with Preserved Meat \u751f\u7092\u81d8\u5473\u7cef\u7c73\u98ef",
           "price": 18.95,
           "category": "Fried Rice"
         },
         {
-          "item": "Beef Entrails over Rice \u725b\u96dc\u84cb\u98ef",
+          "item": "R14 Beef Entrails over Rice \u725b\u96dc\u84cb\u98ef",
           "price": 14.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Pork & Egg over Rice \u6ed1\u86cb\u8089\u7247\u98ef",
+          "item": "R15 Pork & Egg over Rice \u6ed1\u86cb\u8089\u7247\u98ef",
           "price": 14.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Tomato w/ Egg & Beef/Chicken/Pork over Rice \u756a\u8304\u86cb\u96de/\u8089\u7247\u98ef",
+          "item": "R16 Tomato w/ Egg & Beef/Chicken/Pork over Rice \u756a\u8304\u86cb\u96de/\u8089\u7247\u98ef",
           "price": 14.95,
           "category": "Rice Plates",
           "orOptions": [
@@ -6514,62 +6514,62 @@
           ]
         },
         {
-          "item": "Tomato w/ Egg & Beef over Rice \u756a\u8304\u86cb\u725b\u8089\u98ef",
+          "item": "R17 Tomato w/ Egg & Beef over Rice \u756a\u8304\u86cb\u725b\u8089\u98ef",
           "price": 15.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Egg & Beef over Rice \u6ed1\u86cb\u725b\u8089\u98ef",
+          "item": "R18 Egg & Beef over Rice \u6ed1\u86cb\u725b\u8089\u98ef",
           "price": 15.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Egg & Shrimp over Rice \u6ed1\u86cb\u8766\u4ec1\u98ef",
+          "item": "R19 Egg & Shrimp over Rice \u6ed1\u86cb\u8766\u4ec1\u98ef",
           "price": 14.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Curry Fish Fillet over Rice \u5496\u55b1\u6591\u7403\u98ef",
+          "item": "R20 Curry Fish Fillet over Rice \u5496\u55b1\u6591\u7403\u98ef",
           "price": 14.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Tomato & Egg over Rice \u756a\u8304\u96de\u86cb\u98ef",
+          "item": "R21 Tomato & Egg over Rice \u756a\u8304\u96de\u86cb\u98ef",
           "price": 13.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Curry Chicken over Rice \u5496\u55b1\u96de\u98ef",
+          "item": "R22 Curry Chicken over Rice \u5496\u55b1\u96de\u98ef",
           "price": 14.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Pork Ribs in Black Bean Sauce over Rice \u8c49\u6c41\u6392\u9aa8\u98ef",
+          "item": "R23 Pork Ribs in Black Bean Sauce over Rice \u8c49\u6c41\u6392\u9aa8\u98ef",
           "price": 14.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Chicken over Rice & Mushroom \u51ac\u83c7\u96de\u98ef",
+          "item": "R24 Chicken over Rice & Mushroom \u51ac\u83c7\u96de\u98ef",
           "price": 13.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Satay Beef over Rice \u6c99\u7239\u725b\u8089\u98ef",
+          "item": "R25 Satay Beef over Rice \u6c99\u7239\u725b\u8089\u98ef",
           "price": 15.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Spicy Sauce Bean Curd & Minced Pork over Rice \u9ebb\u5a46\u8c46\u8150\u98ef",
+          "item": "R26 Spicy Sauce Bean Curd & Minced Pork over Rice \u9ebb\u5a46\u8c46\u8150\u98ef",
           "price": 13.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Pickled Mustard & Beef over Rice \u69a8\u83dc\u725b\u8089\u98ef",
+          "item": "R27 Pickled Mustard & Beef over Rice \u69a8\u83dc\u725b\u8089\u98ef",
           "price": 15.95,
           "category": "Rice Plates"
         },
         {
-          "item": "Beef/Chicken/Pork Rib with Vegetable Rice \u6642\u83dc\u725b\u8089/\u96de/\u6392\u9aa8\u98ef",
+          "item": "R29 Beef/Chicken/Pork Rib with Vegetable Rice \u6642\u83dc\u725b\u8089/\u96de/\u6392\u9aa8\u98ef",
           "price": 15.95,
           "category": "Rice Plates",
           "orOptions": [
@@ -6579,7 +6579,7 @@
           ]
         },
         {
-          "item": "Lemongrass Pork Chops & Egg on Rice \u9999\u8305\u8c6c\u6252\u714e\u86cb\u98ef",
+          "item": "R31 Lemongrass Pork Chops & Egg on Rice \u9999\u8305\u8c6c\u6252\u714e\u86cb\u98ef",
           "price": 16.95,
           "category": "Hong Kong Style Braised Rice",
           "extras": [
@@ -6590,7 +6590,7 @@
           ]
         },
         {
-          "item": "Tomato Sweet Chili Sauce Fish Fillet on Rice \u756a\u8304\u6cf0\u6c41\u9b5a\u6252\u98ef",
+          "item": "R32 Tomato Sweet Chili Sauce Fish Fillet on Rice \u756a\u8304\u6cf0\u6c41\u9b5a\u6252\u98ef",
           "price": 18.95,
           "category": "Hong Kong Style Braised Rice",
           "extras": [
@@ -6602,7 +6602,7 @@
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Teriyaki Eel & Egg on Rice \u71d2\u6c41\u9c3b\u9b5a\u86cb\u84cb\u98ef",
+          "item": "R33 Teriyaki Eel & Egg on Rice \u71d2\u6c41\u9c3b\u9b5a\u86cb\u84cb\u98ef",
           "price": 18.95,
           "category": "Hong Kong Style Braised Rice",
           "extras": [
@@ -6613,7 +6613,7 @@
           ]
         },
         {
-          "item": "Chef's Curry Egg & Beef on Rice \u65cb\u98a8\u86cb\u5496\u55b1\u725b\u8089\u98ef",
+          "item": "R34 Chef's Curry Egg & Beef on Rice \u65cb\u98a8\u86cb\u5496\u55b1\u725b\u8089\u98ef",
           "price": 18.95,
           "category": "Hong Kong Style Braised Rice",
           "extras": [
@@ -6626,7 +6626,7 @@
           "popular": true
         },
         {
-          "item": "Spicy Vegetable w/ Egg & Braised Pork on Rice \u5916\u5a46\u83dc\u714e\u86cb\u6ef7\u8089\u98ef",
+          "item": "R35 Spicy Vegetable w/ Egg & Braised Pork on Rice \u5916\u5a46\u83dc\u714e\u86cb\u6ef7\u8089\u98ef",
           "price": 17.95,
           "category": "Hong Kong Style Braised Rice",
           "extras": [
@@ -6638,272 +6638,272 @@
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Mapo Tofu w/ Minced Pork \u8089\u788e\u9ebb\u5a46\u8c46\u8150",
+          "item": "P1 Mapo Tofu w/ Minced Pork \u8089\u788e\u9ebb\u5a46\u8c46\u8150",
           "price": 13.95,
           "category": "Pork",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Stir-Fried String Beans w/ Minced Pork \u6b16\u83dc\u8089\u788e\u7092\u56db\u5b63\u8c46",
+          "item": "P2 Stir-Fried String Beans w/ Minced Pork \u6b16\u83dc\u8089\u788e\u7092\u56db\u5b63\u8c46",
           "price": 16.95,
           "category": "Pork"
         },
         {
-          "item": "Stir-Fried Pork w/ Jalape\u00f1o \u58a8\u897f\u54e5\u8fa3\u6912\u7092\u8089\u7d72",
+          "item": "P3 Stir-Fried Pork w/ Jalape\u00f1o \u58a8\u897f\u54e5\u8fa3\u6912\u7092\u8089\u7d72",
           "price": 15.95,
           "category": "Pork",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Pork with Garlic Sauce \u9b5a\u9999\u8089\u7d72",
+          "item": "P4 Pork with Garlic Sauce \u9b5a\u9999\u8089\u7d72",
           "price": 14.95,
           "category": "Pork",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Salt & Pepper Pork Chops \u6912\u9e7d\u6392\u9aa8",
+          "item": "P5 Salt & Pepper Pork Chops \u6912\u9e7d\u6392\u9aa8",
           "price": 17.95,
           "category": "Pork"
         },
         {
-          "item": "Crispy Lemongrass Pork Chops \u70b8\u9999\u8305\u8c6c\u6252",
+          "item": "P6 Crispy Lemongrass Pork Chops \u70b8\u9999\u8305\u8c6c\u6252",
           "price": 16.95,
           "category": "Pork"
         },
         {
-          "item": "Pineapple w/ Kingdom Pork Chops \u83e0\u863f\u4eac\u90fd\u9aa8",
+          "item": "P7 Pineapple w/ Kingdom Pork Chops \u83e0\u863f\u4eac\u90fd\u9aa8",
           "price": 18.95,
           "category": "Pork"
         },
         {
-          "item": "Broccoli w/ Pork \u897f\u82a5\u862d\u7092\u8089\u7247",
+          "item": "P8 Broccoli w/ Pork \u897f\u82a5\u862d\u7092\u8089\u7247",
           "price": 15.95,
           "category": "Pork"
         },
         {
-          "item": "Stir-Fried Cured Pork & Sausages w/ Celery \u8377\u82b9\u7092\u81d8\u5473",
+          "item": "P9 Stir-Fried Cured Pork & Sausages w/ Celery \u8377\u82b9\u7092\u81d8\u5473",
           "price": 18.95,
           "category": "Pork"
         },
         {
-          "item": "Sesame Chicken \u829d\u9ebb\u96de",
+          "item": "C1 Sesame Chicken \u829d\u9ebb\u96de",
           "price": 15.95,
           "category": "Chicken"
         },
         {
-          "item": "General Tso's Chicken \u5de6\u5b97\u96de",
+          "item": "C2 General Tso's Chicken \u5de6\u5b97\u96de",
           "price": 15.95,
           "category": "Chicken",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Hunan Chicken \u6e56\u5357\u96de",
+          "item": "C3 Hunan Chicken \u6e56\u5357\u96de",
           "price": 15.95,
           "category": "Chicken",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Broccoli Chicken \u82a5\u862d\u96de",
+          "item": "C4 Broccoli Chicken \u82a5\u862d\u96de",
           "price": 15.95,
           "category": "Chicken"
         },
         {
-          "item": "Kung Pao Chicken \u5bae\u4fdd\u96de",
+          "item": "C5 Kung Pao Chicken \u5bae\u4fdd\u96de",
           "price": 15.95,
           "category": "Chicken",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Black Pepper Chicken \u9ed1\u6912\u96de",
+          "item": "C6 Black Pepper Chicken \u9ed1\u6912\u96de",
           "price": 15.95,
           "category": "Chicken",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Mix Vegs Chicken \u7d20\u83dc\u96de",
+          "item": "C7 Mix Vegs Chicken \u7d20\u83dc\u96de",
           "price": 15.95,
           "category": "Chicken"
         },
         {
-          "item": "Curry Chicken \u5496\u55b1\u96de",
+          "item": "C8 Curry Chicken \u5496\u55b1\u96de",
           "price": 15.95,
           "category": "Chicken",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Sichuan Chicken \u56db\u5ddd\u96de",
+          "item": "C9 Sichuan Chicken \u56db\u5ddd\u96de",
           "price": 15.95,
           "category": "Chicken",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Mushroom Chicken \u8611\u83c7\u96de",
+          "item": "C10 Mushroom Chicken \u8611\u83c7\u96de",
           "price": 15.95,
           "category": "Chicken"
         },
         {
-          "item": "Cashew Nut Chicken \u8170\u679c\u96de",
+          "item": "C11 Cashew Nut Chicken \u8170\u679c\u96de",
           "price": 17.95,
           "category": "Chicken",
           "desc": "Hot & Spicy, Contains peanut/sesame"
         },
         {
-          "item": "Orange Chicken \u9673\u76ae\u96de",
+          "item": "C12 Orange Chicken \u9673\u76ae\u96de",
           "price": 15.95,
           "category": "Chicken"
         },
         {
-          "item": "Kung-Pao Beef \u5bae\u4fdd\u725b",
+          "item": "B1 Kung-Pao Beef \u5bae\u4fdd\u725b",
           "price": 17.95,
           "category": "Beef",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Broccoli Beef \u82a5\u862d\u725b",
+          "item": "B2 Broccoli Beef \u82a5\u862d\u725b",
           "price": 17.95,
           "category": "Beef"
         },
         {
-          "item": "Hunan Beef \u6e56\u5357\u725b",
+          "item": "B3 Hunan Beef \u6e56\u5357\u725b",
           "price": 17.95,
           "category": "Beef",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Chef's Curry Beef \u5e2b\u5085\u5496\u55b1\u725b",
+          "item": "B4 Chef's Curry Beef \u5e2b\u5085\u5496\u55b1\u725b",
           "price": 17.95,
           "category": "Beef",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Mix Vegs Beef \u7d20\u83dc\u725b",
+          "item": "B5 Mix Vegs Beef \u7d20\u83dc\u725b",
           "price": 20.95,
           "category": "Beef"
         },
         {
-          "item": "Curry Beef \u5496\u55b1\u725b",
+          "item": "B6 Curry Beef \u5496\u55b1\u725b",
           "price": 17.95,
           "category": "Beef",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Orange Beef \u9673\u76ae\u725b",
+          "item": "B7 Orange Beef \u9673\u76ae\u725b",
           "price": 17.95,
           "category": "Beef"
         },
         {
-          "item": "Sichuan Beef \u56db\u5ddd\u725b",
+          "item": "B8 Sichuan Beef \u56db\u5ddd\u725b",
           "price": 19.95,
           "category": "Beef",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Beef with Cashew Nuts \u8170\u679c\u725b",
+          "item": "B9 Beef with Cashew Nuts \u8170\u679c\u725b",
           "price": 18.95,
           "category": "Beef"
         },
         {
-          "item": "String Beans Beef \u56db\u5b63\u8c46\u725b",
+          "item": "B10 String Beans Beef \u56db\u5b63\u8c46\u725b",
           "price": 20.95,
           "category": "Beef"
         },
         {
-          "item": "Stir Fried Beef w/ Egg \u6ed1\u86cb\u725b",
+          "item": "B11 Stir Fried Beef w/ Egg \u6ed1\u86cb\u725b",
           "price": 18.95,
           "category": "Beef"
         },
         {
-          "item": "Mongolian Beef \u8525\u7206\u725b",
+          "item": "B12 Mongolian Beef \u8525\u7206\u725b",
           "price": 20.95,
           "category": "Beef"
         },
         {
-          "item": "Black Pepper Steak \u9ed1\u6912\u725b\u67f3",
+          "item": "B13 Black Pepper Steak \u9ed1\u6912\u725b\u67f3",
           "price": 18.95,
           "category": "Beef"
         },
         {
-          "item": "Spicy Beef \u7d05\u6cb9\u725b\u8089",
+          "item": "B14 Spicy Beef \u7d05\u6cb9\u725b\u8089",
           "price": 18.95,
           "category": "Beef",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Sha Cha Beef \u6c99\u8336\u725b",
+          "item": "B15 Sha Cha Beef \u6c99\u8336\u725b",
           "price": 21.95,
           "category": "Beef"
         },
         {
-          "item": "Filet Mignon French Style \u6cd5\u5f0f\u725b\u4ed4\u7c92",
+          "item": "B16 Filet Mignon French Style \u6cd5\u5f0f\u725b\u4ed4\u7c92",
           "price": 21.95,
           "category": "Beef"
         },
         {
-          "item": "General Tso's Shrimp \u5de6\u5b97\u8766",
+          "item": "F1 General Tso's Shrimp \u5de6\u5b97\u8766",
           "price": 15.95,
           "category": "Shrimp"
         },
         {
-          "item": "Hunan Shrimp \u6e56\u5357\u8766",
+          "item": "F2 Hunan Shrimp \u6e56\u5357\u8766",
           "price": 15.95,
           "category": "Shrimp"
         },
         {
-          "item": "Broccoli Shrimp \u82a5\u862d\u8766",
+          "item": "F3 Broccoli Shrimp \u82a5\u862d\u8766",
           "price": 15.95,
           "category": "Shrimp"
         },
         {
-          "item": "Kung Pao Shrimp \u5bae\u4fdd\u8766",
+          "item": "F4 Kung Pao Shrimp \u5bae\u4fdd\u8766",
           "price": 15.95,
           "category": "Shrimp",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Black Pepper Shrimp \u9ed1\u6912\u8766",
+          "item": "F5 Black Pepper Shrimp \u9ed1\u6912\u8766",
           "price": 15.95,
           "category": "Shrimp",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Mix Vegs Shrimp \u7d20\u83dc\u8766",
+          "item": "F6 Mix Vegs Shrimp \u7d20\u83dc\u8766",
           "price": 15.95,
           "category": "Shrimp"
         },
         {
-          "item": "Curry Shrimp \u5496\u55b1\u8766",
+          "item": "F7 Curry Shrimp \u5496\u55b1\u8766",
           "price": 15.95,
           "category": "Shrimp",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Cashew Nut Shrimp \u8170\u679c\u8766",
+          "item": "F8 Cashew Nut Shrimp \u8170\u679c\u8766",
           "price": 15.95,
           "category": "Shrimp"
         },
         {
-          "item": "String Beans Shrimp \u56db\u5b63\u8c46\u8766",
+          "item": "F9 String Beans Shrimp \u56db\u5b63\u8c46\u8766",
           "price": 17.95,
           "category": "Shrimp"
         },
         {
-          "item": "Snow Pea Shrimp \u96ea\u8c46\u8766",
+          "item": "F10 Snow Pea Shrimp \u96ea\u8c46\u8766",
           "price": 16.95,
           "category": "Shrimp"
         },
         {
-          "item": "Sichuan Shrimp \u56db\u5ddd\u8766",
+          "item": "F11 Sichuan Shrimp \u56db\u5ddd\u8766",
           "price": 16.95,
           "category": "Shrimp",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Walnut Shrimp \u6838\u6843\u8766",
+          "item": "F12 Walnut Shrimp \u6838\u6843\u8766",
           "price": 16.95,
           "category": "Shrimp"
         },
         {
-          "item": "Jumbo Shrimp (Garlic Butter/Tomato Sauce) \u4e7e\u71d2\u5927\u8766\uff08\u849c\u84c9\u725b\u6cb9/\u8304\u6c41\uff09",
+          "item": "F13 Jumbo Shrimp (Garlic Butter/Tomato Sauce) \u4e7e\u71d2\u5927\u8766\uff08\u849c\u84c9\u725b\u6cb9/\u8304\u6c41\uff09",
           "price": 18.95,
           "category": "Shrimp",
           "orOptions": [
@@ -6913,7 +6913,7 @@
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Jumbo Shrimp (Salt & Pepper/Soy Sauce) \u6912\u9e7d/\u7f8e\u6975\u5927\u8766",
+          "item": "F14 Jumbo Shrimp (Salt & Pepper/Soy Sauce) \u6912\u9e7d/\u7f8e\u6975\u5927\u8766",
           "price": 26.95,
           "category": "Shrimp",
           "orOptions": [
@@ -6923,7 +6923,7 @@
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Jumbo Shrimp (Salty Egg Sauce/HK Style) \u91d1\u6c99/\u907f\u98a8\u5858\u5927\u8766",
+          "item": "F15 Jumbo Shrimp (Salty Egg Sauce/HK Style) \u91d1\u6c99/\u907f\u98a8\u5858\u5927\u8766",
           "price": 25.95,
           "category": "Shrimp",
           "orOptions": [
@@ -6932,126 +6932,126 @@
           ]
         },
         {
-          "item": "Salt & Pepper Fish Fillet \u6912\u9e7d\u6591\u584a",
+          "item": "F16 Salt & Pepper Fish Fillet \u6912\u9e7d\u6591\u584a",
           "price": 27.95,
           "category": "Shrimp",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Tomato Sweet Chili Sauce Fish Fillet \u9bae\u8304\u6cf0\u6c41\u6591\u584a",
+          "item": "F17 Tomato Sweet Chili Sauce Fish Fillet \u9bae\u8304\u6cf0\u6c41\u6591\u584a",
           "price": 18.95,
           "category": "Shrimp"
         },
         {
-          "item": "Braised Fish Fillet w/ Tofu \u8c46\u8150\u7117\u6591\u8169",
+          "item": "F18 Braised Fish Fillet w/ Tofu \u8c46\u8150\u7117\u6591\u8169",
           "price": 17.95,
           "category": "Shrimp"
         },
         {
-          "item": "Fish Fillet w/ Chopped Chili \u5241\u6912\u6591\u584a",
+          "item": "F19 Fish Fillet w/ Chopped Chili \u5241\u6912\u6591\u584a",
           "price": 17.95,
           "category": "Shrimp",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Fish Fillets w/ Chinese Greens \u6642\u83dc\u7092\u6591\u584a",
+          "item": "F20 Fish Fillets w/ Chinese Greens \u6642\u83dc\u7092\u6591\u584a",
           "price": 18.95,
           "category": "Shrimp"
         },
         {
-          "item": "Fish Fillets in Black Bean Sauce \u8c49\u6c41\u7092\u6591\u584a",
+          "item": "F21 Fish Fillets in Black Bean Sauce \u8c49\u6c41\u7092\u6591\u584a",
           "price": 18.95,
           "category": "Shrimp"
         },
         {
-          "item": "Salt & Pepper Squid \u6912\u9e7d\u9b77\u9b5a",
+          "item": "F22 Salt & Pepper Squid \u6912\u9e7d\u9b77\u9b5a",
           "price": 18.95,
           "category": "Shrimp",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Satay Squid Stir-Fried \u6c99\u7239\u7206\u7092\u9b77\u9b5a",
+          "item": "F23 Satay Squid Stir-Fried \u6c99\u7239\u7206\u7092\u9b77\u9b5a",
           "price": 20.95,
           "category": "Shrimp"
         },
         {
-          "item": "Broccoli with Garlic \u5927\u849c\u897f\u862d\u82b1",
+          "item": "V1 Broccoli with Garlic \u5927\u849c\u897f\u862d\u82b1",
           "price": 13.95,
           "category": "Vegetable"
         },
         {
-          "item": "Yu Choy with Oyster Sauce \u8814\u6cb9\u83dc\u82af",
+          "item": "V2 Yu Choy with Oyster Sauce \u8814\u6cb9\u83dc\u82af",
           "price": 15.95,
           "category": "Vegetable"
         },
         {
-          "item": "Lettuce with Oyster Sauce \u8814\u6cb9\u751f\u83dc",
+          "item": "V3 Lettuce with Oyster Sauce \u8814\u6cb9\u751f\u83dc",
           "price": 13.95,
           "category": "Vegetable"
         },
         {
-          "item": "Salt and Pepper String Beans \u6912\u9e7d\u56db\u5b63\u8c46",
+          "item": "V4 Salt and Pepper String Beans \u6912\u9e7d\u56db\u5b63\u8c46",
           "price": 14.95,
           "category": "Vegetable",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Eggplant with Garlic Sauce \u9b5a\u9999\u8304\u5b50",
+          "item": "V5 Eggplant with Garlic Sauce \u9b5a\u9999\u8304\u5b50",
           "price": 14.95,
           "category": "Vegetable"
         },
         {
-          "item": "Sauteed Yu Choy with Garlic \u5927\u849c\u83dc\u82af",
+          "item": "V6 Sauteed Yu Choy with Garlic \u5927\u849c\u83dc\u82af",
           "price": 15.95,
           "category": "Vegetable"
         },
         {
-          "item": "Spicy Stir-Fried Cabbage \u9ebb\u8fa3\u9ad8\u9e97\u83dc",
+          "item": "V7 Spicy Stir-Fried Cabbage \u9ebb\u8fa3\u9ad8\u9e97\u83dc",
           "price": 14.95,
           "category": "Vegetable",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Stir-Fried Chinese Broccoli with Garlic \u5927\u849c\u4e2d\u82a5\u862d",
+          "item": "V8 Stir-Fried Chinese Broccoli with Garlic \u5927\u849c\u4e2d\u82a5\u862d",
           "price": 15.95,
           "category": "Vegetable"
         },
         {
-          "item": "Salt and Pepper String Beans and Eggplant \u6912\u9e7d\u56db\u5b63\u8c46\u8304\u5b50",
+          "item": "V9 Salt and Pepper String Beans and Eggplant \u6912\u9e7d\u56db\u5b63\u8c46\u8304\u5b50",
           "price": 16.95,
           "category": "Vegetable",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Assorted Mushrooms & Lettuce in Oyster Sauce \u8814\u6cb9\u96dc\u83c7\u6252\u751f\u83dc",
+          "item": "V10 Assorted Mushrooms & Lettuce in Oyster Sauce \u8814\u6cb9\u96dc\u83c7\u6252\u751f\u83dc",
           "price": 16.95,
           "category": "Vegetable",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Stir-Fried String Beans & Jalape\u00f1o in Black Bean Sauce \u8c49\u6c41\u864e\u76ae\u8fa3\u6912\u56db\u5b63\u8c46",
+          "item": "V11 Stir-Fried String Beans & Jalape\u00f1o in Black Bean Sauce \u8c49\u6c41\u864e\u76ae\u8fa3\u6912\u56db\u5b63\u8c46",
           "price": 15.95,
           "category": "Vegetable",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Salt and Pepper Tofu \u6912\u9e7d\u8c46\u8150",
+          "item": "T1 Salt and Pepper Tofu \u6912\u9e7d\u8c46\u8150",
           "price": 12.95,
           "category": "Tofu",
           "desc": "Hot & Spicy"
         },
         {
-          "item": "Tofu Home Style \u7d05\u71d2\u8c46\u8150",
+          "item": "T2 Tofu Home Style \u7d05\u71d2\u8c46\u8150",
           "price": 14.95,
           "category": "Tofu"
         },
         {
-          "item": "Vegetables with Tofu \u7d20\u83dc\u8c46\u8150",
+          "item": "T3 Vegetables with Tofu \u7d20\u83dc\u8c46\u8150",
           "price": 14.95,
           "category": "Tofu"
         },
         {
-          "item": "Shrimp Tofu \u8766\u4ec1\u8c46\u8150",
+          "item": "T4 Shrimp Tofu \u8766\u4ec1\u8c46\u8150",
           "price": 16.95,
           "category": "Tofu",
           "desc": "Hot & Spicy"
@@ -7299,7 +7299,7 @@
           "category": "Chef's Recommendations"
         },
         {
-          "item": "Lunch Special: Broccoli (Chicken/Beef/Shrimp) \u82a5\u862d\uff08\u96de/\u8766/\u725b\uff09",
+          "item": "L1 Lunch Special: Broccoli (Chicken/Beef/Shrimp) \u82a5\u862d\uff08\u96de/\u8766/\u725b\uff09",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special",
@@ -7310,7 +7310,7 @@
           ]
         },
         {
-          "item": "Lunch Special: Fried Rice (Chicken/Beef/Shrimp) \u7092\u98ef\uff08\u96de/\u8766/\u725b\uff09",
+          "item": "L2 Lunch Special: Fried Rice (Chicken/Beef/Shrimp) \u7092\u98ef\uff08\u96de/\u8766/\u725b\uff09",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special",
@@ -7321,13 +7321,13 @@
           ]
         },
         {
-          "item": "Lunch Special: Mixed Vegetables Fried Rice \u7d20\u83dc\u7092\u98ef",
+          "item": "L3 Lunch Special: Mixed Vegetables Fried Rice \u7d20\u83dc\u7092\u98ef",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special"
         },
         {
-          "item": "Lunch Special: General Tso's Chicken/Shrimp \u5de6\u516c\u96de/\u8766",
+          "item": "L4 Lunch Special: General Tso's Chicken/Shrimp \u5de6\u516c\u96de/\u8766",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special",
@@ -7337,7 +7337,7 @@
           ]
         },
         {
-          "item": "Lunch Special: Hunan (Chicken/Beef/Shrimp) \u6e56\u5357\uff08\u96de/\u8766/\u725b\uff09",
+          "item": "L5 Lunch Special: Hunan (Chicken/Beef/Shrimp) \u6e56\u5357\uff08\u96de/\u8766/\u725b\uff09",
           "price": 11.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special",
@@ -7348,13 +7348,13 @@
           ]
         },
         {
-          "item": "Lunch Special: Hunan Vegetable \u6e56\u5357\u83dc",
+          "item": "L6 Lunch Special: Hunan Vegetable \u6e56\u5357\u83dc",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special"
         },
         {
-          "item": "Lunch Special: Kung-Pao (Chicken/Beef/Shrimp) \u5bae\u4fdd\uff08\u96de/\u8766/\u725b\uff09",
+          "item": "L7 Lunch Special: Kung-Pao (Chicken/Beef/Shrimp) \u5bae\u4fdd\uff08\u96de/\u8766/\u725b\uff09",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special",
@@ -7365,7 +7365,7 @@
           ]
         },
         {
-          "item": "Lunch Special: Lo Mein (Chicken/Shrimp) \u6488\u9eb5\uff08\u96de/\u8766\uff09",
+          "item": "L8 Lunch Special: Lo Mein (Chicken/Shrimp) \u6488\u9eb5\uff08\u96de/\u8766\uff09",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special",
@@ -7375,19 +7375,19 @@
           ]
         },
         {
-          "item": "Lunch Special: Orange Chicken \u9673\u76ae\u96de",
+          "item": "L9 Lunch Special: Orange Chicken \u9673\u76ae\u96de",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special"
         },
         {
-          "item": "Lunch Special: Sesame Chicken \u829d\u9ebb\u96de",
+          "item": "L10 Lunch Special: Sesame Chicken \u829d\u9ebb\u96de",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special"
         },
         {
-          "item": "Lunch Special: Stir-fried Mixed Vegetables (Chicken/Shrimp) \u7d20\u83dc\uff08\u96de/\u8766\uff09",
+          "item": "L11 Lunch Special: Stir-fried Mixed Vegetables (Chicken/Shrimp) \u7d20\u83dc\uff08\u96de/\u8766\uff09",
           "price": 11.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special",
@@ -7397,13 +7397,13 @@
           ]
         },
         {
-          "item": "Lunch Special: Sweet & Sour Chicken \u751c\u9178\u96de",
+          "item": "L12 Lunch Special: Sweet & Sour Chicken \u751c\u9178\u96de",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special"
         },
         {
-          "item": "Lunch Special: Sichuan (Chicken/Beef/Shrimp) \u56db\u5ddd\uff08\u96de/\u8766/\u725b\uff09",
+          "item": "L13 Lunch Special: Sichuan (Chicken/Beef/Shrimp) \u56db\u5ddd\uff08\u96de/\u8766/\u725b\uff09",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special",
@@ -7414,19 +7414,19 @@
           ]
         },
         {
-          "item": "Lunch Special: Triple Delight \u7092\u4e09\u9bae",
+          "item": "L14 Lunch Special: Triple Delight \u7092\u4e09\u9bae",
           "price": 10.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special"
         },
         {
-          "item": "Lunch Special: Combination Fried Rice \u4ec0\u9326\u7092\u98ef",
+          "item": "L15 Lunch Special: Combination Fried Rice \u4ec0\u9326\u7092\u98ef",
           "price": 11.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special"
         },
         {
-          "item": "Lunch Special: Combination/Beef Lo Mein \u4ec0\u9326/\u725b\u6488\u9eb5",
+          "item": "L16 Lunch Special: Combination/Beef Lo Mein \u4ec0\u9326/\u725b\u6488\u9eb5",
           "price": 12.95,
           "desc": "Mon-Fri 11am-3pm only, excludes holidays/weekends. Includes (1) Vegetable Spring Roll OR (1) Soda. Beef/Combination +$2.",
           "category": "Lunch Combination Special"

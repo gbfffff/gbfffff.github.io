@@ -1247,6 +1247,21 @@
       min-width: 0;
     }
     .grouped-item-name { font-weight: 700; color: var(--text); }
+    .grouped-item-name.grouped-item-name-coded {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.4rem;
+      font-weight: normal;
+    }
+    .grouped-item-code {
+      flex: 0 0 auto;
+      min-width: 1.8rem;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .grouped-item-name-text { flex: 1 1 auto; min-width: 0; font-weight: 700; color: var(--text); }
     .grouped-item-names {
       margin-left: 0.5rem;
       font-size: 0.7rem;
@@ -2372,6 +2387,25 @@
     }
 
     .mpi-name { font-size: 1rem; color: #000; line-height: 1.3; }
+    /* Order code (e.g. "AP1") sits in its own fixed-start column, baseline-
+       aligned with the first line of the name -- so a long dish name can
+       wrap to a second line without the code wrapping down with it or
+       repeating, and there's a deliberate gap instead of the code running
+       straight into the name. */
+    .mpi-name.mpi-name-coded {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .mpi-code {
+      flex: 0 0 auto;
+      min-width: 2.1rem;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 700;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .mpi-name-text { flex: 1 1 auto; min-width: 0; }
     .mpi-desc { font-size: 0.8rem; color: #333; opacity: 0.75; line-height: 1.3; font-style: italic; }
     .mpi-price { font-size: 1rem; font-weight: 700; color: #000; white-space: nowrap; flex-shrink: 0; padding-top: 0.1rem; }
 
