@@ -8868,8 +8868,7 @@
             }
           ],
           "desc": "Beef and lamb patty with herbs and spices. Topped with tzatziki, tomato, and onions. Server with feta cube and pepperoncini.",
-          "category": "Sandwiches",
-          "outOfStock": true
+          "category": "Sandwiches"
         },
         {
           "item": "Hercules Platter",
