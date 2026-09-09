@@ -63,6 +63,7 @@ const CHANGELOG = [
     "Thai Cottage's full menu added (78 items across 13 sections), transcribed from their menu photos -- appetizers, soups, salads, Thai street food, noodle soups, curries, chef's picks, fusion tacos, loaded fries, burgers/sandwiches, sides, drinks and desserts. Dishes that call for a protein now require that pick before they can be added (curries, noodle soups, tacos, burgers/sandwiches, Tom Yum/Tom Kha), priced per choice where the menu prices them differently; taco shell, cheese and almond-milk swaps come through as optional checkboxes",
     "Rate Your Order goes back to a dragged scale instead of the tap-target grid, and the scale is now 0-10 in half steps -- so 0 and 7.5 are both ratable. The slider is drawn chunkier than a stock one (taller track, bigger thumb) since a half-step scale has 21 stops to land on, with the live value shown beside it. Whole-number ratings already recorded are unaffected and mix freely into every average",
     "Menu \"choose ...\" hints (choose 1, + N sides, + protein) now read as their own thing rather than blending into the dish description -- upright and solid instead of dimmed italics, still smaller than the dish name",
+    "Overall Satisfaction's trend chart now names the restaurant behind each point (e.g. \"Jul 24, 2026 - Ah'Haan - 7.3/10\") -- it spans every restaurant, so a date on its own never said whose score it was. Points respond to a tap as well as a hover, so this works on a phone; the per-dish and per-restaurant trends are already about one subject and are unchanged",
   ]},
   { version: "1.13.1", date: "2026-07-22", notes: [
     "Full menus added for Wai Kee (Traditional Chinese), Pollo Cabana, Taco Madre, and Big Greek, scraped directly from each restaurant's own ordering platform for exact modifiers/pricing",
@@ -2695,21 +2696,25 @@ function computeRestaurantMomentum() {
 // at once -- "how did satisfaction trend over time" for the Reports and
 // Stats Overall Satisfaction widget, one point per order date.
 function computeGlobalRatingTrend() {
-  const byDate = new Map(); // date -> { weightedSum, weight }
+  const byDate = new Map(); // date -> { weightedSum, weight, restaurants:Set }
   _allRatingRows.forEach(r => {
     const restaurant = (r[2] || "").trim();
     const item = (r[3] || "").trim();
     const date = (r[1] || "").trim();
     const rating = Number(r[r.length - 1]);
     if (!date || isNaN(rating)) return;
-    if (!byDate.has(date)) byDate.set(date, { weightedSum: 0, weight: 0 });
+    if (!byDate.has(date)) byDate.set(date, { weightedSum: 0, weight: 0, restaurants: new Set() });
     const e = byDate.get(date);
     const w = ratingWeight(restaurant, item);
     e.weightedSum += rating * w;
     e.weight += w;
+    // Each order date is normally a single restaurant, but a reopened or
+    // overridden round can put two on one date -- keep both rather than
+    // silently attributing the score to whichever was seen first.
+    if (restaurant) e.restaurants.add(restaurant);
   });
   return [...byDate.entries()]
-    .map(([date, e]) => ({ date, avg: e.weightedSum / e.weight }))
+    .map(([date, e]) => ({ date, avg: e.weightedSum / e.weight, label: [...e.restaurants].join(", ") }))
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
@@ -4604,7 +4609,7 @@ function renderTrendChart(trend, ids) {
   trend.forEach((p, i) => {
     const cx = xAt(i).toFixed(1), cy = yAt(p.avg).toFixed(1);
     dotsSvg += `<circle cx="${cx}" cy="${cy}" r="4" fill="${ink}"/>`;
-    hitsSvg += `<circle cx="${cx}" cy="${cy}" r="11" fill="transparent" class="item-detail-hit" data-date="${escAttr(fmtRatingDate(p.date))}" data-rating="${p.avg.toFixed(1)}"/>`;
+    hitsSvg += `<circle cx="${cx}" cy="${cy}" r="11" fill="transparent" class="item-detail-hit" data-date="${escAttr(fmtRatingDate(p.date))}" data-rating="${p.avg.toFixed(1)}"${p.label ? ` data-label="${escAttr(p.label)}"` : ""}/>`;
   });
 
   // Sparse date labels (first/middle/last) rather than one per point, which
@@ -4624,20 +4629,35 @@ function renderTrendChart(trend, ids) {
 
   const tooltip = document.getElementById(ids.tooltip);
   const wrapEl  = document.getElementById(ids.wrap);
+  // data-label is only set where the point needs naming -- the global
+  // Overall Satisfaction trend spans every restaurant, so a date alone
+  // doesn't say whose score it was. The per-item and per-restaurant charts
+  // are already about one subject and stay date + rating.
+  function showTip(hit) {
+    const label = hit.dataset.label ? ` — ${hit.dataset.label}` : "";
+    tooltip.textContent = `${hit.dataset.date}${label} — ${hit.dataset.rating}/10`;
+    tooltip.style.display = "block";
+    const wrap = wrapEl.getBoundingClientRect();
+    const hr = hit.getBoundingClientRect();
+    const tr = tooltip.getBoundingClientRect();
+    let left = hr.left - wrap.left + hr.width / 2 - tr.width / 2;
+    left = Math.max(4, Math.min(left, wrap.width - tr.width - 4));
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top  = `${hr.top - wrap.top - tr.height - 8}px`;
+  }
+  const hideTip = () => { tooltip.style.display = "none"; };
+
   svg.querySelectorAll(".item-detail-hit").forEach(hit => {
-    hit.addEventListener("mouseenter", () => {
-      tooltip.textContent = `${hit.dataset.date} — ${hit.dataset.rating}/10`;
-      tooltip.style.display = "block";
-      const wrap = wrapEl.getBoundingClientRect();
-      const hr = hit.getBoundingClientRect();
-      const tr = tooltip.getBoundingClientRect();
-      let left = hr.left - wrap.left + hr.width / 2 - tr.width / 2;
-      left = Math.max(4, Math.min(left, wrap.width - tr.width - 4));
-      tooltip.style.left = `${left}px`;
-      tooltip.style.top  = `${hr.top - wrap.top - tr.height - 8}px`;
-    });
-    hit.addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
+    hit.addEventListener("mouseenter", () => showTip(hit));
+    hit.addEventListener("mouseleave", hideTip);
   });
+  // Tapping a point has to work too -- there's no hover on a phone. Assigned
+  // (not addEventListener) because the <svg> element outlives each re-render
+  // of its contents, so a listener would stack up on every refresh.
+  svg.onclick = e => {
+    const hit = e.target.closest(".item-detail-hit");
+    if (hit) showTip(hit); else hideTip();
+  };
 }
 
 let _lbImages = [];
