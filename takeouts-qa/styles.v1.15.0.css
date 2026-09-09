@@ -3558,18 +3558,41 @@
       color: var(--text-dim);
       border-bottom: 1px solid var(--border);
     }
+    /* Fixed width, not min-width: with flex:0 0 auto each cell sized to its
+       own text, so the header words ("Visits") came out wider than the
+       numbers under them and the columns didn't line up. A fixed basis
+       makes the header and every value share one column edge. */
     .order-reports-restaurants-visits,
     .order-reports-restaurants-orders,
     .order-reports-restaurants-rating {
-      flex: 0 0 auto;
-      min-width: 2.6rem;
+      flex: 0 0 3.1rem;
+      width: 3.1rem;
       text-align: right;
       font-variant-numeric: tabular-nums;
+    }
+    /* space-between spread the gaps differently on every row depending on
+       how long the restaurant name was; let the name take the slack instead. */
+    #order-reports-restaurants-mini .order-reports-foodchart-row {
+      justify-content: flex-start;
+      gap: 0.5rem;
+    }
+    #order-reports-restaurants-mini .order-reports-foodchart-item {
+      flex: 1 1 auto;
+      min-width: 0;
     }
     /* Somewhere we haven't ordered from yet still gets a row -- dimmed, so
        "no data" reads differently from "genuinely scored zero". */
     .order-reports-foodchart-row.is-unvisited,
     .order-reports-restaurant-detail-row.is-unvisited { opacity: 0.55; }
+    /* .report-table is table-layout:fixed with widths declared for THREE
+       columns (58/21/21). Restaurant Stats has four, so the extra one got
+       no allocation and pushed the table past 100%. Declare all four here,
+       summing to 100, and let the headers wrap -- "Avg Rating" held on one
+       line was forcing that column wider than its share. */
+    .report-table-restaurants th:nth-child(1) { width: 43%; }
+    .report-table-restaurants th:nth-child(2) { width: 16%; }
+    .report-table-restaurants th:nth-child(3) { width: 17%; }
+    .report-table-restaurants th:nth-child(4) { width: 24%; }
     .report-table-restaurants td:nth-child(2),
     .report-table-restaurants td:nth-child(3),
     .report-table-restaurants td:nth-child(4),
@@ -3578,7 +3601,20 @@
     .report-table-restaurants th:nth-child(4) {
       text-align: right;
       font-variant-numeric: tabular-nums;
-      white-space: nowrap;
+    }
+    /* Only the values stay on one line; they're short. */
+    .report-table-restaurants td:nth-child(2),
+    .report-table-restaurants td:nth-child(3),
+    .report-table-restaurants td:nth-child(4) { white-space: nowrap; }
+    .report-table-restaurants td:nth-child(1) {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    /* Nothing in the detail modal should scroll sideways. */
+    .report-modal-body { overflow-x: hidden; }
+    @media (max-width: 380px) {
+      .report-table-restaurants th { font-size: 0.58rem; padding: 0.5rem 0.25rem; }
+      .report-table-restaurants td { font-size: 0.74rem; padding: 0.45rem 0.25rem; }
     }
 
     /* ── Protein Mix tile + donut report ── */
