@@ -2240,8 +2240,12 @@ function computeRestaurantStats() {
   // table. Rotation slots can repeat a restaurant (and `ref` slots point
   // at another entry), so dedupe by name.
   const known = new Map(); // lowercased name -> display name
-  (config.restaurants || []).forEach(raw => {
-    const r = raw?.ref ? ((config.restaurants || []).find(x => x.name === raw.ref) || raw) : raw;
+  // _restaurantsConfig, not `config` -- `config` is a local inside the
+  // loader and a parameter of the rotation builders, so referencing it
+  // here threw a ReferenceError and took the whole Reports card down.
+  const rotation = _restaurantsConfig?.restaurants || [];
+  rotation.forEach(raw => {
+    const r = raw?.ref ? (rotation.find(x => x.name === raw.ref) || raw) : raw;
     const name = (r?.name || "").trim();
     if (name) known.set(name.toLowerCase(), name);
   });
