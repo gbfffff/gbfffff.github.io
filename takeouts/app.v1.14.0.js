@@ -60,7 +60,9 @@ const CHANGELOG = [
     "Menu items with a leading order code (e.g. Mi La Cay's \"P1\", \"AP3\") now show that code in its own small column in front of the name, on the menu panel and the Worksheet's grouped-duplicates view -- long names wrap on their own without dragging the code down with them. Detected automatically wherever a restaurant's menu actually uses codes, so it applies to any menu with them, not just Mi La Cay",
     "偉記's menu now has its real order codes too (S1-S4, A1-A20, W1-W6, G1-G21, D1-D7, M1-M20, N1-N13, R1-R35, P1-P9, C1-C12, B1-B16, F1-F23, V1-V11, T1-T4, L1-L16), pulled directly off their printed menu -- previously missing entirely, so nothing showed there despite the feature already existing for Mi La Cay. Note: any past 偉記 order/rating history logged under the old code-less names won't link back to these renamed catalog entries for pricing/weighting lookups; the ratings themselves aren't lost",
     "Fixed Big Greek's \"Our Famous Gyro Pita Sandwich\" listed at $7 instead of its actual $11.75 -- $7 is their Wednesday-only promo price, not the everyday one; whoever entered the menu data originally must have grabbed that number off the \"$7 Gyro Wednesday\" callout instead of the Sandwiches section",
-    "Thai Cottage's full menu added (78 items across 13 sections), transcribed from their menu photos -- appetizers, soups, salads, Thai street food, noodle soups, curries, chef's picks, fusion tacos, loaded fries, burgers/sandwiches, sides, drinks and desserts. Dishes that call for a protein now require that pick before they can be added (curries, noodle soups, tacos, burgers/sandwiches, Tom Yum/Tom Kha), priced per choice where the menu prices them differently; taco shell, cheese and almond-milk swaps come through as optional checkboxes",  ]},
+    "Thai Cottage's full menu added (78 items across 13 sections), transcribed from their menu photos -- appetizers, soups, salads, Thai street food, noodle soups, curries, chef's picks, fusion tacos, loaded fries, burgers/sandwiches, sides, drinks and desserts. Dishes that call for a protein now require that pick before they can be added (curries, noodle soups, tacos, burgers/sandwiches, Tom Yum/Tom Kha), priced per choice where the menu prices them differently; taco shell, cheese and almond-milk swaps come through as optional checkboxes",
+    "Ratings can now land on a half point. The 1-10 buttons are unchanged -- a \"+ \u00bd\" toggle sits under them and a live readout shows the score being submitted (e.g. \"7.5 / 10\"), so a half is one extra tap instead of 19 cramped buttons. Picking a 10 clears and locks the toggle since there is no 10.5. Existing whole-number ratings are unaffected and the two mix freely in every average",
+  ]},
   { version: "1.13.1", date: "2026-07-22", notes: [
     "Full menus added for Wai Kee (Traditional Chinese), Pollo Cabana, Taco Madre, and Big Greek, scraped directly from each restaurant's own ordering platform for exact modifiers/pricing",
     "Extras reworked from single-pick buttons to independent multi-select checkboxes -- any number can apply at once (e.g. \"No Cilantro\" and \"No Onions\" together), with +/- quantity steppers for repeatable add-ons (e.g. up to 3 Extra Pita) and pre-checked boxes for ingredients a dish includes by default (unchecking one records \"No {item}\")",
@@ -2929,8 +2931,12 @@ function renderRatingItemsHtml(name) {
       // so without replaying the saved value here, an in-progress rating
       // would silently un-select itself out from under the user.
       const savedValue = _ratingValues.get(key);
+      // A half-point pick is stored as the whole value ("7.5"); split it back
+      // into which number button is lit and whether the +1/2 toggle is on.
+      const savedNum  = savedValue ? Math.floor(Number(savedValue)) : null;
+      const savedHalf = savedValue ? Number(savedValue) % 1 !== 0 : false;
       const scaleBtns = Array.from({ length: 10 }, (_, i) => i + 1)
-        .map(n => `<button type="button" class="rating-item-btn${String(n) === savedValue ? " active" : ""}" data-value="${n}">${n}</button>`)
+        .map(n => `<button type="button" class="rating-item-btn${n === savedNum ? " active" : ""}" data-value="${n}">${n}</button>`)
         .join("");
       // Side dishes/appetizers count for less toward a restaurant's combined
       // score (see ratingWeight) -- flagged here so the reduced weight isn't
@@ -2943,6 +2949,10 @@ function renderRatingItemsHtml(name) {
         <div class="rating-item-input-wrap">
           <input type="hidden" class="rating-item-slider" data-key="${escAttr(key)}" value="${escAttr(savedValue || "")}">
           <div class="rating-item-scale">${scaleBtns}</div>
+          <div class="rating-item-fine">
+            <button type="button" class="rating-half-btn${savedHalf ? " active" : ""}" aria-pressed="${savedHalf}"${savedNum === 10 ? " disabled" : ""}>+ &frac12;</button>
+            <span class="rating-item-readout${savedValue ? " has-value" : ""}">${savedValue ? `${Number(savedValue).toFixed(1)} / 10` : "Tap a number"}</span>
+          </div>
         </div>
       </div>`;
     }).join("");
@@ -2963,16 +2973,39 @@ function bindRatingItemEvents() {
   const tableEl = document.getElementById("rating-names-table");
 
   tableEl.querySelectorAll(".rating-item-input-wrap").forEach(wrap => {
-    const hidden = wrap.querySelector(".rating-item-slider");
+    const hidden  = wrap.querySelector(".rating-item-slider");
     const buttons = [...wrap.querySelectorAll(".rating-item-btn")];
-    buttons.forEach(b => {
-      b.addEventListener("click", () => {
-        hidden.value = b.dataset.value;
-        _ratingTouched.add(hidden.dataset.key);
-        _ratingValues.set(hidden.dataset.key, b.dataset.value);
-        buttons.forEach(x => x.classList.toggle("active", x === b));
-      });
-    });
+    const halfBtn = wrap.querySelector(".rating-half-btn");
+    const readout = wrap.querySelector(".rating-item-readout");
+    let base = hidden.value ? Math.floor(Number(hidden.value)) : null;
+    let half = hidden.value ? Number(hidden.value) % 1 !== 0 : false;
+
+    // Only ever called from a real click -- never on load, since it records
+    // the row as touched and an untouched row must stay out of the submit.
+    function apply() {
+      // 10 is the ceiling: there's no 10.5, so picking a perfect 10 drops
+      // the half and locks the toggle until a lower number is chosen.
+      if (base === 10) half = false;
+      halfBtn.disabled = base === 10;
+      halfBtn.classList.toggle("active", half);
+      halfBtn.setAttribute("aria-pressed", String(half));
+      buttons.forEach(b => b.classList.toggle("active", Number(b.dataset.value) === base));
+      if (base === null) {
+        readout.textContent = "Tap a number";
+        readout.classList.remove("has-value");
+        return;
+      }
+      const val = base + (half ? 0.5 : 0);
+      hidden.value = String(val);
+      readout.textContent = `${val.toFixed(1)} / 10`;
+      readout.classList.add("has-value");
+      _ratingTouched.add(hidden.dataset.key);
+      _ratingValues.set(hidden.dataset.key, String(val));
+    }
+
+    buttons.forEach(b => b.addEventListener("click", () => { base = Number(b.dataset.value); apply(); }));
+    // Tapping the half before any number just arms it for the next tap.
+    halfBtn?.addEventListener("click", () => { half = !half; apply(); });
   });
 
   const submitBtn = tableEl.querySelector(".rating-submit-btn");
@@ -2996,7 +3029,7 @@ async function submitRatings(btn) {
     .filter(r => _ratingTouched.has(r.slider.dataset.key));
 
   if (!toSubmit.length) {
-    _ratingStatusMsg = "Move a slider for at least one item first.";
+    _ratingStatusMsg = "Pick a rating for at least one item first.";
     renderRatingCard();
     return;
   }

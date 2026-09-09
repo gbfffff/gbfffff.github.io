@@ -1455,6 +1455,44 @@
     body.dark .rating-item-btn { border-color: var(--ink); color: var(--ink); }
     body.dark .rating-item-btn.active { background: var(--ink); color: var(--bg); }
 
+    /* Half-point row: the 1-10 buttons stay the big, easy tap targets they
+       were, and a half is one extra tap on top rather than doubling the row
+       to 19 cramped buttons. The readout is the confirmation that the two
+       controls combined into the score actually being submitted. */
+    .rating-item-fine {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-top: 0.4rem;
+    }
+    .rating-half-btn {
+      flex-shrink: 0;
+      min-width: 4.2rem;
+      height: 2rem;
+      border: 2px solid #000;
+      background: var(--bg);
+      color: #000;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.8rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.1s ease, color 0.1s ease, opacity 0.1s ease;
+    }
+    .rating-half-btn:active { transform: scale(0.94); }
+    .rating-half-btn.active { background: #000; color: var(--accent); }
+    .rating-half-btn:disabled { opacity: 0.3; cursor: default; }
+    .rating-item-readout {
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-dim);
+    }
+    .rating-item-readout.has-value { color: var(--text); font-size: 0.95rem; }
+    body.dark .rating-half-btn { border-color: var(--ink); color: var(--ink); }
+    body.dark .rating-half-btn.active { background: var(--ink); color: var(--bg); }
+
 
 
     /* ── Order info strip ── */
