@@ -40,8 +40,14 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.15.0";
+const APP_VERSION = "1.15.1";
 const CHANGELOG = [
+  { version: "1.15.1", date: "2026-09-09", notes: [
+    "Restaurant Stats now lists every restaurant in the rotation, including ones we haven't ordered from yet -- they show dimmed with dashes instead of being missing from the table altogether",
+    "Restaurant Stats gained a Visits column next to Orders, so \"23 orders\" reads as \"23 orders over how many trips\". A visit is one date we ordered from them, however many dishes came back on it -- not a rotation slot, since the rotation repeats some restaurants and a skipped slot was never a visit. Both the tile and the full table now show the Restaurant / Visits / Orders / Avg Rating headers",
+    "The Food Chart tile on the Reports card previews 10 items instead of 5 before you open the full chart",
+    "Opening an item from the Food Chart puts Back to Food Chart in the top-left corner as a colored pill with a larger arrow, with the item's name underneath it -- it used to be small underlined text below the title, which read as part of the item rather than as the way out",
+  ]},
   { version: "1.15.0", date: "2026-09-09", notes: [
     "Thai Cottage's full menu added (78 items across 13 sections), transcribed from their menu photos -- appetizers, soups, salads, Thai street food, noodle soups, curries, chef's picks, fusion tacos, loaded fries, burgers/sandwiches, sides, drinks and desserts. Dishes that call for a protein now require that pick before they can be added (curries, noodle soups, tacos, burgers/sandwiches, Tom Yum/Tom Kha), priced per choice where the menu prices them differently; taco shell, cheese and almond-milk swaps come through as optional checkboxes",
     "Rate Your Order goes back to a dragged scale instead of the tap-target grid, and the scale is now 0-10 in half steps -- so 0 and 7.5 are both ratable. The slider is drawn chunkier than a stock one (taller track, bigger thumb) since a half-step scale has 21 stops to land on, with the live value shown beside it. Whole-number ratings already recorded are unaffected and mix freely into every average",
@@ -2183,6 +2189,7 @@ function computeGlobalFavsAndHates() {
 function computeRestaurantStats() {
   const stats = computeAllItemStats();
   const totals = new Map(); // restaurant -> qty
+  const visits = new Map(); // restaurant -> Set of order dates
   _historyRows.forEach(r => {
     const restaurant = (r[2] || "").trim();
     const item = (r[3] || "").trim();
@@ -2192,14 +2199,41 @@ function computeRestaurantStats() {
     // restaurant's order total.
     if (!restaurant || item.startsWith("Sauce: ")) return;
     totals.set(restaurant, (totals.get(restaurant) || 0) + (Number(r[4]) || 0));
+    // A visit is one date we ordered from them, however many dishes came
+    // back on it -- that's what makes "23 orders" readable as "over how
+    // many trips". The rotation isn't the source here: it repeats some
+    // restaurants twice a cycle, and a slot we skipped was never a visit.
+    const date = (r[1] || "").trim();
+    if (date) {
+      if (!visits.has(restaurant)) visits.set(restaurant, new Set());
+      visits.get(restaurant).add(date);
+    }
   });
-  return [...totals.entries()].map(([restaurant, qty]) => {
+  // Seed every restaurant in the rotation at zero so somewhere we haven't
+  // been yet still gets a row, rather than silently vanishing from the
+  // table. Rotation slots can repeat a restaurant (and `ref` slots point
+  // at another entry), so dedupe by name.
+  const known = new Map(); // lowercased name -> display name
+  (config.restaurants || []).forEach(raw => {
+    const r = raw?.ref ? ((config.restaurants || []).find(x => x.name === raw.ref) || raw) : raw;
+    const name = (r?.name || "").trim();
+    if (name) known.set(name.toLowerCase(), name);
+  });
+  // History can also name a restaurant that's no longer in the rotation --
+  // keep those rows too rather than dropping past orders on the floor.
+  totals.forEach((_, name) => known.set(name.toLowerCase(), name));
+
+  return [...known.values()].map(restaurant => {
     let weightedSum = 0, weight = 0;
     stats.forEach(s => { if (s.restaurant === restaurant) { weightedSum += s.weightedSum; weight += s.weight; } });
-    return { restaurant, qty, avg: weight ? weightedSum / weight : null };
-  }).sort((a, b) => b.qty - a.qty);
+    return {
+      restaurant,
+      qty: totals.get(restaurant) || 0,
+      visits: visits.get(restaurant)?.size || 0,
+      avg: weight ? weightedSum / weight : null,
+    };
+  }).sort((a, b) => (b.qty - a.qty) || (b.visits - a.visits) || a.restaurant.localeCompare(b.restaurant));
 }
-
 function computeAverageSpendPerPerson() {
   const entries = new Map(); // "person|date" -> subtotal
   const byRestaurant = new Map(); // restaurant -> [subtotal, ...]
@@ -2236,10 +2270,10 @@ function computeAverageSpendPerPerson() {
   return { avg: values.reduce((a, b) => a + b, 0) / values.length, count: values.length, byRestaurant: byRestaurantAvg };
 }
 
-// Top 5 items, same ranking the Food Chart defaults to now (qty first,
+// Top 10 items, same ranking the Food Chart defaults to now (qty first,
 // ties broken by rating) -- a condensed preview so the widget doesn't need
 // to be the full sortable/paginated table to be useful at a glance.
-const FOOD_CHART_PREVIEW_ROWS = 5;
+const FOOD_CHART_PREVIEW_ROWS = 10;
 function computeFoodChartPreview() {
   const stats = computeAllItemStats();
   return [...stats.values()]
@@ -2380,19 +2414,30 @@ function renderRestaurantStatsPreview(stats) {
   const el = document.getElementById("order-reports-restaurants-mini");
   const empty = document.getElementById("order-reports-restaurants-empty");
   if (!el) return;
-  if (!stats.length) {
+  // Every rotation restaurant now gets a row, so "has rows" no longer means
+  // "has data" -- the empty state keys off whether anything was ordered.
+  const anyOrders = stats.some(s => s.qty > 0);
+  if (!stats.length || !anyOrders) {
     el.innerHTML = "";
     if (empty) empty.style.display = "block";
     return;
   }
   if (empty) empty.style.display = "none";
-  el.innerHTML = stats.slice(0, RESTAURANT_STATS_PREVIEW_ROWS).map(s => `
-    <div class="order-reports-foodchart-row">
+  const header = `
+    <div class="order-reports-foodchart-row order-reports-restaurants-head">
+      <span class="order-reports-foodchart-item">Restaurant</span>
+      <span class="order-reports-restaurants-visits">Visits</span>
+      <span class="order-reports-restaurants-orders">Orders</span>
+      <span class="order-reports-restaurants-rating">Rating</span>
+    </div>`;
+  el.innerHTML = header + stats.slice(0, RESTAURANT_STATS_PREVIEW_ROWS).map(s => `
+    <div class="order-reports-foodchart-row${s.qty ? "" : " is-unvisited"}">
       <span class="order-reports-foodchart-item">${esc(s.restaurant)}</span>
-      <span class="order-reports-foodchart-rating">${s.qty}&times;${s.avg != null ? ` &middot; ${s.avg.toFixed(1)}/10` : ""}</span>
+      <span class="order-reports-restaurants-visits">${s.visits || "&mdash;"}</span>
+      <span class="order-reports-restaurants-orders">${s.qty || "&mdash;"}</span>
+      <span class="order-reports-restaurants-rating">${s.avg != null ? `${s.avg.toFixed(1)}` : "&mdash;"}</span>
     </div>`).join("");
 }
-
 // Just two big counts, not a list of item names -- a tile is meant to be
 // read in a glance, and "how many" reads faster than a wall of dish names
 // crammed into a small box. The full lists (with restaurant + rating) are
@@ -2450,19 +2495,19 @@ function closeOrderReportsDetail(e) {
 }
 
 function renderRestaurantStatsDetailHtml(stats) {
-  if (!stats.length) return `<div class="placeholder">No order history logged yet.</div>`;
+  if (!stats.length) return `<div class="placeholder">No restaurants configured yet.</div>`;
   const rows = stats.map((s, i) => `
-    <tr class="order-reports-restaurant-detail-row" data-i="${i}">
+    <tr class="order-reports-restaurant-detail-row${s.qty ? "" : " is-unvisited"}" data-i="${i}">
       <td>${esc(s.restaurant)}</td>
-      <td>${s.qty}</td>
-      <td>${s.avg != null ? `${s.avg.toFixed(1)}/10` : "—"}</td>
+      <td>${s.visits || "&mdash;"}</td>
+      <td>${s.qty || "&mdash;"}</td>
+      <td>${s.avg != null ? `${s.avg.toFixed(1)}/10` : "&mdash;"}</td>
     </tr>`).join("");
-  return `<table class="report-table">
-    <thead><tr><th>Restaurant</th><th>Orders</th><th>Avg Rating</th></tr></thead>
+  return `<table class="report-table report-table-restaurants">
+    <thead><tr><th>Restaurant</th><th>Visits</th><th>Orders</th><th>Avg Rating</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>`;
 }
-
 // Same chart markup shape openMenuReport's Restaurant Performance Trend
 // uses -- one point per order date, but averaged across every restaurant
 // instead of one, so renderTrendChart (the shared line-chart renderer) can

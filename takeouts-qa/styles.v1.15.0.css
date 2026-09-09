@@ -1951,20 +1951,46 @@
     body.dark .food-chart-page-btn.active { background: var(--ink); color: var(--bg); }
 
     /* ── Item detail: rating trend chart ── */
-    .item-detail-back-link {
-      display: block;
-      margin: 0 0 0.75rem;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-decoration: underline;
-      cursor: pointer;
-      padding: 0;
-      font-family: inherit;
+    /* Back-to-chart lives in the header, above the item name, so the way
+       out is the first thing in the top-left corner rather than something
+       tucked into the body text. Pill + arrow (not underlined text) so it
+       reads as navigation at a glance and doesn't get mistaken for the
+       item's own label. */
+    .item-detail-header { align-items: flex-start; }
+    .item-detail-heading {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4rem;
+      min-width: 0;
     }
-    .item-detail-back-link:hover { color: var(--text); }
+    .item-detail-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin: 0;
+      background: #000;
+      border: none;
+      border-radius: 999px !important;
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      padding: 0.3rem 0.7rem 0.3rem 0.55rem;
+      font-family: inherit;
+      transition: background 0.1s, color 0.1s;
+    }
+    .item-detail-back-arrow {
+      font-size: 1.15rem;
+      line-height: 1;
+      font-weight: 900;
+    }
+    .item-detail-back-link:hover { background: var(--red); color: #fff; }
+    body.dark .item-detail-back-link { background: var(--ink); color: var(--bg); }
+    body.dark .item-detail-back-link:hover { background: var(--red); color: #fff; }
     .item-detail-stats {
       display: flex;
       flex-wrap: wrap;
@@ -3522,3 +3548,35 @@
     body.dark .order-reports-widget { border-color: var(--ink); }
     body.dark .order-reports-widget:hover { background: rgba(255,255,255,0.08); }
     body.dark .order-reports-bar-track { background: rgba(255,255,255,0.12); }
+
+    /* ── Restaurant stats: Visits / Orders / Rating columns ── */
+    .order-reports-restaurants-head {
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+    }
+    .order-reports-restaurants-visits,
+    .order-reports-restaurants-orders,
+    .order-reports-restaurants-rating {
+      flex: 0 0 auto;
+      min-width: 2.6rem;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    /* Somewhere we haven't ordered from yet still gets a row -- dimmed, so
+       "no data" reads differently from "genuinely scored zero". */
+    .order-reports-foodchart-row.is-unvisited,
+    .order-reports-restaurant-detail-row.is-unvisited { opacity: 0.55; }
+    .report-table-restaurants td:nth-child(2),
+    .report-table-restaurants td:nth-child(3),
+    .report-table-restaurants td:nth-child(4),
+    .report-table-restaurants th:nth-child(2),
+    .report-table-restaurants th:nth-child(3),
+    .report-table-restaurants th:nth-child(4) {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
