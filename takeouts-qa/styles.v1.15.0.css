@@ -1979,14 +1979,22 @@
       text-transform: uppercase;
       text-decoration: none;
       cursor: pointer;
-      padding: 0.3rem 0.7rem 0.3rem 0.55rem;
+      padding: 0.34rem 0.8rem 0.34rem 0.6rem;
+      line-height: 1;
       font-family: inherit;
       transition: background 0.1s, color 0.1s;
     }
+    /* An SVG, not a "←" glyph: its box is exactly the drawing, so centring
+       is geometric instead of depending on where a given font hangs the
+       arrow relative to its baseline. Sized in em so it tracks the label. */
     .item-detail-back-arrow {
-      font-size: 1.15rem;
-      line-height: 1;
-      font-weight: 900;
+      display: block;
+      flex: 0 0 auto;
+      width: 1.5em;
+      height: 1.5em;
+      /* Uppercase text has no descender, so its visual mass sits a touch
+         above the line box centre -- lift the arrow to match. */
+      margin-top: -0.08em;
     }
     .item-detail-back-link:hover { background: var(--red); color: #fff; }
     body.dark .item-detail-back-link { background: var(--ink); color: var(--bg); }
@@ -3589,10 +3597,10 @@
        no allocation and pushed the table past 100%. Declare all four here,
        summing to 100, and let the headers wrap -- "Avg Rating" held on one
        line was forcing that column wider than its share. */
-    .report-table-restaurants th:nth-child(1) { width: 43%; }
-    .report-table-restaurants th:nth-child(2) { width: 16%; }
-    .report-table-restaurants th:nth-child(3) { width: 17%; }
-    .report-table-restaurants th:nth-child(4) { width: 24%; }
+    .report-table.report-table-restaurants th:nth-child(1) { width: 43%; }
+    .report-table.report-table-restaurants th:nth-child(2) { width: 16%; }
+    .report-table.report-table-restaurants th:nth-child(3) { width: 17%; }
+    .report-table.report-table-restaurants th:nth-child(4) { width: 24%; }
     .report-table-restaurants td:nth-child(2),
     .report-table-restaurants td:nth-child(3),
     .report-table-restaurants td:nth-child(4),

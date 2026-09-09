@@ -5014,7 +5014,10 @@ function openItemDetail(restaurant, item, fromFoodChart) {
   document.getElementById("item-detail-title").textContent = item;
   _itemDetailFromFoodChart = !!fromFoodChart;
   const backLink = document.getElementById("item-detail-back-link");
-  if (backLink) backLink.style.display = _itemDetailFromFoodChart ? "block" : "none";
+  // "inline-flex", not "block": an inline display:block here beats the
+  // stylesheet's inline-flex, which silently kills the align-items/gap that
+  // centre the arrow against the label.
+  if (backLink) backLink.style.display = _itemDetailFromFoodChart ? "inline-flex" : "none";
 
   const trend = computeItemRatingTrend(restaurant, item);
   const stats = computeItemStats(restaurant).get((item || "").trim().toLowerCase());
