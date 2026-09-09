@@ -11967,48 +11967,39 @@
           "price": 11,
           "desc": "Spicy Kaprow chicken patty chopped over fries, topped with a fried egg, scallion and a creamy aioli sauce. ** = medium spicy.",
           "category": "Loaded Fries",
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese"
+            ]
+          }
         },
         {
           "item": "Classic BBQ Pork Fries",
           "price": 11,
           "desc": "Thai style sliced BBQ pork over fries topped with scallion and a creamy aioli sauce.",
           "category": "Loaded Fries",
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese"
+            ]
+          }
         },
         {
           "item": "Chicken Satay Fries",
           "price": 11,
           "desc": "Chicken satay slices over fries topped with cucumber and red onions and creamy peanut sauce, sweet vinegar sauce.",
           "category": "Loaded Fries",
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese"
+            ]
+          }
         },
         {
           "item": "Ka Prow Burger*",
@@ -12020,20 +12011,14 @@
             "Beef Patty (+$1.00)",
             "Tempura Chicken (Wheat Flour) (+$2.00)"
           ],
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Tom Yum Burger*",
@@ -12045,20 +12030,14 @@
             "Beef Patty (+$1.00)",
             "Tempura Chicken (Wheat Flour) (+$2.00)"
           ],
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Green Curry Burger*",
@@ -12070,20 +12049,14 @@
             "Beef Patty (+$1.00)",
             "Tempura Chicken (Wheat Flour) (+$2.00)"
           ],
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Red Curry Burger*",
@@ -12095,80 +12068,56 @@
             "Beef Patty (+$1.00)",
             "Tempura Chicken (Wheat Flour) (+$2.00)"
           ],
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Ka Prow Fish Burger*",
           "price": 14,
           "desc": "Served with fries. Crispy fish fillets, basil leaves, red onion, bell pepper, white onions, red cabbage, tomato, lettuce, mayo and a Thai signature spicy basil sauce. * = little spicy.",
           "category": "Burger & Sandwich",
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Chicken Satay Burger",
           "price": 12,
           "desc": "Served with fries. Marinated grilled chicken, red onion, bell pepper, white onions, red cabbage, tomato, lettuce, pickled cucumber, Thai peanut sauce and sweet vinegar sauce.",
           "category": "Burger & Sandwich",
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Spider Basil Burger*",
           "price": 16,
           "desc": "Served with fries. Deep-fried prime soft shell crab (wheat flour), basil leaves, bell pepper, white onions, red cabbage, tomato, lettuce, and Thai signature spicy basil sauce. * = little spicy.",
           "category": "Burger & Sandwich",
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Ka Prow Sandwich*",
@@ -12180,20 +12129,14 @@
             "Beef Patty (+$1.00)",
             "Tempura Chicken (Wheat Flour) (+$2.00)"
           ],
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Green Curry Sandwich*",
@@ -12205,20 +12148,14 @@
             "Beef Patty (+$1.00)",
             "Tempura Chicken (Wheat Flour) (+$2.00)"
           ],
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Red Curry Sandwich*",
@@ -12230,80 +12167,56 @@
             "Beef Patty (+$1.00)",
             "Tempura Chicken (Wheat Flour) (+$2.00)"
           ],
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Thaiger Crying Sandwich*",
           "price": 14,
           "desc": "Served with fries. Marinated beef, carrot, red cabbage, red and white onion, cilantro and Thai signature spicy lime sauce. * = little spicy.",
           "category": "Burger & Sandwich",
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Chicken Satay Sandwich",
           "price": 12,
           "desc": "Served with fries. Marinated grilled chicken, red cabbage, red and white onion, pickled cucumber, Thai signature rich and creamy peanut sauce.",
           "category": "Burger & Sandwich",
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Grilled Cheese Sandwich",
           "price": 8,
           "desc": "Served with fries. Regular grilled cheese with choice of cheeses.",
           "category": "Burger & Sandwich",
-          "extras": [
-            {
-              "name": "Mozzarella Cheese",
-              "price": 0
-            },
-            {
-              "name": "Provolone Cheese",
-              "price": 0
-            },
-            {
-              "name": "Cheddar Cheese",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Cheese",
+            "options": [
+              "Mozzarella Cheese",
+              "Provolone Cheese",
+              "Cheddar Cheese"
+            ]
+          }
         },
         {
           "item": "Jasmine Rice",
