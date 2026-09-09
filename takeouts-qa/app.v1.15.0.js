@@ -43,6 +43,8 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 const APP_VERSION = "1.15.1";
 const CHANGELOG = [
   { version: "1.15.1", date: "2026-09-09", notes: [
+    "GBF Favs now shows how many people order each dish regularly -- the count of people who've ordered it more than twice, beside its rating. A dish two people keep coming back to is loved differently from one twelve people each tried once",
+    "The Hates side is now an inverted panel: black background with the theme color for its text and dividers",
     "Restaurant Stats now lists every restaurant in the rotation, including ones we haven't ordered from yet -- they show dimmed with dashes instead of being missing from the table altogether",
     "Restaurant Stats gained a Visits column next to Orders, so \"23 orders\" reads as \"23 orders over how many trips\". A visit is one date we ordered from them, however many dishes came back on it -- not a rotation slot, since the rotation repeats some restaurants and a skipped slot was never a visit. Both the tile and the full table now show the Restaurant / Visits / Orders / Avg Rating headers",
     "The Food Chart tile on the Reports card previews 10 items instead of 5 before you open the full chart",
@@ -2114,7 +2116,7 @@ function computeAllItemStats() {
 
   function entryFor(restaurant, label) {
     const key = `${restaurant}|${label}`.toLowerCase();
-    if (!stats.has(key)) stats.set(key, { restaurant, label, qty: 0, weeksOrdered: new Set(), ratingSum: 0, ratingCount: 0, weightedSum: 0, weight: 0 });
+    if (!stats.has(key)) stats.set(key, { restaurant, label, qty: 0, weeksOrdered: new Set(), byPerson: new Map(), ratingSum: 0, ratingCount: 0, weightedSum: 0, weight: 0 });
     return stats.get(key);
   }
 
@@ -2127,6 +2129,18 @@ function computeAllItemStats() {
     e.qty += Number(r[4]) || 0;
     const week = (r[1] || "").trim();
     if (week) e.weeksOrdered.add(week);
+    // Per-person tally, for "how many people order this repeatedly".
+    // Post-fix History rows are one row per person and their qty is that
+    // person's own count, so it carries over directly. A legacy row can
+    // still list several names against one combined qty, and there's no
+    // way to know who took what, so each name there counts for one --
+    // the same call computeAverageSpendPerPerson already makes.
+    const people = (r[5] || "").split(",").map(n => n.trim()).filter(Boolean);
+    people.forEach(person => {
+      const who = person.toLowerCase();
+      const n = people.length === 1 ? (Number(r[4]) || 0) : 1;
+      e.byPerson.set(who, (e.byPerson.get(who) || 0) + n);
+    });
   });
 
   // ratingSum/ratingCount stay a plain unweighted mean -- every per-item
@@ -2180,7 +2194,13 @@ function computeGlobalFavsAndHates() {
   const favs = [], hates = [];
   stats.forEach(s => {
     const avg = s.ratingCount > 0 ? s.ratingSum / s.ratingCount : null;
-    if (s.weeksOrdered.size >= 2) favs.push({ label: s.label, restaurant: s.restaurant, avg });
+    if (s.weeksOrdered.size >= 2) {
+      // People who've ordered this dish more than twice -- a dish two
+      // people keep coming back to is loved differently from one that
+      // twelve people each tried once.
+      const repeatFans = [...s.byPerson.values()].filter(n => n > 2).length;
+      favs.push({ label: s.label, restaurant: s.restaurant, avg, repeatFans });
+    }
     if (avg !== null && avg < 3) hates.push({ label: s.label, restaurant: s.restaurant, avg });
   });
   favs.sort((a, b) => (b.avg ?? -1) - (a.avg ?? -1));
@@ -2917,15 +2937,19 @@ function renderFavsAndHatesDetailHtml(data) {
       <div class="order-reports-favshates-row ${cls}" data-kind="${cls}" data-i="${i}">
         <span class="order-reports-favshates-label">${esc(s.label)}</span>
         <span class="order-reports-favshates-restaurant">${esc(s.restaurant)}</span>
-        <span class="order-reports-favshates-rating">${s.avg != null ? `${s.avg.toFixed(1)}/10` : "—"}</span>
+        <span class="order-reports-favshates-rating">${s.avg != null ? `${s.avg.toFixed(1)}/10` : "—"}${
+          cls === "fav"
+            ? ` <span class="order-reports-favshates-fans${s.repeatFans ? "" : " is-none"}">&middot; ${s.repeatFans} regular${s.repeatFans === 1 ? "" : "s"}</span>`
+            : ""}</span>
       </div>`).join("");
   }
   return `<div class="order-reports-favshates-cols">
     <div class="order-reports-favshates-col">
       <div class="item-detail-stats-label">&#9733; Favs (ordered 2+ separate weeks)</div>
+      <div class="order-reports-favshates-note">&ldquo;Regulars&rdquo; = people who&rsquo;ve ordered it more than twice</div>
       ${rows(data.favs, "fav")}
     </div>
-    <div class="order-reports-favshates-col">
+    <div class="order-reports-favshates-col order-reports-favshates-col-hate">
       <div class="item-detail-stats-label">Hates (avg rating under 3)</div>
       ${rows(data.hates, "hate")}
     </div>

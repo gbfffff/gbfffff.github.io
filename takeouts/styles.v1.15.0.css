@@ -3723,3 +3723,49 @@
       padding: 0.85rem 0 0;
       line-height: 1.45;
     }
+
+    /* ── Favs: repeat-orderer count ── */
+    .order-reports-favshates-fans { font-weight: 800; }
+    .order-reports-favshates-fans.is-none { font-weight: 400; opacity: 0.6; }
+    .order-reports-favshates-note {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      padding: 0 0 0.35rem;
+      line-height: 1.4;
+    }
+
+    /* ── Hates: inverted panel, theme color on black ── */
+    .order-reports-favshates-col-hate {
+      background: #000;
+      color: var(--accent);
+      padding: 0.7rem 0.85rem 0.85rem;
+      border-radius: 4px;
+      /* The grid gives both columns equal width; the padding here would
+         otherwise make this one overflow its track. */
+      box-sizing: border-box;
+      min-width: 0;
+    }
+    .order-reports-favshates-col-hate .item-detail-stats-label,
+    .order-reports-favshates-col-hate .order-reports-favshates-label { color: var(--accent); }
+    .order-reports-favshates-col-hate .order-reports-favshates-restaurant,
+    .order-reports-favshates-col-hate .order-reports-favshates-rating,
+    .order-reports-favshates-col-hate .placeholder {
+      color: var(--accent);
+      opacity: 0.78;
+    }
+    .order-reports-favshates-col-hate .order-reports-favshates-row {
+      border-top-color: var(--accent);
+    }
+    .order-reports-favshates-col-hate .order-reports-favshates-row:first-child { border-top: none; }
+    .order-reports-favshates-col-hate .order-reports-favshates-row:hover { opacity: 0.75; }
+    /* On a dark theme --accent is the pale tint used against black in light
+       mode; --ink is the theme color proper, which is what reads there. */
+    body.dark .order-reports-favshates-col-hate { color: var(--ink); }
+    body.dark .order-reports-favshates-col-hate .item-detail-stats-label,
+    body.dark .order-reports-favshates-col-hate .order-reports-favshates-label { color: var(--ink); }
+    body.dark .order-reports-favshates-col-hate .order-reports-favshates-restaurant,
+    body.dark .order-reports-favshates-col-hate .order-reports-favshates-rating,
+    body.dark .order-reports-favshates-col-hate .placeholder { color: var(--ink); }
+    body.dark .order-reports-favshates-col-hate .order-reports-favshates-row {
+      border-top-color: var(--ink);
+    }
