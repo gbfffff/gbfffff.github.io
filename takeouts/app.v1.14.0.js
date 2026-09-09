@@ -64,6 +64,7 @@ const CHANGELOG = [
     "Rate Your Order goes back to a dragged scale instead of the tap-target grid, and the scale is now 0-10 in half steps -- so 0 and 7.5 are both ratable. The slider is drawn chunkier than a stock one (taller track, bigger thumb) since a half-step scale has 21 stops to land on, with the live value shown beside it. Whole-number ratings already recorded are unaffected and mix freely into every average",
     "Menu \"choose ...\" hints (choose 1, + N sides, + protein) now read as their own thing rather than blending into the dish description -- upright and solid instead of dimmed italics, still smaller than the dish name",
     "Overall Satisfaction's trend chart now names the restaurant behind each point (e.g. \"Jul 24, 2026 - Ah'Haan - 7.3/10\") -- it spans every restaurant, so a date on its own never said whose score it was. Points respond to a tap as well as a hover, so this works on a phone; the per-dish and per-restaurant trends are already about one subject and are unchanged",
+    "Thai Cottage tacos: the shell is a required either/or (Crispy or Soft Flour Tortillas), not an optional checkbox you could tick both of or skip. Tacos with a filling choice now ask for both the shell and the meat in one card and won't add until both are answered; the fish and pulled beef tacos, which come one way, just ask for the shell",
   ]},
   { version: "1.13.1", date: "2026-07-22", notes: [
     "Full menus added for Wai Kee (Traditional Chinese), Pollo Cabana, Taco Madre, and Big Greek, scraped directly from each restaurant's own ordering platform for exact modifiers/pricing",
@@ -663,6 +664,7 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     const price       = item.price ? `<span class="mpi-price">$${Number(item.price).toFixed(2)}</span>`
       : (item.sizes ? `<span class="mpi-price">$${Math.min(...Object.values(item.sizes).map(Number)).toFixed(2)}+</span>` : "");
     const orHint      = item.orOptions?.length ? `<span class="mpi-protein-hint">choose 1: ${esc(item.orOptions.join(" or "))}</span>` : "";
+    const pickHint    = item.requiredPick ? `<span class="mpi-protein-hint">choose ${esc(item.requiredPick.options.join("/"))}</span>` : "";
     const sidesHint   = item.sidesPick ? `<span class="mpi-protein-hint">+ ${item.sidesPick.count} sides</span>` : "";
     const sauceHint   = item.saucePick
       ? `<span class="mpi-protein-hint">+ ${item.saucePick.min != null ? `${item.saucePick.min}-${item.saucePick.max}` : item.saucePick.count} sauces</span>`
@@ -672,7 +674,7 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
     const desc        = item.desc ? `<span class="mpi-desc">${esc(item.desc)}</span>` : "";
     const oos         = !!item.outOfStock;
     const oosBadge     = oos ? `<span class="mpi-oos-badge">Out of Stock</span>` : "";
-    const hints = `${orHint || sidesHint}${sauceHint}${!orHint && !sidesHint ? sizeHint || proteinHint : ""}`;
+    const hints = `${pickHint}${orHint || sidesHint}${sauceHint}${!orHint && !sidesHint ? sizeHint || proteinHint : ""}`;
     // A leading order code (e.g. "AP1") gets its own column so it stays
     // pinned to the front instead of wrapping into the name -- the rest
     // of the name still wraps normally on a long dish.
@@ -930,7 +932,7 @@ function addItem(name) {
     showSaucePickPrompt(name, meta);
     return;
   }
-  if (meta && meta.orOptions && meta.orOptions.length) {
+  if (meta && ((meta.orOptions && meta.orOptions.length) || meta.requiredPick)) {
     showOrOptionsPrompt(name, meta);
     return;
   }
@@ -1167,38 +1169,74 @@ function showProteinPrompt(baseName) {
 
 function showOrOptionsPrompt(baseName, meta) {
   const hasExtras = meta.extras && meta.extras.length;
-  const el = mountPrompt(`
+  // Some items need TWO required picks, not one -- a Thai Cottage taco is
+  // both a shell AND a filling, and neither is optional. addItem() only ever
+  // fires a single required prompt, so the second group renders inside this
+  // one and the Add button waits on both. requiredPick is exclusive (radio
+  // behaviour), unlike extras, which are independent checkboxes.
+  const pick = meta.requiredPick;
+  const orOpts = meta.orOptions || [];
+  const pickHtml = pick ? `
+    <div style="color:var(--text-muted);margin-bottom:0.5rem">${esc(pick.label || "Choose one")} <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
+    <div class="required-pick-list" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.6rem">
+      ${pick.options.map(opt =>
+        `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
+          <input type="checkbox" class="required-pick-checkbox" data-option="${escAttr(opt)}" style="accent-color:var(--gold);width:15px;height:15px">
+          ${esc(opt)}
+        </label>`
+      ).join("")}
+    </div>` : "";
+  const orHtml = orOpts.length ? `
     <div style="color:var(--text-muted);margin-bottom:0.5rem">Choose one for <strong>${esc(baseName)}</strong> <span style="font-size:0.72rem;color:var(--red)">(required)</span></div>
     <div class="or-options-list" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.6rem">
-      ${meta.orOptions.map(opt =>
+      ${orOpts.map(opt =>
         `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text)">
           <input type="checkbox" class="or-option-checkbox" data-option="${escAttr(opt)}" style="accent-color:var(--gold);width:15px;height:15px">
           ${esc(opt)}
         </label>`
       ).join("")}
-    </div>` +
+    </div>` : "";
+  const el = mountPrompt(
+    (pick ? `<div style="color:var(--text-muted);margin-bottom:0.5rem"><strong>${esc(baseName)}</strong></div>` : "") +
+    pickHtml + orHtml +
     (hasExtras ? extrasSectionHTML(meta, { divider: true }) : "") +
     `<div style="display:flex;gap:0.5rem">
       <button type="button" class="protein-btn protein-btn-add or-options-add-btn" disabled>Add to Order</button>
     </div>`);
   if (!el) return;
 
-  const listEl   = el.querySelector(".or-options-list");
   const addBtn   = el.querySelector(".or-options-add-btn");
   const closeBtn = el.querySelector(".prompt-close-btn");
-  const boxes    = [...listEl.querySelectorAll(".or-option-checkbox")];
+  const listEl   = el.querySelector(".or-options-list");
+  const pickEl   = el.querySelector(".required-pick-list");
+  const boxes     = listEl ? [...listEl.querySelectorAll(".or-option-checkbox")] : [];
+  const pickBoxes = pickEl ? [...pickEl.querySelectorAll(".required-pick-checkbox")] : [];
   const collectExtras = hasExtras ? wireExtras(el) : () => [];
 
-  listEl.addEventListener("change", e => {
-    const box = e.target.closest(".or-option-checkbox");
-    if (!box) return;
-    if (box.checked) boxes.forEach(b => { if (b !== box) b.checked = false; });
-    addBtn.disabled = !boxes.some(b => b.checked);
-  });
+  // Every rendered group has to be answered before the item can be added.
+  function refresh() {
+    const ok = (!boxes.length     || boxes.some(b => b.checked))
+            && (!pickBoxes.length || pickBoxes.some(b => b.checked));
+    addBtn.disabled = !ok;
+  }
+  function wireExclusive(container, group) {
+    container?.addEventListener("change", e => {
+      const box = e.target.closest("input[type=checkbox]");
+      if (!box) return;
+      if (box.checked) group.forEach(b => { if (b !== box) b.checked = false; });
+      refresh();
+    });
+  }
+  wireExclusive(listEl, boxes);
+  wireExclusive(pickEl, pickBoxes);
+
   addBtn.addEventListener("click", () => {
-    const chosen = boxes.find(b => b.checked);
-    if (!chosen) return;
-    const finalName = withExtras(`${baseName} (${chosen.dataset.option})`, collectExtras());
+    // Shell before filling, in one parenthesised group -- splitTopLevel reads
+    // them back as separate options, so any baked "(+$N.NN)" still resolves.
+    const chosen = [pickBoxes.find(b => b.checked), boxes.find(b => b.checked)]
+      .filter(Boolean).map(b => b.dataset.option);
+    if (!chosen.length) return;
+    const finalName = withExtras(`${baseName} (${chosen.join(", ")})`, collectExtras());
     selectedItems.push(finalName);
     renderPills();
     checkDuplicates();

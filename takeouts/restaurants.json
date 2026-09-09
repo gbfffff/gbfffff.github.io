@@ -11871,32 +11871,26 @@
             "Grilled Shrimp (3) (+$2.00)",
             "Tempura Chicken (Wheat Flour) (+$2.00)"
           ],
-          "extras": [
-            {
-              "name": "Crispy Taco",
-              "price": 0
-            },
-            {
-              "name": "Soft Flour Tortillas Taco",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Taco",
+            "options": [
+              "Crispy Taco",
+              "Soft Flour Tortillas Taco"
+            ]
+          }
         },
         {
           "item": "Tom Yum Fish Taco* (3)",
           "price": 11,
           "desc": "Only fish. Battered and fried fish topped with a choice of taco shell, homemade tomato salsa, lettuce and Thai spicy Tom Yum (chili lemongrass) sauce. * = little spicy.",
           "category": "Thai Fusion Taco",
-          "extras": [
-            {
-              "name": "Crispy Taco",
-              "price": 0
-            },
-            {
-              "name": "Soft Flour Tortillas Taco",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Taco",
+            "options": [
+              "Crispy Taco",
+              "Soft Flour Tortillas Taco"
+            ]
+          }
         },
         {
           "item": "Larb Taco* (3)",
@@ -11909,16 +11903,13 @@
             "Grilled Shrimp (3) (+$2.00)",
             "Tempura Chicken (Wheat Flour) (+$2.00)"
           ],
-          "extras": [
-            {
-              "name": "Crispy Taco",
-              "price": 0
-            },
-            {
-              "name": "Soft Flour Tortillas Taco",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Taco",
+            "options": [
+              "Crispy Taco",
+              "Soft Flour Tortillas Taco"
+            ]
+          }
         },
         {
           "item": "Green Curry Taco* (3)",
@@ -11931,16 +11922,13 @@
             "Grilled Shrimp (3) (+$2.00)",
             "Tempura Chicken (Wheat Flour) (+$2.00)"
           ],
-          "extras": [
-            {
-              "name": "Crispy Taco",
-              "price": 0
-            },
-            {
-              "name": "Soft Flour Tortillas Taco",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Taco",
+            "options": [
+              "Crispy Taco",
+              "Soft Flour Tortillas Taco"
+            ]
+          }
         },
         {
           "item": "Red Curry Taco* (3)",
@@ -11953,32 +11941,26 @@
             "Grilled Shrimp (3) (+$2.00)",
             "Tempura Chicken (Wheat Flour) (+$2.00)"
           ],
-          "extras": [
-            {
-              "name": "Crispy Taco",
-              "price": 0
-            },
-            {
-              "name": "Soft Flour Tortillas Taco",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Taco",
+            "options": [
+              "Crispy Taco",
+              "Soft Flour Tortillas Taco"
+            ]
+          }
         },
         {
           "item": "Pulled Beef Taco (3)",
           "price": 12,
           "desc": "Only pulled beef. Braised pulled beef topped with a choice of taco shell, pickled and cilantro. Served with medium spicy chili-lime sauce.",
           "category": "Thai Fusion Taco",
-          "extras": [
-            {
-              "name": "Crispy Taco",
-              "price": 0
-            },
-            {
-              "name": "Soft Flour Tortillas Taco",
-              "price": 0
-            }
-          ]
+          "requiredPick": {
+            "label": "Choice of Taco",
+            "options": [
+              "Crispy Taco",
+              "Soft Flour Tortillas Taco"
+            ]
+          }
         },
         {
           "item": "Spicy Ka Prow Chicken Fries**",
