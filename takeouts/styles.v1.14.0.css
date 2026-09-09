@@ -1429,69 +1429,78 @@
       margin-left: 0.5rem;
       vertical-align: middle;
     }
-    .rating-item-input-wrap { width: 100%; }
-    .rating-item-scale {
-      display: grid;
-      grid-template-columns: repeat(10, 1fr);
-      gap: 0.3rem;
+    .rating-item-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      width: 100%;
     }
-    .rating-item-btn {
-      height: 2.6rem;
-      border: 2px solid #000;
-      background: var(--bg);
-      color: #000;
+    .rating-scale-end {
+      font-size: 0.7rem;
       font-weight: 700;
-      font-size: 0.85rem;
-      font-family: inherit;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      transition: background 0.1s ease, color 0.1s ease;
-    }
-    .rating-item-btn:active { transform: scale(0.94); }
-    .rating-item-btn.active { background: #000; color: var(--accent); }
-    body.dark .rating-item-btn { border-color: var(--ink); color: var(--ink); }
-    body.dark .rating-item-btn.active { background: var(--ink); color: var(--bg); }
-
-    /* Half-point row: the 1-10 buttons stay the big, easy tap targets they
-       were, and a half is one extra tap on top rather than doubling the row
-       to 19 cramped buttons. The readout is the confirmation that the two
-       controls combined into the score actually being submitted. */
-    .rating-item-fine {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      margin-top: 0.4rem;
-    }
-    .rating-half-btn {
+      color: var(--text-dim);
       flex-shrink: 0;
-      min-width: 4.2rem;
-      height: 2rem;
-      border: 2px solid #000;
-      background: var(--bg);
-      color: #000;
-      font-family: inherit;
-      font-weight: 700;
-      font-size: 0.8rem;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: background 0.1s ease, color 0.1s ease, opacity 0.1s ease;
-    }
-    .rating-half-btn:active { transform: scale(0.94); }
-    .rating-half-btn.active { background: #000; color: var(--accent); }
-    .rating-half-btn:disabled { opacity: 0.3; cursor: default; }
-    .rating-item-readout {
-      font-size: 0.78rem;
-      font-weight: 700;
       font-variant-numeric: tabular-nums;
+    }
+    /* Deliberately chunkier than a stock range input: this is dragged with a
+       thumb on a phone, and the half-step scale has 21 stops to land on. */
+    .rating-item-slider {
+      flex: 1;
+      min-width: 0;
+      height: 1.75rem;
+      margin: 0;
+      background: transparent;
+      accent-color: #000;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .rating-item-slider::-webkit-slider-runnable-track {
+      height: 0.5rem;
+      background: rgba(0,0,0,0.15);
+      border: 1px solid #000;
+    }
+    .rating-item-slider::-moz-range-track {
+      height: 0.5rem;
+      background: rgba(0,0,0,0.15);
+      border: 1px solid #000;
+    }
+    .rating-item-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 1.6rem;
+      height: 1.6rem;
+      margin-top: -0.62rem;
+      border-radius: 999px;
+      background: #000;
+      border: 2px solid var(--bg);
+      cursor: grab;
+    }
+    .rating-item-slider::-moz-range-thumb {
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 999px;
+      background: #000;
+      border: 2px solid var(--bg);
+      cursor: grab;
+    }
+    .rating-item-slider:active::-webkit-slider-thumb { cursor: grabbing; transform: scale(1.08); }
+    .rating-item-value {
+      font-weight: 900;
+      font-size: 1.05rem;
+      font-family: "Courier New", Courier, monospace;
+      font-variant-numeric: tabular-nums;
+      min-width: 2.4rem;
+      text-align: right;
+      flex-shrink: 0;
       color: var(--text-dim);
     }
-    .rating-item-readout.has-value { color: var(--text); font-size: 0.95rem; }
-    body.dark .rating-half-btn { border-color: var(--ink); color: var(--ink); }
-    body.dark .rating-half-btn.active { background: var(--ink); color: var(--bg); }
+    .rating-item-value.has-value { color: var(--text); }
+    body.dark .rating-item-slider { accent-color: var(--ink); }
+    body.dark .rating-item-slider::-webkit-slider-runnable-track,
+    body.dark .rating-item-slider::-moz-range-track { background: rgba(255,255,255,0.18); border-color: var(--ink); }
+    body.dark .rating-item-slider::-webkit-slider-thumb,
+    body.dark .rating-item-slider::-moz-range-thumb { background: var(--ink); border-color: var(--bg); }
 
 
 
@@ -2791,7 +2800,19 @@
       }
     }
     .dd-popular { margin-right: 0.2rem; font-size: 0.8em; }
-    .mpi-protein-hint { font-size: 0.68rem; color: #000; opacity: 0.6; margin-left: 0.35rem; font-style: italic; }
+    /* The "choose ..." / "+ N sides" hints flag that an item needs a decision
+       before it can be ordered, so they sit between the description and the
+       item name in weight: upright and solid rather than dimmed italics like
+       the description, but still clearly smaller than the dish name. */
+    .mpi-protein-hint {
+      font-size: 0.74rem;
+      font-weight: 700;
+      font-style: normal;
+      letter-spacing: 0.01em;
+      color: #000;
+      opacity: 1;
+      margin-left: 0.4rem;
+    }
     .mpi-taken-badge {
       display: block;
       font-size: 0.65rem;
