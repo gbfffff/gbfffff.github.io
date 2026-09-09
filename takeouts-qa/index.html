@@ -243,10 +243,21 @@
           <div class="order-reports-stat-label">Average $ / Person</div>
           <div class="order-reports-stat-sub" id="order-reports-spend-sub"></div>
         </div>
-        <div class="order-reports-widget order-reports-widget-num" style="cursor:default">
-          <div class="order-reports-stat-value" id="order-reports-orders">—</div>
+        <div class="order-reports-widget order-reports-widget-num" onclick="openOrderReportsDetail('spent')">
+          <div class="order-reports-stat-value" id="order-reports-spent">&mdash;</div>
+          <div class="order-reports-stat-label">Total Spent</div>
+          <div class="order-reports-stat-sub" id="order-reports-spent-sub"></div>
+        </div>
+        <div class="order-reports-widget order-reports-widget-num" onclick="openOrderReportsDetail('orders')">
+          <div class="order-reports-stat-value" id="order-reports-orders">&mdash;</div>
           <div class="order-reports-stat-label">Dishes Logged</div>
           <div class="order-reports-stat-sub" id="order-reports-orders-sub"></div>
+        </div>
+        <div class="order-reports-widget order-reports-widget-protein" onclick="openOrderReportsDetail('protein')">
+          <h3 class="order-reports-widget-heading">Protein Mix</h3>
+          <div class="order-reports-protein-bar" id="order-reports-protein-bar"></div>
+          <div class="order-reports-protein-list" id="order-reports-protein-list"></div>
+          <div id="order-reports-protein-empty" class="placeholder" style="display:none">No dishes logged yet.</div>
         </div>
         <div class="order-reports-widget order-reports-widget-favshates" onclick="openOrderReportsDetail('favshates')">
           <div class="order-reports-favshates-mini-cols">

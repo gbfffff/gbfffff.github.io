@@ -3580,3 +3580,146 @@
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
+
+    /* ── Protein Mix tile + donut report ── */
+    .order-reports-widget-protein { grid-column: span 2; }
+    .order-reports-protein-bar {
+      display: flex;
+      width: 100%;
+      height: 0.85rem;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      margin: 0.45rem 0 0.6rem;
+      background: var(--surface);
+    }
+    .order-reports-protein-seg { display: block; height: 100%; }
+    .order-reports-protein-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 0.9rem;
+    }
+    .order-reports-protein-row {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .order-reports-protein-label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .order-reports-protein-pct {
+      color: var(--text-dim);
+      font-variant-numeric: tabular-nums;
+    }
+    .report-donut-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 0.5rem 0 0.25rem;
+    }
+    .report-donut {
+      width: 200px;
+      height: 200px;
+      flex: 0 0 auto;
+      max-width: 100%;
+    }
+    .report-donut-slice { stroke: var(--surface); stroke-width: 1.5; }
+    .report-donut-total {
+      text-anchor: middle;
+      font-size: 2rem;
+      font-weight: 900;
+      fill: var(--text);
+    }
+    .report-donut-total-label {
+      text-anchor: middle;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      fill: var(--text-dim);
+    }
+    .report-legend {
+      flex: 1 1 12rem;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .report-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+    .report-legend-swatch {
+      flex: 0 0 auto;
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+    }
+    .report-legend-label { flex: 1 1 auto; min-width: 0; font-weight: 700; }
+    .report-legend-value,
+    .report-legend-pct {
+      flex: 0 0 auto;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-dim);
+    }
+    .report-legend-pct { min-width: 3.1rem; text-align: right; font-weight: 700; }
+
+    /* ── Year / month pickers on the period-scoped reports ── */
+    .report-period-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+      padding: 0 0 0.9rem;
+    }
+    .report-period-field {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .report-period-field select {
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: 0;
+      padding: 0.28rem 0.5rem;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      /* Fixed light scheme: on a dark theme the native control would
+         otherwise paint dark-on-dark and read as an empty box. */
+      background: #fff;
+      color: #000;
+      color-scheme: light;
+      cursor: pointer;
+    }
+    .report-subhead {
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin: 1rem 0 0.5rem;
+    }
+    .order-reports-bar-row.is-selected .order-reports-bar-label { font-weight: 900; }
+    .order-reports-bar-row.is-selected .order-reports-bar-fill { outline: 2px solid var(--text); }
+
+    .report-footnote {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      padding: 0.85rem 0 0;
+      line-height: 1.45;
+    }

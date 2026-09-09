@@ -47,6 +47,12 @@ const CHANGELOG = [
     "Restaurant Stats gained a Visits column next to Orders, so \"23 orders\" reads as \"23 orders over how many trips\". A visit is one date we ordered from them, however many dishes came back on it -- not a rotation slot, since the rotation repeats some restaurants and a skipped slot was never a visit. Both the tile and the full table now show the Restaurant / Visits / Orders / Avg Rating headers",
     "The Food Chart tile on the Reports card previews 10 items instead of 5 before you open the full chart",
     "Opening an item from the Food Chart puts Back to Food Chart in the top-left corner as a colored pill with a larger arrow, with the item's name underneath it -- it used to be small underlined text below the title, which read as part of the item rather than as the way out",
+    "New Total Spent tile showing what the group has paid out so far this year. Clicking it opens the full year-by-year breakdown with an all-time total. This is the plain bill -- price times quantity per dish -- which is a different question from Average $ / Person beside it, so the two aren't meant to reconcile item-for-item. Market-price dishes are logged without a price, so they don't count toward the totals",
+    "New Protein Mix report: a donut chart of what kind of protein we've actually been ordering, grouped as Chicken, Beef, Pork, Seafood, Organ Meat, Duck & Other Poultry, Lamb & Goat, Egg & Dairy, Vegetarian, and No Meat / Other. Organ meat is checked first so pork intestine, tripe, beef tendon, pork hock and duck feet count as offal rather than as pork or beef",
+    "A dish whose protein is a choice counts as what was actually picked -- \"Green Curry (Grilled Beef)\" is beef, the same taco with Grilled Shrimp is seafood. Where a dish name names no protein at all, its menu category and description are used as a fallback; where it names several, the highest group on the list wins, so Triple Delight counts once as seafood",
+    "Dishes Logged is now clickable and opens a By Year and By Month breakdown",
+    "Both the Protein Mix and Dishes Logged reports have Year and Month pickers, offering only the periods we actually ordered in. Picking a year scopes the monthly bars to that one year, so March means one specific March instead of every March stacked together",
+    "Free sauce picks stay excluded from all of these counts, the same way they already were for restaurant order totals",
   ]},
   { version: "1.15.0", date: "2026-09-09", notes: [
     "Thai Cottage's full menu added (78 items across 13 sections), transcribed from their menu photos -- appetizers, soups, salads, Thai street food, noodle soups, curries, chef's picks, fusion tacos, loaded fries, burgers/sandwiches, sides, drinks and desserts. Dishes that call for a protein now require that pick before they can be added (curries, noodle soups, tacos, burgers/sandwiches, Tom Yum/Tom Kha), priced per choice where the menu prices them differently; taco shell, cheese and almond-milk swaps come through as optional checkboxes",
@@ -2270,6 +2276,334 @@ function computeAverageSpendPerPerson() {
   return { avg: values.reduce((a, b) => a + b, 0) / values.length, count: values.length, byRestaurant: byRestaurantAvg };
 }
 
+// ── Total spent, by year ───────────────────────────────────────────────
+// What the group actually paid out, which is simply price x quantity per
+// logged dish. Note this is a different question from Average $ / Person
+// just above: that one splits a date's bill between the people named on
+// it, this one just adds the bill up, so the two aren't expected to
+// reconcile item-for-item.
+//
+// Caveat worth knowing when reading the number: a market-price dish is
+// stored at $0 (we don't invent a price for live lobster), so a year with
+// a lot of those reads slightly low.
+function computeSpendByYear() {
+  const byYear = new Map();
+  _historyRows.forEach(r => {
+    const restaurant = (r[2] || "").trim();
+    const item = (r[3] || "").trim();
+    const date = (r[1] || "").trim();
+    const qty = Number(r[4]) || 0;
+    // Free sauce picks came bundled with a chicken meal -- they cost
+    // nothing on their own, same exclusion the order counts use.
+    if (!restaurant || !item || !date || !qty || item.startsWith("Sauce: ")) return;
+    const menu = findRestaurantByName(restaurant)?.menu || allMenuItems;
+    const total = resolveItemPrice(item, menu) * qty;
+    if (!total) return;
+    const y = date.slice(0, 4);
+    byYear.set(y, (byYear.get(y) || 0) + total);
+  });
+  return [...byYear.entries()]
+    .sort((a, b) => b[0].localeCompare(a[0]))   // newest year first
+    .map(([year, total]) => ({ year, total }));
+}
+
+function currentYearStr() {
+  return String(new Date(debugNow()).getFullYear());
+}
+
+function renderSpentDetailHtml() {
+  const years = computeSpendByYear();
+  if (!years.length) return `<div class="placeholder">No price data logged yet.</div>`;
+  const grand = years.reduce((s, y) => s + y.total, 0);
+  const max = Math.max(...years.map(y => y.total), 0.01);
+  const thisYear = currentYearStr();
+  const rows = years.map(y => `
+    <div class="order-reports-bar-row${y.year === thisYear ? " is-selected" : ""}">
+      <span class="order-reports-bar-label">${esc(y.year)}</span>
+      <div class="order-reports-bar-track"><div class="order-reports-bar-fill" style="width:${Math.round((y.total / max) * 100)}%"></div></div>
+      <span class="order-reports-bar-value">$${y.total.toFixed(2)}</span>
+    </div>`).join("");
+  return `<div class="order-reports-detail-summary"><strong>$${grand.toFixed(2)}</strong> spent all-time, across ${years.length} year${years.length === 1 ? "" : "s"}</div>
+    <div class="order-reports-bar-list">${rows}</div>
+    <div class="report-footnote">Market-price dishes are logged without a price, so they don't count toward these totals.</div>`;
+}
+
+// ── Protein mix ────────────────────────────────────────────────────────
+// What kind of protein are we actually eating across the whole rotation.
+// Classification runs off the logged order text, which is the item name
+// plus whatever was picked in parentheses ("Green Curry (Grilled Beef)"),
+// so a dish whose protein is a choice lands in the group actually chosen
+// rather than in a generic bucket.
+//
+// Order matters and is the whole trick: the list is checked top-down and
+// the first hit wins. Organ meat has to come before pork or "Stir Fried
+// Pork Intestine" would count as pork, and seafood before chicken so
+// "Chicken & Corn Soup" doesn't outrank "Seafood Soup with chicken stock".
+// A dish naming several proteins ("Triple Delight (Shrimp, Chicken, Beef)")
+// counts once, under whichever sits highest here.
+const PROTEIN_GROUPS = [
+  { key: "organ", label: "Organ Meat", color: "#8e44ad", re:
+    /intestine|tripe|tendon|liver|kidney|gizzard|chitterling|offal|sweetbread|pork hock|pig ear|pig feet|duck feet|chicken feet|blood cake|大肠|肥肠|牛筋|肺片|猪肚|鸭掌|熏蹄|猪耳|猪脚|凤爪/ },
+  { key: "seafood", label: "Seafood", color: "#2980b9", re:
+    /shrimp|prawn|\bfish\b|fillet of sole|squid|calamari|scallop|oyster|clam|mussel|crab|lobster|\beel\b|conch|jellyfish|cuttlefish|seafood|anchov|tilapia|\bcod\b|flounder|salmon|tuna|ceviche|marisco|camaron|虾|鱼|蟹|蚝|生蚝|螺|墨鱼|海鲜|带子|鱿鱼|海螫|田鸡/ },
+  { key: "duck", label: "Duck & Other Poultry", color: "#d35400", re:
+    /\bduck\b|turkey|quail|squab|pato|鸭|鹅/ },
+  { key: "chicken", label: "Chicken", color: "#e8b53f", re:
+    /chicken|poultry|pollo|gai yang|鸡|雞/ },
+  { key: "beef", label: "Beef", color: "#c0392b", re:
+    /\bbeef\b|steak|brisket|oxtail|carne asada|barbacoa|birria|bistec|lomo saltado|keftethes|kofta|moussaka|pastichio|牛/ },
+  { key: "lamb", label: "Lamb & Goat", color: "#7f8c8d", re:
+    /\blamb\b|mutton|goat|birria de chivo|羊/ },
+  { key: "pork", label: "Pork", color: "#e08aa8", re:
+    /pork|bacon|\bham\b|sausage|chorizo|carnitas|al pastor|pancetta|prosciutto|spare ?ribs?|\bribs?\b|char siu|gyro|souvlaki|moo ping|wonton|dumpling|gyoza|shumai|siu mai|potsticker|猪|豬|叉烧|叉燒|排骨|腊味|臘味|肉|雲吞|云吞|馄饨|餛飩|抄手|餃|饺|鍋貼|锅贴|獅子頭|狮子头|燒賣|烧卖/ },
+  { key: "egg", label: "Egg & Dairy", color: "#f0c987", re:
+    /\begg\b|omelet|foo young|tyropita|feta|halloumi|tzatziki|queso|芙蓉蛋|蛋/ },
+  { key: "veg", label: "Vegetarian", color: "#27ae60", re:
+    /tofu|bean curd|vegetab|veggie|vegetarian|mushroom|eggplant|broccoli|spinach|spanakopita|cucumber|radish|lotus|string bean|snow pea|green bean|zucchini|salad|falafel|hummus|dolmade|avocado|guacamole|frijol|豆腐|素|斋|齋|茄子|蔬|菜/ },
+];
+const PROTEIN_OTHER = { key: "other", label: "No Meat / Other", color: "#95a5a6" };
+
+// "Fish-fragrant" (yuxiang) is a garlic-chili sauce with no fish in it, so
+// the 鱼 in 鱼香茄子 must not drag eggplant into Seafood. Same idea for the
+// English side: a dish "served with" something isn't made of it.
+// Deliberately narrow. "Bean curd" is an ingredient, not a claim -- 枝竹羊腩煲
+// is bean curd sticks with LAMB. And 素菜 is how these menus write "mixed
+// vegetable", so 素菜牛 is beef, not vegetarian. Only words that a kitchen
+// uses to promise there's no meat belong here.
+const PROTEIN_EXPLICIT_VEG = /vegetarian|veggie|\bvegan\b|斋|齋/;
+const PROTEIN_FALSE_FRIENDS = /鱼香|魚香|fish sauce|fish-fragrant|oyster sauce|蚝油|XO ?酱|XO ?醬/g;
+
+function classifyProtein(itemText, extraText) {
+  const clean = t => (t || "").toLowerCase().replace(PROTEIN_FALSE_FRIENDS, " ");
+  const name = clean(itemText);
+  if (!name) return PROTEIN_OTHER;
+  // The dish's own name decides it. Only when the name carries no protein
+  // at all do we fall back to its menu category and description -- that
+  // rescues things like "Rice Pilaf (cooked in chicken broth)" or a gyro
+  // whose meat only shows up in the blurb, without ever letting a passing
+  // mention in the description outrank the name itself.
+  // A menu that says "Vegetarian" / "Veggie" / 素 / tofu is making a
+  // deliberate claim, and it outranks the filling guesses below -- without
+  // this, "Vegetarian Spring Rolls" and "Crispy Veggie Gyoza" would be
+  // swept into Pork along with every other dumpling.
+  if (PROTEIN_EXPLICIT_VEG.test(name)) return PROTEIN_GROUPS.find(g => g.key === "veg");
+  const byName = PROTEIN_GROUPS.find(g => g.re.test(name));
+  if (byName) return byName;
+  const extra = clean(extraText);
+  if (extra) {
+    const byDesc = PROTEIN_GROUPS.find(g => g.re.test(extra));
+    if (byDesc) return byDesc;
+  }
+  return PROTEIN_OTHER;
+}
+
+// The menu blurb for a logged dish, used only as the fallback signal
+// above. Logged text can carry a chosen-options suffix, so strip that
+// before looking the item up.
+function menuTextFor(restaurant, item) {
+  const menu = findRestaurantByName(restaurant)?.menu;
+  if (!menu) return "";
+  const base = (item || "").replace(/\s*\(.*\)\s*$/, "").trim();
+  const meta = menu.find(x => (x.item || "").trim() === base)
+            || menu.find(x => (x.item || "").trim() === (item || "").trim());
+  return meta ? `${meta.category || ""} ${meta.desc || ""}` : "";
+}
+
+// "" for either bound means "no filter", so ("", "") is all-time.
+function historyRowsInScope(year, month) {
+  return _historyRows.filter(r => {
+    const date = (r[1] || "").trim();
+    const item = (r[3] || "").trim();
+    // Same exclusion the restaurant order counts use: a free sauce pick
+    // rides along with a chicken meal, it isn't a dish of its own.
+    if (!date || !item || item.startsWith("Sauce: ")) return false;
+    if (year && date.slice(0, 4) !== year) return false;
+    if (month && date.slice(5, 7) !== month) return false;
+    return true;
+  });
+}
+
+function computeProteinMix(year, month) {
+  const byGroup = new Map();
+  historyRowsInScope(year, month).forEach(r => {
+    const g = classifyProtein(r[3], menuTextFor(r[2], r[3]));
+    const qty = Number(r[4]) || 0;
+    if (!qty) return;
+    if (!byGroup.has(g.key)) byGroup.set(g.key, { ...g, qty: 0 });
+    byGroup.get(g.key).qty += qty;
+  });
+  const total = [...byGroup.values()].reduce((s, g) => s + g.qty, 0);
+  return {
+    total,
+    slices: [...byGroup.values()]
+      .map(g => ({ ...g, pct: total ? (g.qty / total) * 100 : 0 }))
+      .sort((a, b) => b.qty - a.qty),
+  };
+}
+
+// Every year/month that actually has orders, so the pickers only offer
+// periods there's something to show.
+function historyPeriods() {
+  const years = new Set(), months = new Set();
+  _historyRows.forEach(r => {
+    const date = (r[1] || "").trim();
+    const item = (r[3] || "").trim();
+    if (!date || !item || item.startsWith("Sauce: ")) return;
+    years.add(date.slice(0, 4));
+    months.add(date.slice(5, 7));
+  });
+  return {
+    years: [...years].sort().reverse(),
+    months: [...months].sort(),
+  };
+}
+
+const MONTH_NAMES = ["January","February","March","April","May","June",
+                     "July","August","September","October","November","December"];
+function monthName(mm) { return MONTH_NAMES[Number(mm) - 1] || mm; }
+
+// Dishes logged per year and per month, for the Dishes Logged breakdown.
+// The monthly series is scoped to the selected year when there is one, so
+// "March" means one specific March rather than every March stacked.
+function computeDishesTimeline(year, month) {
+  const byYear = new Map(), byMonth = new Map();
+  historyRowsInScope("", "").forEach(r => {
+    const date = (r[1] || "").trim();
+    const qty = Number(r[4]) || 0;
+    if (!qty) return;
+    const y = date.slice(0, 4), m = date.slice(5, 7);
+    byYear.set(y, (byYear.get(y) || 0) + qty);
+    if (!year || y === year) byMonth.set(m, (byMonth.get(m) || 0) + qty);
+  });
+  const scoped = historyRowsInScope(year, month)
+    .reduce((s, r) => s + (Number(r[4]) || 0), 0);
+  return {
+    scoped,
+    byYear:  [...byYear.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+               .map(([k, v]) => ({ key: k, label: k, qty: v })),
+    byMonth: [...byMonth.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+               .map(([k, v]) => ({ key: k, label: monthName(k).slice(0, 3), qty: v })),
+  };
+}
+
+// ── Shared chart primitives for the two new reports ────────────────────
+// A donut rather than a solid pie: the hole gives the total somewhere to
+// live, and thin slices stay readable as arcs instead of slivers meeting
+// at a point.
+function renderDonutSvg(slices, total) {
+  const R = 90, r = 52, cx = 100, cy = 100;
+  if (!slices.length) return "";
+  // A single group is the whole circle, and a 360-degree arc collapses --
+  // its start and end points are identical, so the path draws nothing.
+  // Draw it as a ring of two half-arcs instead.
+  if (slices.length === 1) {
+    const c = slices[0].color;
+    return `<svg class="report-donut" viewBox="0 0 200 200" role="img" aria-label="${esc(slices[0].label)} 100%">
+      <path d="M ${cx} ${cy - R} A ${R} ${R} 0 1 1 ${cx - 0.01} ${cy - R} Z
+               M ${cx} ${cy - r} A ${r} ${r} 0 1 0 ${cx - 0.01} ${cy - r} Z"
+            fill="${c}" fill-rule="evenodd"></path>
+      ${donutCenter(total)}
+    </svg>`;
+  }
+  let angle = -Math.PI / 2; // start at 12 o'clock
+  const paths = slices.map(s => {
+    const sweep = (s.pct / 100) * Math.PI * 2;
+    const a0 = angle, a1 = angle + sweep;
+    angle = a1;
+    const large = sweep > Math.PI ? 1 : 0;
+    const p = (rad, ang) => `${(cx + rad * Math.cos(ang)).toFixed(2)} ${(cy + rad * Math.sin(ang)).toFixed(2)}`;
+    return `<path d="M ${p(R, a0)} A ${R} ${R} 0 ${large} 1 ${p(R, a1)} L ${p(r, a1)} A ${r} ${r} 0 ${large} 0 ${p(r, a0)} Z"
+                  fill="${s.color}" class="report-donut-slice"
+                  data-label="${esc(s.label)}" data-qty="${s.qty}" data-pct="${s.pct.toFixed(1)}">
+              <title>${esc(s.label)}: ${s.qty} (${s.pct.toFixed(1)}%)</title>
+            </path>`;
+  }).join("");
+  return `<svg class="report-donut" viewBox="0 0 200 200">${paths}${donutCenter(total)}</svg>`;
+}
+function donutCenter(total) {
+  return `<text x="100" y="96" class="report-donut-total">${total}</text>
+          <text x="100" y="116" class="report-donut-total-label">dishes</text>`;
+}
+
+// Horizontal bars, the same shape the Average $ / Person breakdown already
+// uses -- one row per period, so twelve months stay legible on a phone in
+// a way twelve vertical columns would not.
+function renderBarsHtml(rows, selectedKey) {
+  if (!rows.length) return `<div class="placeholder">Nothing logged in this period.</div>`;
+  const max = Math.max(...rows.map(r => r.qty), 1);
+  return `<div class="order-reports-bar-list">` + rows.map(r => `
+    <div class="order-reports-bar-row${selectedKey && r.key === selectedKey ? " is-selected" : ""}">
+      <span class="order-reports-bar-label">${esc(r.label)}</span>
+      <div class="order-reports-bar-track"><div class="order-reports-bar-fill" style="width:${Math.round((r.qty / max) * 100)}%"></div></div>
+      <span class="order-reports-bar-value">${r.qty}</span>
+    </div>`).join("") + `</div>`;
+}
+
+// ── Period pickers shared by both new reports ──────────────────────────
+let _reportYear  = "";  // "" = all years
+let _reportMonth = "";  // "" = all months
+
+function renderPeriodPickerHtml(kind) {
+  const { years, months } = historyPeriods();
+  const yOpts = [`<option value="">All years</option>`]
+    .concat(years.map(y => `<option value="${y}"${y === _reportYear ? " selected" : ""}>${y}</option>`)).join("");
+  const mOpts = [`<option value="">All months</option>`]
+    .concat(months.map(m => `<option value="${m}"${m === _reportMonth ? " selected" : ""}>${monthName(m)}</option>`)).join("");
+  return `<div class="report-period-picker">
+    <label class="report-period-field">Year
+      <select id="report-period-year" onchange="setReportPeriod('${kind}', 'year', this.value)">${yOpts}</select>
+    </label>
+    <label class="report-period-field">Month
+      <select id="report-period-month" onchange="setReportPeriod('${kind}', 'month', this.value)">${mOpts}</select>
+    </label>
+  </div>`;
+}
+
+function setReportPeriod(kind, which, value) {
+  if (which === "year") _reportYear = value; else _reportMonth = value;
+  openOrderReportsDetail(kind); // re-render the open modal in place
+}
+
+function scopeLabel() {
+  if (_reportYear && _reportMonth) return `${monthName(_reportMonth)} ${_reportYear}`;
+  if (_reportYear)  return _reportYear;
+  if (_reportMonth) return `every ${monthName(_reportMonth)}`;
+  return "all time";
+}
+
+function renderProteinMixDetailHtml() {
+  const mix = computeProteinMix(_reportYear, _reportMonth);
+  const picker = renderPeriodPickerHtml("protein");
+  if (!mix.total) {
+    return picker + `<div class="placeholder">No dishes logged in ${esc(scopeLabel())}.</div>`;
+  }
+  const legend = mix.slices.map(s => `
+    <div class="report-legend-row">
+      <span class="report-legend-swatch" style="background:${s.color}"></span>
+      <span class="report-legend-label">${esc(s.label)}</span>
+      <span class="report-legend-value">${s.qty}</span>
+      <span class="report-legend-pct">${s.pct.toFixed(1)}%</span>
+    </div>`).join("");
+  return `${picker}
+    <div class="order-reports-detail-summary"><strong>${mix.total}</strong> dishes in ${esc(scopeLabel())}, across ${mix.slices.length} protein group${mix.slices.length === 1 ? "" : "s"}</div>
+    <div class="report-donut-wrap">
+      ${renderDonutSvg(mix.slices, mix.total)}
+      <div class="report-legend">${legend}</div>
+    </div>`;
+}
+
+function renderDishesLoggedDetailHtml() {
+  const t = computeDishesTimeline(_reportYear, _reportMonth);
+  const picker = renderPeriodPickerHtml("orders");
+  if (!t.byYear.length) return picker + `<div class="placeholder">No dishes logged yet.</div>`;
+  return `${picker}
+    <div class="order-reports-detail-summary"><strong>${t.scoped}</strong> dishes logged in ${esc(scopeLabel())}</div>
+    <h4 class="report-subhead">By Year</h4>
+    ${renderBarsHtml(t.byYear, _reportYear)}
+    <h4 class="report-subhead">By Month${_reportYear ? ` &middot; ${esc(_reportYear)}` : ""}</h4>
+    ${renderBarsHtml(t.byMonth, _reportMonth)}`;
+}
+
 // Top 10 items, same ranking the Food Chart defaults to now (qty first,
 // ties broken by rating) -- a condensed preview so the widget doesn't need
 // to be the full sortable/paginated table to be useful at a glance.
@@ -2315,7 +2649,14 @@ function renderOrderReportsCard() {
   setStatTile("satisfaction", sat ? `${sat.avg.toFixed(1)}/10` : "—", sat ? `${sat.count} rating${sat.count === 1 ? "" : "s"}` : "No ratings yet");
   setStatTile("spend", spend ? `$${spend.avg.toFixed(2)}` : "—", spend ? `avg across ${spend.count} order${spend.count === 1 ? "" : "s"}` : "No price data yet");
   setStatTile("orders", totalQty, "dishes logged all-time");
+  const spentYears = computeSpendByYear();
+  const thisYear = currentYearStr();
+  const thisYearSpend = spentYears.find(y => y.year === thisYear);
+  setStatTile("spent",
+    thisYearSpend ? `$${thisYearSpend.total.toFixed(2)}` : "—",
+    thisYearSpend ? `spent in ${thisYear}` : `nothing logged in ${thisYear}`);
 
+  renderProteinMixPreview(computeProteinMix("", ""));
   renderFoodChartPreview(computeFoodChartPreview());
   renderFavsAndHates(computeGlobalFavsAndHates());
   renderRestaurantStatsPreview(restStats);
@@ -2409,6 +2750,30 @@ function setStatTile(key, value, sub) {
   if (subEl) subEl.textContent = sub;
 }
 
+// The tile shows the top few groups as a bar; the donut and the full
+// breakdown live one click away, same as every other widget here.
+const PROTEIN_PREVIEW_ROWS = 4;
+function renderProteinMixPreview(mix) {
+  const bar = document.getElementById("order-reports-protein-bar");
+  const list = document.getElementById("order-reports-protein-list");
+  const empty = document.getElementById("order-reports-protein-empty");
+  if (!bar || !list) return;
+  if (!mix.total) {
+    bar.innerHTML = ""; list.innerHTML = "";
+    if (empty) empty.style.display = "block";
+    return;
+  }
+  if (empty) empty.style.display = "none";
+  bar.innerHTML = mix.slices.map(s =>
+    `<span class="order-reports-protein-seg" style="width:${s.pct}%;background:${s.color}" title="${esc(s.label)}: ${s.qty} (${s.pct.toFixed(1)}%)"></span>`).join("");
+  list.innerHTML = mix.slices.slice(0, PROTEIN_PREVIEW_ROWS).map(s => `
+    <div class="order-reports-protein-row">
+      <span class="report-legend-swatch" style="background:${s.color}"></span>
+      <span class="order-reports-protein-label">${esc(s.label)}</span>
+      <span class="order-reports-protein-pct">${Math.round(s.pct)}%</span>
+    </div>`).join("");
+}
+
 const RESTAURANT_STATS_PREVIEW_ROWS = 5;
 function renderRestaurantStatsPreview(stats) {
   const el = document.getElementById("order-reports-restaurants-mini");
@@ -2482,6 +2847,15 @@ function openOrderReportsDetail(kind) {
     const spend = computeAverageSpendPerPerson();
     title.textContent = "Average $ / Person";
     body.innerHTML = renderSpendDetailHtml(spend);
+  } else if (kind === "spent") {
+    title.textContent = "Total Spent by Year";
+    body.innerHTML = renderSpentDetailHtml();
+  } else if (kind === "protein") {
+    title.textContent = "Protein Mix";
+    body.innerHTML = renderProteinMixDetailHtml();
+  } else if (kind === "orders") {
+    title.textContent = "Dishes Logged";
+    body.innerHTML = renderDishesLoggedDetailHtml();
   }
 
   modal.classList.add("open");
