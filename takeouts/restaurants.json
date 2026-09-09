@@ -13878,8 +13878,1162 @@
       "mapUrl": "",
       "address": "",
       "menuUrl": "",
-      "menuImages": [],
-      "menu": [],
+      "menuImages": [
+        "images/ys1.jpg",
+        "images/ys2.jpg",
+        "images/ys3.jpg",
+        "images/ys4.jpg",
+        "images/ys5.jpg",
+        "images/ys6.jpg",
+        "images/ys7.jpg",
+        "images/ys8.jpg"
+      ],
+      "menu": [
+        {
+          "item": "Vegetarian Spring Rolls (2) \u4e0a\u6d77\u6625\u5377",
+          "category": "Appetizer",
+          "price": 4.25
+        },
+        {
+          "item": "Shrimp Egg Rolls (2) \u6625\u5377",
+          "category": "Appetizer",
+          "price": 4.25
+        },
+        {
+          "item": "Fried Chicken Wings \u70b8\u9e21\u7fc5",
+          "category": "Appetizer",
+          "sizes": {
+            "3 Pcs": 10.95,
+            "5 Pcs": 14.95,
+            "10 Pcs": 23.95
+          }
+        },
+        {
+          "item": "French Fries \u85af\u6761",
+          "category": "Appetizer",
+          "sizes": {
+            "Small": 4.95,
+            "Large": 7.95
+          }
+        },
+        {
+          "item": "Spicy Tangy Wontons (10) \u7ea2\u6cb9\u6284\u624b",
+          "category": "Appetizer",
+          "price": 8.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Steamed or Pan-Fried Pork Dumpling (6) \u84b8\u8089\u997a\u6216\u714e\u8089\u997a",
+          "category": "Appetizer",
+          "price": 10.0
+        },
+        {
+          "item": "Pork Soup Dumpling (6) \u732a\u8089\u5c0f\u6c64\u5305",
+          "category": "Appetizer",
+          "price": 10.95
+        },
+        {
+          "item": "Pork and Shrimp Soup Dumpling (6) \u732a\u867e\u5c0f\u6c64\u5305",
+          "category": "Appetizer",
+          "price": 10.95
+        },
+        {
+          "item": "Crispy Fried Pork Intestine \u8106\u76ae\u5927\u80a0",
+          "category": "Appetizer",
+          "price": 14.95
+        },
+        {
+          "item": "Pork and Shrimp Shumai (4) \u732a\u8089\u548c\u867e\u70e7\u5356",
+          "category": "Appetizer",
+          "price": 7.95
+        },
+        {
+          "item": "Cucumber Salad \u51c9\u62cc\u9ec4\u74dc",
+          "category": "Appetizer",
+          "price": 8.95
+        },
+        {
+          "item": "Cold Dressed Radish \u51c9\u62cc\u841d\u535c",
+          "category": "Appetizer",
+          "price": 8.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Crab Rangoon (6) \u829d\u58eb\u87f9\u8089\u4e91\u541e",
+          "category": "Appetizer",
+          "price": 7.95
+        },
+        {
+          "item": "BBQ Spare Ribs (4 Pcs) \u70e7\u6392\u9aa8",
+          "category": "Appetizer",
+          "price": 11.25
+        },
+        {
+          "item": "Spicy Beef Tendon and Tripe \u592b\u59bb\u80ba\u7247",
+          "category": "Appetizer",
+          "price": 11.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Jellyfish With Sesame Oil \u51c9\u62cc\u6d77\u87ab\u4e1d",
+          "category": "Appetizer",
+          "price": 13.95
+        },
+        {
+          "item": "Spicy Tangy Beef Tendon \u9ebb\u8fa3\u725b\u7b4b",
+          "category": "Appetizer",
+          "price": 10.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Seasoned Cuttlefish \u5364\u6c34\u58a8\u9c7c",
+          "category": "Appetizer",
+          "price": 14.95
+        },
+        {
+          "item": "Seasoned Pork Hock \u718f\u8e44",
+          "category": "Appetizer",
+          "price": 16.95
+        },
+        {
+          "item": "Cold Appetizer Combo \u51b7\u76d8\u53cc\u62fc / \u4e09\u62fc",
+          "category": "Appetizer",
+          "sizes": {
+            "Two Kinds": 21.95,
+            "Three Kinds": 28.95
+          },
+          "desc": "Choice of Jellyfish, Cuttlefish & Pork Hock \u53ef\u9009\uff1a\u6d77\u87ab\u4e1d\uff0c\u58a8\u9c7c\uff0c\u718f\u8e44."
+        },
+        {
+          "item": "Hot & Sour Soup \u9178\u8fa3\u6c64",
+          "category": "Soup",
+          "sizes": {
+            "Small": 3.95,
+            "Large": 7.5
+          },
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Wonton Soup \u4e91\u541e\u6c64",
+          "category": "Soup",
+          "sizes": {
+            "Small": 4.25,
+            "Large": 7.95
+          }
+        },
+        {
+          "item": "Egg Drop Soup \u86cb\u82b1\u6c64",
+          "category": "Soup",
+          "sizes": {
+            "Small": 3.75,
+            "Large": 7.25
+          }
+        },
+        {
+          "item": "Chicken & Corn Soup \u9e21\u84c9\u7ca0\u7c73\u6c64",
+          "category": "Soup",
+          "sizes": {
+            "Small": 4.5,
+            "Large": 8.49
+          }
+        },
+        {
+          "item": "Seafood Soup \u6d77\u9c9c\u7fb9",
+          "category": "Soup",
+          "sizes": {
+            "Serves 2": 10.95,
+            "Serves 6": 27.95,
+            "Serves 10": 45.95
+          }
+        },
+        {
+          "item": "Seafood & Fish Maw Soup \u6d77\u9c9c\u9c7c\u80da\u6c64",
+          "category": "Soup",
+          "sizes": {
+            "Serves 2": 13.95,
+            "Serves 6": 33.95,
+            "Serves 10": 49.95
+          }
+        },
+        {
+          "item": "Beef Chowder \u897f\u6e56\u725b\u8089\u7fb9",
+          "category": "Soup",
+          "sizes": {
+            "Serves 2": 10.95,
+            "Serves 6": 30.95,
+            "Serves 10": 47.95
+          }
+        },
+        {
+          "item": "Scallops Combination Soup \u4e09\u4e1d\u7476\u67f1\u7fb9",
+          "category": "Soup",
+          "sizes": {
+            "Serves 2": 11.95,
+            "Serves 6": 33.95,
+            "Serves 10": 49.95
+          }
+        },
+        {
+          "item": "Salted Egg, Pork and Mustard Soup \u54b8\u86cb\u7626\u8089\u82a5\u83dc\u6c64",
+          "category": "Soup",
+          "sizes": {
+            "Serves 2": 9.95,
+            "Serves 6": 27.95,
+            "Serves 10": 45.95
+          }
+        },
+        {
+          "item": "Seaweed Egg Drop Soup \u7d2b\u83dc\u86cb\u82b1\u6c64",
+          "category": "Soup",
+          "sizes": {
+            "Serves 2": 9.95,
+            "Serves 6": 27.95,
+            "Serves 10": 45.95
+          }
+        },
+        {
+          "item": "Roasted Duck Cantonese \u5e7f\u5f0f\u70e7\u9e2d",
+          "category": "Roasted Meat",
+          "sizes": {
+            "Half": 26.0,
+            "Whole": 48.0
+          }
+        },
+        {
+          "item": "Roasted Pork \u53c9\u70e7",
+          "category": "Roasted Meat",
+          "sizes": {
+            "1/2 LB": 9.95,
+            "1 LB": 16.5
+          }
+        },
+        {
+          "item": "Crispy Roasted Pig \u8106\u76ae\u70e7\u732a",
+          "category": "Roasted Meat",
+          "sizes": {
+            "1/2 LB": 9.95,
+            "1 LB": 16.5
+          }
+        },
+        {
+          "item": "Steamed Chicken with Ginger Scallion Sauce \u8d35\u5983\u9e21",
+          "category": "Roasted Meat",
+          "sizes": {
+            "Half": 22.0,
+            "Whole": 40.0
+          }
+        },
+        {
+          "item": "Soy Sauce Chicken \u8c49\u6cb9\u9e21",
+          "category": "Roasted Meat",
+          "sizes": {
+            "Half": 22.0,
+            "Whole": 40.0
+          }
+        },
+        {
+          "item": "Hot Crispy Fried Chicken \u5f53\u7ea2\u70b8\u5b50\u9e21",
+          "category": "Roasted Meat",
+          "sizes": {
+            "Half": 25.0,
+            "Whole": 45.0
+          },
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Fried Garlic Flavored Chicken \u849c\u9999\u9e21",
+          "category": "Roasted Meat",
+          "sizes": {
+            "Half": 25.0,
+            "Whole": 45.0
+          }
+        },
+        {
+          "item": "Chicken with Choy Sum Soup \u83dc\u80c6\u4e0a\u6c64\u9e21",
+          "category": "Roasted Meat",
+          "sizes": {
+            "Half": 25.0,
+            "Whole": 45.0
+          }
+        },
+        {
+          "item": "Roasted Meats Combo \u70e7\u814a\u53cc\u62fc / \u4e09\u62fc",
+          "category": "Roasted Meat",
+          "sizes": {
+            "Two Kinds": 23.99,
+            "Three Kinds": 27.99
+          },
+          "desc": "Choice of Roasted Duck, Roasted Pork, Crispy Roasted Pig, Soy Sauce Chicken \u53ef\u9009\uff1a\u70e7\u9e2d\uff0c\u53c9\u70e7\uff0c\u8106\u76ae\u70e7\u732a\uff0c\u8c49\u6cb9\u9e21."
+        },
+        {
+          "item": "Steamed Whole Live Tilapia \u6e05\u84b8/\u8c46\u8c49\u4fa7\u9c7c",
+          "category": "Live Seafood",
+          "price": 0,
+          "desc": "With ginger & scallion, or black bean sauce. Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Steamed Eel with Black Bean Sauce \u8c46\u8c49\u84b8\u9cd7\u9c7c",
+          "category": "Live Seafood",
+          "price": 0,
+          "desc": "Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "One/Two Lobsters \u5355\u9f99/\u53cc\u9f99",
+          "category": "Live Seafood",
+          "price": 0,
+          "desc": "Style of ginger scallion, Cantonese, Thai, black bean sauce or salt pepper \uff08\u59dc\u8471/\u5e7f\u5f0f/\u6cf0\u5f0f/\u8c46\u8c49/\u6912\u76d0\uff09. Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Lobster Hong Kong Style \u907f\u98ce\u5858\u9f99\u867e/\u53cc\u9f99",
+          "category": "Live Seafood",
+          "price": 0,
+          "desc": "Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "One/Two Dungeness \u52a0\u62ff\u5927\u87f9",
+          "category": "Live Seafood",
+          "price": 0,
+          "desc": "Style of ginger scallion, Cantonese, Thai, black bean sauce or salt pepper \uff08\u59dc\u8471/\u5e7f\u5f0f/\u6cf0\u5f0f/\u8c46\u8c49/\u6912\u76d0\uff09. Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Stir Fried Baby Clams with Black Bean Sauce \u8c49\u6c41\u7092\u8756",
+          "category": "Live Seafood",
+          "price": 0,
+          "desc": "Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Stir Fried Conch with Yellow Chives \u97ed\u9ec4\u87ba\u7247",
+          "category": "Live Seafood",
+          "price": 0,
+          "desc": "Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Spicy Sliced Conch \u9ebb\u8fa3\u87ba\u7247",
+          "category": "Live Seafood",
+          "price": 0,
+          "desc": "Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Steamed Oyster with Garlic Sauce or Black Bean Sauce \u849c\u84c9/\u8c46\u8c49\u84b8\u751f\u868a",
+          "category": "Live Seafood",
+          "price": 0,
+          "desc": "Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Seafood Delight in XO Sauce \u6d77\u9c9c\u7092 XO \u9171",
+          "category": "Authentic Chinese Food",
+          "price": 28.95
+        },
+        {
+          "item": "Stir Fried Lotus Root with Seafood and Meats \u83b2\u85d5\u5c0f\u7092",
+          "category": "Authentic Chinese Food",
+          "price": 20.95
+        },
+        {
+          "item": "Stir Fried Flounder Fillet with Deep Fried Bone \u9999\u9aa8\u9f99\u5229\u9c7c",
+          "category": "Authentic Chinese Food",
+          "price": 0,
+          "desc": "Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Steamed Flounder \u6e05\u84b8\u9f99\u5229\u9c7c",
+          "category": "Authentic Chinese Food",
+          "price": 0,
+          "desc": "Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Salt and Pepper Deep Fried White Fish \u6912\u76d0\u767d\u996d\u9c7c",
+          "category": "Authentic Chinese Food",
+          "price": 23.95
+        },
+        {
+          "item": "Salt and Pepper Deep Fried Frog and White Fish \u6912\u76d0\u7530\u9e21\u767d\u996d\u9c7c",
+          "category": "Authentic Chinese Food",
+          "price": 0,
+          "desc": "Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Salt and Pepper Deep Fried Frog \u6912\u76d0\u7530\u9e21",
+          "category": "Authentic Chinese Food",
+          "price": 0,
+          "desc": "Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Salt and Pepper Deep Fried Seafood \u6912\u76d0\u4e09\u5b9d",
+          "category": "Authentic Chinese Food",
+          "price": 23.95,
+          "desc": "Shrimp, squid & scallop."
+        },
+        {
+          "item": "Salt and Pepper Deep Fried Scallop \u6912\u76d0\u5e72\u8d1d",
+          "category": "Authentic Chinese Food",
+          "price": 35.95
+        },
+        {
+          "item": "Salt and Pepper Deep Fried Shrimp Without Shell & Head \u6912\u76d0\u65e0\u58f3\u867e",
+          "category": "Authentic Chinese Food",
+          "price": 20.95
+        },
+        {
+          "item": "Salt and Pepper Deep Fried Shrimp with Head On \u6912\u76d0\u5927\u867e",
+          "category": "Authentic Chinese Food",
+          "price": 20.95
+        },
+        {
+          "item": "Salt and Pepper Deep Fried Fish Fillet \u6912\u76d0\u9c7c\u7247",
+          "category": "Authentic Chinese Food",
+          "price": 20.95
+        },
+        {
+          "item": "Salt and Pepper Deep Fried Calamari \u6912\u76d0\u9c7f\u9c7c",
+          "category": "Authentic Chinese Food",
+          "price": 20.95
+        },
+        {
+          "item": "Fillet Fish Hong Kong Style \u907f\u98ce\u5858\u9c7c\u7247",
+          "category": "Authentic Chinese Food",
+          "price": 24.95
+        },
+        {
+          "item": "Golden Walnut Shrimp \u6838\u6843\u867e",
+          "category": "Authentic Chinese Food",
+          "price": 21.95
+        },
+        {
+          "item": "Crispy Fried Oysters \u9165\u70b8\u751f\u868a",
+          "category": "Authentic Chinese Food",
+          "price": 29.95
+        },
+        {
+          "item": "Cod Fish \u9cd5\u9c7c",
+          "category": "Authentic Chinese Food",
+          "price": 40.95,
+          "desc": "Fried, steamed or salt & pepper \uff08\u5e72\u714e/\u6e05\u84b8/\u6912\u76d0\uff09."
+        },
+        {
+          "item": "Stir-Fried Fish Fillet with Bitter Melon \u82e6\u74dc\u7092\u9c7c\u7247",
+          "category": "Authentic Chinese Food",
+          "price": 21.95
+        },
+        {
+          "item": "Sour Cabbage Fish Filet \u9178\u83dc\u7092\u9c7c\u7247",
+          "category": "Authentic Chinese Food",
+          "price": 21.95
+        },
+        {
+          "item": "Szechuan Style Fish Filet \u56db\u5ddd\u6c34\u716e\u9c7c\u7247",
+          "category": "Authentic Chinese Food",
+          "price": 23.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Steamed Ground Pork with Salted Fish \u54b8\u9c7c\u84b8\u8089\u997c",
+          "category": "Authentic Chinese Food",
+          "price": 27.95
+        },
+        {
+          "item": "Filet of Tenderloin in Black Pepper Sauce \u9ed1\u6912\u725b\u67f3",
+          "category": "Authentic Chinese Food",
+          "price": 23.95
+        },
+        {
+          "item": "Beef Ribs in Black Pepper Sauce \u9ed1\u6912\u725b\u4ed4\u9aa8",
+          "category": "Authentic Chinese Food",
+          "price": 26.95
+        },
+        {
+          "item": "Chinese Style Beef \u4e2d\u5f0f\u725b\u67f3",
+          "category": "Authentic Chinese Food",
+          "price": 23.95
+        },
+        {
+          "item": "French Style Beef Cubes \u6cd5\u5f0f\u725b\u4ed4\u7c92",
+          "category": "Authentic Chinese Food",
+          "price": 23.95
+        },
+        {
+          "item": "Szechuan Style Beef \u6c34\u716e\u725b",
+          "category": "Authentic Chinese Food",
+          "price": 23.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Stir Fried Beef with Tomato \u756a\u8304\u725b\u8089",
+          "category": "Authentic Chinese Food",
+          "price": 21.95
+        },
+        {
+          "item": "Stir Fried Beef with Sour Cabbage \u9178\u83dc\u725b\u8089",
+          "category": "Authentic Chinese Food",
+          "price": 21.95
+        },
+        {
+          "item": "Stir Fried Beef with Bitter Melon \u82e6\u74dc\u7092\u725b\u8089",
+          "category": "Authentic Chinese Food",
+          "price": 21.95
+        },
+        {
+          "item": "Stir Fried Pork Intestine with Sour Cabbage \u9178\u83dc\u5927\u80a0",
+          "category": "Authentic Chinese Food",
+          "price": 21.95
+        },
+        {
+          "item": "Szechuan Pork Intestines \u4e94\u66f4\u80a0\u65fa",
+          "category": "Authentic Chinese Food",
+          "price": 23.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Pepper Salt Pork Chop \u6912\u76d0\u8089\u6392",
+          "category": "Authentic Chinese Food",
+          "price": 20.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Sweet and Sour Pork Chop \u4eac\u90fd\u6392\u9aa8",
+          "category": "Authentic Chinese Food",
+          "price": 20.95
+        },
+        {
+          "item": "Stir Fried Pork Chop \u751f\u7092\u6392\u9aa8",
+          "category": "Authentic Chinese Food",
+          "price": 21.95
+        },
+        {
+          "item": "Stir Fried Pork with Chili Pepper \u8fa3\u6912\u5c0f\u7092",
+          "category": "Authentic Chinese Food",
+          "price": 19.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Shredded Pork with Dried Tofu \u9999\u5e72\u8089\u4e1d",
+          "category": "Authentic Chinese Food",
+          "price": 21.95
+        },
+        {
+          "item": "Snow Peas with Cured Pork \u814a\u5473\u96ea\u8c46",
+          "category": "Authentic Chinese Food",
+          "price": 21.95
+        },
+        {
+          "item": "Steamed Pork Belly with Preserved Pork \u6885\u83dc\u6263\u8089",
+          "category": "Authentic Chinese Food",
+          "price": 25.95
+        },
+        {
+          "item": "Pipa Tofu \u7435\u7436\u8c46\u8150",
+          "category": "Authentic Chinese Food",
+          "price": 27.95
+        },
+        {
+          "item": "Deep Fried Tofu Stuffed with Shrimp \u70b8\u6f3e\u8c46\u8150",
+          "category": "Authentic Chinese Food",
+          "price": 27.95
+        },
+        {
+          "item": "Shanghai Bachoi with Shiitake Mushroom \u9999\u83c7\u6252\u83dc\u80c6",
+          "category": "Authentic Chinese Food",
+          "price": 18.95
+        },
+        {
+          "item": "Stir Fried Vegetable \u7092\u65f6\u852c",
+          "category": "Authentic Chinese Food",
+          "price": 17.99,
+          "desc": "Please see server for available choices."
+        },
+        {
+          "item": "Stir Fried Mix Vegetable \u7f57\u6c49\u658b",
+          "category": "Authentic Chinese Food",
+          "price": 18.95
+        },
+        {
+          "item": "Bean Curd Stick with Lamb in Casserole \u679d\u7af9\u7f8a\u8169\u714b",
+          "category": "Casserole",
+          "price": 29.95
+        },
+        {
+          "item": "Eggplant with Salty Fish and Chicken in Casserole \u54b8\u9c7c\u9e21\u7c92\u8304\u5b50\u714b",
+          "category": "Casserole",
+          "price": 21.95
+        },
+        {
+          "item": "Eggplant with Salty Fish and Tofu in Casserole \u54b8\u9c7c\u9e21\u7c92\u8c46\u8150\u714b",
+          "category": "Casserole",
+          "price": 21.95
+        },
+        {
+          "item": "8 Treasures Tofu \u516b\u73cd\u8c46\u8150\u714b",
+          "category": "Casserole",
+          "price": 23.95
+        },
+        {
+          "item": "Beef Brisket and Radish in Casserole \u725b\u8169\u841d\u535c\u714b",
+          "category": "Casserole",
+          "price": 26.95
+        },
+        {
+          "item": "Shiitake Mushroom & Duck Feet in Casserole \u9999\u83c7\u9e2d\u638c\u714b",
+          "category": "Casserole",
+          "price": 20.95
+        },
+        {
+          "item": "Cod Fish in Casserole \u9cd5\u9c7c\u714b",
+          "category": "Casserole",
+          "price": 40.95,
+          "desc": "Price obscured by glare in the menu photo \u2014 confirm when ordering."
+        },
+        {
+          "item": "Seafood in Casserole \u6d77\u9c9c\u714b",
+          "category": "Casserole",
+          "price": 26.95,
+          "desc": "Price obscured by glare in the menu photo \u2014 confirm when ordering."
+        },
+        {
+          "item": "Frog in Casserole \u7530\u9e21\u714b",
+          "category": "Casserole",
+          "price": 0,
+          "desc": "Market price \u2014 ask when ordering."
+        },
+        {
+          "item": "Combination Pan Fried Noodles \u672c\u697c\u4e24\u9762\u9ec4",
+          "category": "Hong Kong Style Noodle & Noodle Soup",
+          "price": 20.95
+        },
+        {
+          "item": "Seafood Pan Fried Noodles \u6d77\u9c9c\u4e24\u9762\u9ec4",
+          "category": "Hong Kong Style Noodle & Noodle Soup",
+          "price": 23.95
+        },
+        {
+          "item": "Vegetable Pan Fried Noodles with Soy Sauce \u8c49\u6cb9\u7687\u7092\u9762",
+          "category": "Hong Kong Style Noodle & Noodle Soup",
+          "price": 17.95
+        },
+        {
+          "item": "Beef Chow Fun \u5e72\u7092/\u6e7f\u7092\u725b\u6cb3",
+          "category": "Hong Kong Style Noodle & Noodle Soup",
+          "price": 16.95,
+          "desc": "Dried or wet."
+        },
+        {
+          "item": "Chicken or Seafood Yee Mee \u9e21/\u6d77\u9c9c\u4f0a\u9762",
+          "category": "Hong Kong Style Noodle & Noodle Soup",
+          "sizes": {
+            "Chicken": 18.95,
+            "Seafood": 23.95
+          }
+        },
+        {
+          "item": "Egg or Rice Noodle Soup with Meats \u70e7\u814a\u9762/\u6cb3\u7c89",
+          "category": "Hong Kong Style Noodle & Noodle Soup",
+          "price": 14.95,
+          "desc": "Choose one of Duck, Roasted Pork, Crispy Pig, Chicken & Beef Brisket \uff08\u53ef\u9009\u70e7\u9e2d\uff0c\u53c9\u70e7\uff0c\u70e7\u732a\uff0c\u8c49\u6cb9\u9e21\u548c\u725b\u8169\uff09.",
+          "requiredPick": {
+            "label": "Choice of Meat",
+            "options": [
+              "Roasted Duck \u70e7\u9e2d",
+              "Roasted Pork \u53c9\u70e7",
+              "Crispy Pig \u70e7\u732a",
+              "Soy Sauce Chicken \u8c49\u6cb9\u9e21",
+              "Beef Brisket \u725b\u8169"
+            ]
+          }
+        },
+        {
+          "item": "Hong Kong Style Wonton Soup w/ or w/o Noodle \u6e2f\u5f0f\u6df7\u6c8c\u9762/\u51c0\u9984\u9968",
+          "category": "Hong Kong Style Noodle & Noodle Soup",
+          "price": 14.95
+        },
+        {
+          "item": "Chow Fun with Curry Sauce \u5496\u55b1\u6cb3\u7c89",
+          "category": "Hong Kong Style Noodle & Noodle Soup",
+          "price": 17.95
+        },
+        {
+          "item": "Singapore Style Rice Noodle \u661f\u6d32\u7092\u7c73\u7c89",
+          "category": "Rice Noodle & Pad Thai",
+          "price": 17.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Chicken Rice Noodle/Pad Thai \u9e21\u7c73\u7c89/\u6cf0\u7c73",
+          "category": "Rice Noodle & Pad Thai",
+          "price": 16.95
+        },
+        {
+          "item": "Shrimp Rice Noodle/Pad Thai \u867e\u7c73\u7c89/\u6cf0\u7c73",
+          "category": "Rice Noodle & Pad Thai",
+          "price": 16.95
+        },
+        {
+          "item": "Beef Rice Noodle/Pad Thai \u725b\u8089\u7c73\u7c89/\u6cf0\u7c73",
+          "category": "Rice Noodle & Pad Thai",
+          "price": 16.95
+        },
+        {
+          "item": "Combination Rice Noodle/Pad Thai \u672c\u697c\u7c73\u7c89/\u6cf0\u7c73",
+          "category": "Rice Noodle & Pad Thai",
+          "price": 17.95
+        },
+        {
+          "item": "Seafood Rice Noodle/Pad Thai \u6d77\u9c9c\u7c73\u7c89/\u6cf0\u7c73",
+          "category": "Rice Noodle & Pad Thai",
+          "price": 21.95,
+          "desc": "Shrimp, scallop & squid."
+        },
+        {
+          "item": "Szechuan Style Chicken \u56db\u5ddd\u9e21",
+          "category": "Poultry",
+          "price": 15.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Kung Pao Chicken \u5bab\u4fdd\u9e21",
+          "category": "Poultry",
+          "price": 15.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Chicken With Cashew Nuts \u8170\u679c\u9e21",
+          "category": "Poultry",
+          "price": 15.95
+        },
+        {
+          "item": "Sweet & Sour Chicken \u751c\u9178\u9e21",
+          "category": "Poultry",
+          "price": 15.95
+        },
+        {
+          "item": "Lemon Chicken \u67e0\u6aac\u9e21",
+          "category": "Poultry",
+          "price": 16.95
+        },
+        {
+          "item": "General Tso's Chicken \u5de6\u5b97\u9e21",
+          "category": "Poultry",
+          "price": 16.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Orange Chicken \u9648\u76ae\u9e21",
+          "category": "Poultry",
+          "price": 16.95
+        },
+        {
+          "item": "Sesame Chicken \u829d\u9ebb\u9e21",
+          "category": "Poultry",
+          "price": 16.95
+        },
+        {
+          "item": "Chicken with Mixed Vegetable \u7d20\u83dc\u9e21",
+          "category": "Poultry",
+          "price": 15.95
+        },
+        {
+          "item": "Chicken with Broccoli \u82a5\u5170\u9e21",
+          "category": "Poultry",
+          "price": 15.95
+        },
+        {
+          "item": "Chicken Hunan Style \u6e56\u5357\u9e21",
+          "category": "Poultry",
+          "price": 15.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Moo Shi Chicken with 4 Pancakes \u6728\u987b\u9e21",
+          "category": "Poultry",
+          "price": 16.95
+        },
+        {
+          "item": "Crispy Chicken \u5e72\u7178\u9e21",
+          "category": "Poultry",
+          "price": 19.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "King Pao Shrimp \u5bab\u4fdd\u867e",
+          "category": "Seafood",
+          "price": 17.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Moo Shu Shrimp with 4 Pancakes \u6728\u987b\u867e",
+          "category": "Seafood",
+          "price": 17.95
+        },
+        {
+          "item": "Jumbo Shrimp in Hot Garlic Sauce \u9c7c\u9999\u5927\u867e",
+          "category": "Seafood",
+          "price": 17.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Scallop in Hot Garlic Sauce \u9c7c\u9999\u5e26\u5b50",
+          "category": "Seafood",
+          "price": 22.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Jumbo Shrimp and Scallops in Black Bean Sauce \u8c46\u8c49\u53cc\u9c9c",
+          "category": "Seafood",
+          "price": 22.95
+        },
+        {
+          "item": "Jumbo Shrimp and Scallops with Mixed Vegetables \u6742\u83dc\u53cc\u9c9c",
+          "category": "Seafood",
+          "price": 22.95
+        },
+        {
+          "item": "Scallop in Black Bean Sauce \u8c46\u8c49\u5e26\u5b50",
+          "category": "Seafood",
+          "price": 22.95
+        },
+        {
+          "item": "Scallop with Mixed Vegetables \u78a7\u7eff\u5e26\u5b50",
+          "category": "Seafood",
+          "price": 22.95
+        },
+        {
+          "item": "Shrimp in Black Bean Sauce \u8c46\u8c49\u867e",
+          "category": "Seafood",
+          "price": 17.95
+        },
+        {
+          "item": "Shrimp In Lobster Sauce \u867e\u9f99\u7cca",
+          "category": "Seafood",
+          "price": 17.95
+        },
+        {
+          "item": "Sweet and Sour Shrimp \u751c\u9178\u867e",
+          "category": "Seafood",
+          "price": 20.95
+        },
+        {
+          "item": "Triple Delight \u7092\u4e09\u9c9c",
+          "category": "Seafood",
+          "price": 19.95,
+          "desc": "Shrimp, chicken, beef."
+        },
+        {
+          "item": "Shrimp Hunan Style \u6e56\u5357\u867e",
+          "category": "Seafood",
+          "price": 17.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Shrimp with Broccoli \u82a5\u5170\u867e",
+          "category": "Seafood",
+          "price": 17.95
+        },
+        {
+          "item": "Shrimp with Mixed Vegetables \u7d20\u83dc\u867e",
+          "category": "Seafood",
+          "price": 17.95
+        },
+        {
+          "item": "Combination Seafood \u6d77\u9c9c\u5927\u4f1a",
+          "category": "Seafood",
+          "price": 23.95,
+          "desc": "Shrimp, scallop and squid."
+        },
+        {
+          "item": "Vegetable Lo Mein \u7d20\u83dc\u635e\u9762",
+          "category": "Lo Mein",
+          "price": 13.95
+        },
+        {
+          "item": "Chicken Lo Mein \u9e21\u635e\u9762",
+          "category": "Lo Mein",
+          "price": 14.95
+        },
+        {
+          "item": "Beef Lo Mein \u725b\u635e\u9762",
+          "category": "Lo Mein",
+          "price": 14.95,
+          "desc": "Price obscured by glare in the menu photo \u2014 confirm when ordering."
+        },
+        {
+          "item": "Shrimp Lo Mein \u867e\u635e\u9762",
+          "category": "Lo Mein",
+          "price": 14.95,
+          "desc": "Price obscured by glare in the menu photo \u2014 confirm when ordering."
+        },
+        {
+          "item": "Combination Lo Mein \u672c\u697c\u635e\u9762",
+          "category": "Lo Mein",
+          "price": 15.95,
+          "desc": "Chicken, shrimp & beef."
+        },
+        {
+          "item": "Seafood Lo Mein \u6d77\u9c9c\u635e\u9762",
+          "category": "Lo Mein",
+          "price": 21.95,
+          "desc": "Shrimp, scallop & squid."
+        },
+        {
+          "item": "Vegetable Fried Rice \u7d20\u83dc\u7092\u996d",
+          "category": "Rice Dishes",
+          "price": 13.95
+        },
+        {
+          "item": "Roast Pork Fried Rice \u53c9\u71d2\u7092\u98ef",
+          "category": "Rice Dishes",
+          "price": 14.95
+        },
+        {
+          "item": "Chicken Fried Rice \u9e21\u7092\u996d",
+          "category": "Rice Dishes",
+          "price": 14.95
+        },
+        {
+          "item": "Beef Fried Rice \u725b\u7092\u996d",
+          "category": "Rice Dishes",
+          "price": 14.95
+        },
+        {
+          "item": "Shrimp Fried Rice \u867e\u7092\u996d",
+          "category": "Rice Dishes",
+          "price": 14.95
+        },
+        {
+          "item": "Combination Fried Rice \u672c\u697c\u7092\u996d",
+          "category": "Rice Dishes",
+          "price": 15.95,
+          "desc": "Chicken, shrimp & beef."
+        },
+        {
+          "item": "Seafood Fried Rice \u6d77\u9c9c\u7092\u996d",
+          "category": "Rice Dishes",
+          "price": 21.95,
+          "desc": "Shrimp, scallop & squid."
+        },
+        {
+          "item": "Salt Fish & Chicken Fried Rice \u54b8\u9c7c\u9e21\u7c92\u7092\u996d",
+          "category": "Rice Dishes",
+          "price": 18.95
+        },
+        {
+          "item": "Shrimp & Egg Over Rice \u6ed1\u86cb\u867e\u4ec1\u996d",
+          "category": "Rice Dishes",
+          "price": 14.95
+        },
+        {
+          "item": "Beef & Egg Over Rice \u6ed1\u86cb\u725b\u8089\u996d",
+          "category": "Rice Dishes",
+          "price": 14.95
+        },
+        {
+          "item": "Minced Beef Over Rice \u514d\u6cbb\u725b\u8089\u996d",
+          "category": "Rice Dishes",
+          "price": 14.95
+        },
+        {
+          "item": "Roasted Meat over Rice \u70e7\u814a\u76d6\u996d",
+          "category": "Rice Dishes",
+          "sizes": {
+            "One Kind": 14.95,
+            "Two Kinds": 17.95,
+            "Three Kinds": 19.95
+          }
+        },
+        {
+          "item": "Vegetables Egg Foo Young \u7d20\u83dc\u8299\u84c9\u86cb",
+          "category": "Egg Foo Young",
+          "price": 15.95
+        },
+        {
+          "item": "Chicken Egg Foo Yong \u9e21\u8089\u8299\u84c9\u86cb",
+          "category": "Egg Foo Young",
+          "price": 16.95
+        },
+        {
+          "item": "Roast Pork Egg Foo Yong \u53c9\u71d2\u8299\u84c9\u86cb",
+          "category": "Egg Foo Young",
+          "price": 16.95
+        },
+        {
+          "item": "Beef Egg Foo Yong \u725b\u8089\u8299\u84c9\u86cb",
+          "category": "Egg Foo Young",
+          "price": 16.95
+        },
+        {
+          "item": "Shrimp Egg Foo Yong \u867e\u8299\u84c9\u86cb",
+          "category": "Egg Foo Young",
+          "price": 16.95
+        },
+        {
+          "item": "Combination Egg Foo Young \u672c\u697c\u8299\u84c9\u86cb",
+          "category": "Egg Foo Young",
+          "price": 17.95,
+          "desc": "Chicken, shrimp and beef."
+        },
+        {
+          "item": "Seafood Egg Foo Young \u6d77\u9c9c\u8299\u84c9\u86cb",
+          "category": "Egg Foo Young",
+          "price": 22.95,
+          "desc": "Shrimp, scallop & squid."
+        },
+        {
+          "item": "Beef Hunan Style \u6e56\u5357\u725b",
+          "category": "Beef",
+          "price": 17.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Pepper Steak \u9752\u6912\u725b",
+          "category": "Beef",
+          "price": 17.95
+        },
+        {
+          "item": "Szechuan Style Beef \u56db\u5ddd\u725b",
+          "category": "Beef",
+          "price": 17.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Beef With Broccoli \u82a5\u5170\u725b",
+          "category": "Beef",
+          "price": 17.95
+        },
+        {
+          "item": "Beef Snow Peas \u96ea\u8c46\u725b",
+          "category": "Beef",
+          "price": 17.95
+        },
+        {
+          "item": "Beef With Mixed Vegetable \u7d20\u83dc\u725b",
+          "category": "Beef",
+          "price": 17.95
+        },
+        {
+          "item": "Orange Beef \u9648\u76ae\u725b",
+          "category": "Beef",
+          "price": 20.95
+        },
+        {
+          "item": "Mongolian Beef \u8471\u7206\u725b",
+          "category": "Beef",
+          "price": 17.95
+        },
+        {
+          "item": "Hot Crispy Beef \u5e72\u7178\u725b\u8089\u4e1d",
+          "category": "Beef",
+          "price": 20.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Kung Pao Beef \u5bab\u4fdd\u725b",
+          "category": "Beef",
+          "price": 17.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Sweet and Sour Pork \u751c\u9178\u8089",
+          "category": "Pork",
+          "price": 16.95
+        },
+        {
+          "item": "BBQ Pork With Snow Peas \u53c9\u71d2\u96ea\u8c46",
+          "category": "Pork",
+          "price": 16.95
+        },
+        {
+          "item": "Szechuan Style Shredded Pork \u56db\u5ddd\u8089\u4e1d",
+          "category": "Pork",
+          "price": 16.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Moo Shi Pork with 4 Pancakes \u6728\u9808\u8089",
+          "category": "Pork",
+          "price": 16.95
+        },
+        {
+          "item": "Shredded Pork with Green Pepper \u9752\u6912\u8089\u4e1d",
+          "category": "Pork",
+          "price": 16.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Pork with Broccoli \u82a5\u5170\u53c9\u70e7",
+          "category": "Pork",
+          "price": 16.95
+        },
+        {
+          "item": "Pork Hunan Style \u6e56\u5357\u8089",
+          "category": "Pork",
+          "price": 16.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Bean Curd Hunan Style \u6e58\u5357\u8c46\u8150",
+          "category": "Vegetarian's Paradise",
+          "price": 15.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Bean Curd Szechuan Style \u9ebb\u5a46\u8c46\u8150",
+          "category": "Vegetarian's Paradise",
+          "price": 14.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Braised Bean Curd \u7d05\u71d2\u8c46\u8150",
+          "category": "Vegetarian's Paradise",
+          "price": 15.95
+        },
+        {
+          "item": "General Tso's Tofu \u5de6\u5b97\u8c46\u8150",
+          "category": "Vegetarian's Paradise",
+          "price": 15.95
+        },
+        {
+          "item": "Sesame Tofu \u829d\u9ebb\u8c46\u8150",
+          "category": "Vegetarian's Paradise",
+          "price": 15.95
+        },
+        {
+          "item": "Salt and Spicy Deep-Fried Tofu \u6912\u76d0\u8c46\u8150",
+          "category": "Vegetarian's Paradise",
+          "price": 16.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Mixed Vegetable in Brown Sauce \u7d20\u4ec0\u9326",
+          "category": "Vegetarian's Paradise",
+          "price": 14.95
+        },
+        {
+          "item": "String Bean Szechuan Style \u5e72\u7178\u56db\u5b63\u8c46",
+          "category": "Vegetarian's Paradise",
+          "price": 15.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Eggplant Hot Garlic Sauce \u9c7c\u9999\u8304\u5b50",
+          "category": "Vegetarian's Paradise",
+          "price": 16.95,
+          "desc": "Hot and spicy."
+        },
+        {
+          "item": "Additional Steamed Rice \u52a0\u767d\u996d",
+          "category": "Extras",
+          "price": 1.5,
+          "desc": "Steamed rice is served per entr\u00e9e; each additional rice is $1.50."
+        },
+        {
+          "item": "Substitute Plain Fried Rice \u6362\u7092\u996d",
+          "category": "Extras",
+          "price": 2.0
+        },
+        {
+          "item": "Additional Sauce \u52a0\u9171",
+          "category": "Extras",
+          "price": 2.5,
+          "desc": "Additional sauce on entrees."
+        }
+      ],
       "cuisine": "Chinese"
     }
   ]
