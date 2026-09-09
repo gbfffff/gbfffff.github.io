@@ -3813,3 +3813,47 @@
     body.dark .order-reports-favshates-col-hate .order-reports-favshates-row {
       border-top-color: var(--ink);
     }
+
+    /* ── Favs: repeat-orderer hearts ── */
+    .fav-tiers {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.15rem 0.6rem;
+      margin-top: 0.2rem;
+    }
+    .fav-tiers.is-none {
+      display: block;
+      font-size: 0.66rem;
+      color: var(--text-dim);
+      opacity: 0.75;
+    }
+    .fav-tier { display: inline-flex; align-items: center; gap: 0.25rem; }
+    /* Hearts overlap so a band reads as a stack rather than as a count of
+       separate icons. padding-left leaves room for the shifted first heart. */
+    .fav-hearts { display: inline-flex; align-items: center; padding-left: 0.32rem; }
+    .fav-heart {
+      display: block;
+      width: 0.95rem;
+      height: 0.95rem;
+      margin-left: -0.32rem;
+      fill: var(--red);
+      /* A thin cut-out in the page colour so overlapping hearts stay
+         individually readable instead of merging into one blob. */
+      stroke: var(--card-bg);
+      stroke-width: 1.6;
+      paint-order: stroke fill;
+    }
+    .fav-tier-count {
+      font-size: 0.72rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+    .order-reports-favshates-note .fav-hearts { vertical-align: middle; }
+    body.dark .fav-heart { stroke: var(--surface); }
+
+    /* ── Sortable table headers (Restaurant Stats) ── */
+    .report-sortable { cursor: pointer; user-select: none; }
+    .report-sortable:hover { background: rgba(0,0,0,0.06); }
+    .report-sortable.is-sorted { text-decoration: underline; }
+    body.dark .report-sortable:hover { background: rgba(255,255,255,0.10); }
