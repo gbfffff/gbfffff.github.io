@@ -40,8 +40,15 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.15.1";
+const APP_VERSION = "1.16.0";
 const CHANGELOG = [
+  { version: "1.16.0", date: "2026-10-09", notes: [
+    "Yia Yia's prices updated from their new menu -- gyros are up $0.50-0.55, the platters $0.25 across the board (Grilled Salmon $1.00), and the combo upcharge went $4.25 to $4.50",
+    "A dish whose price we've seen change now shows a small +/-% pill next to its price in the menu, so a reprint reads as \"the gyro went up 5%\" instead of just a number that's different from the one you remember. Hover it for the old price and what it's measured since",
+    "New Menu Price Change tile in Reports and Stats: what the same basket of repriced dishes costs now versus before, opening to a per-restaurant breakdown with every dish that moved. The headline is basket inflation (a $22 salmon counts for more than a $4 side); the per-dish average sits beside it because the two answer different questions",
+    "Previous prices now live in the menu data itself (priceHistory on the dish, priceUpdated on the restaurant), so each reprint stacks up instead of overwriting what came before",
+    "Where we don't know the date a restaurant actually reprinted -- which is usually -- a price change is measured since the last night we ordered from them, that being the most recent proof the old price was still being charged",
+  ]},
   { version: "1.15.1", date: "2026-09-09", notes: [
     "GBF Favs now marks repeat orderers with hearts instead of a plain count, and the rule changed: a regular is someone who ordered the same dish in more than one separate week. Ordering three of something on one night is a big appetite, not a habit, so quantity no longer counts. One heart means people who ordered it in 2 separate weeks, two overlapping hearts 3 weeks, three hearts 4 or more; the xN beside each stack is how many people are in that band",
     "Restaurant Stats headers are now sortable -- Restaurant, Visits, Orders and Avg Rating, clicking again to flip the direction. Restaurants we haven't ordered from stay at the bottom either way, so sorting ascending surfaces the lowest real number instead of a wall of dashes",
@@ -662,6 +669,10 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
 
   if (!items.length) { card.style.display = "none"; return; }
 
+  // Needed for the price-change badges -- priceHistory lives on the menu
+  // item but the "as of" date lives on the restaurant.
+  const restaurantObj = findRestaurantByName(restaurantName);
+
   const menuUrlBtn = menuUrl
     ? `<a href="${escAttr(menuUrl)}" target="_blank" rel="noopener" class="menu-title-btn">View Full Menu</a>`
     : "";
@@ -683,7 +694,8 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
   imagesEl.innerHTML = imgHtml;
 
   function mpiHtml(item) {
-    const price       = item.price ? `<span class="mpi-price">$${Number(item.price).toFixed(2)}</span>`
+    const priceDelta  = priceDeltaBadgeHtml(priceChangeFor(item, restaurantObj));
+    const price       = item.price ? `<span class="mpi-price">$${Number(item.price).toFixed(2)}${priceDelta}</span>`
       : (item.sizes ? `<span class="mpi-price">$${Math.min(...Object.values(item.sizes).map(Number)).toFixed(2)}+</span>` : "");
     const orHint      = item.orOptions?.length ? `<span class="mpi-protein-hint">choose 1: ${esc(item.orOptions.join(" or "))}</span>` : "";
     const pickHint    = item.requiredPick ? `<span class="mpi-protein-hint">choose ${esc(item.requiredPick.options.join("/"))}</span>` : "";
@@ -716,7 +728,9 @@ function buildMenuPanel(items, restaurantName, menuUrl, menuImages, favSet, disl
 
   function avgRatingMpiHtml(item, avgMap) {
     const avg = avgMap.get(item.item.toLowerCase());
-    const price = item.price ? `<span class="mpi-price">$${Number(item.price).toFixed(2)}</span>` : "";
+    const price = item.price
+      ? `<span class="mpi-price">$${Number(item.price).toFixed(2)}${priceDeltaBadgeHtml(priceChangeFor(item, restaurantObj))}</span>`
+      : "";
     return `<div class="mpi" data-name="${escAttr(item.item)}">
       <span class="mpi-left"><span class="mpi-name">${esc(item.item)}</span><span class="mpi-desc">Avg rating: ${avg.toFixed(1)}/10</span></span>
       ${price}
@@ -2163,6 +2177,113 @@ function computeAllItemStats() {
   return stats;
 }
 
+// ── Menu price history ──────────────────────────────────────────────────
+// restaurants.json records a dish's superseded prices in `priceHistory`
+// (oldest first; the live `price` is always the current one) and the date
+// the current menu was transcribed in the restaurant's `priceUpdated`.
+//
+// A superseded entry only carries its own `date` where we actually know
+// when it stopped applying. Usually we don't -- a restaurant reprints its
+// menu whenever it likes and doesn't tell us. What we do know is the last
+// night we ordered from them, which is the most recent proof that the old
+// price was still being charged, so that order date is what an undated
+// change is measured "since".
+function lastOrderDateFor(restaurantName) {
+  const key = (restaurantName || "").trim().toLowerCase();
+  if (!key) return null;
+  let latest = null;
+  _historyRows.forEach(r => {
+    if ((r[2] || "").trim().toLowerCase() !== key) return;
+    const d = (r[1] || "").trim();           // Ordered Date, already YYYY-MM-DD
+    if (d && (!latest || d > latest)) latest = d;
+  });
+  return latest;
+}
+
+// The latest price move for one dish, or null if it has no recorded
+// history or the price came back unchanged (a reprint that moved other
+// dishes but not this one shouldn't render a "+0.0%" badge).
+function priceChangeFor(item, restaurant) {
+  const hist = item && item.priceHistory;
+  if (!Array.isArray(hist) || !hist.length) return null;
+  const prevEntry = hist[hist.length - 1];
+  const cur  = Number(item.price);
+  const prev = Number(prevEntry.price);
+  if (!isFinite(cur) || !isFinite(prev) || prev <= 0 || cur === prev) return null;
+  return {
+    item: item.item,
+    prev, cur,
+    diff: cur - prev,
+    pct: ((cur - prev) / prev) * 100,
+    // Undated revisions fall back to our last visit -- see above.
+    since:     prevEntry.date || lastOrderDateFor(restaurant && restaurant.name) || null,
+    sinceIsOrder: !prevEntry.date,
+    on:        (restaurant && restaurant.priceUpdated) || null,
+  };
+}
+
+// Small "+5.0%" pill shown beside a price in the menu panel. Only rendered
+// when there's a real move, so an unchanged menu stays visually quiet.
+function priceDeltaBadgeHtml(change) {
+  if (!change) return "";
+  const up  = change.pct > 0;
+  const pct = Math.abs(change.pct) < 0.05 ? "0.0" : Math.abs(change.pct).toFixed(1);
+  const when = change.since
+    ? ` as of ${change.sinceIsOrder ? "our last order on " : ""}${fmtRatingDate(change.since)}`
+    : " on the previous menu";
+  const title = `was $${change.prev.toFixed(2)}${when}`;
+  return `<span class="mpi-price-delta ${up ? "is-up" : "is-down"}" title="${escAttr(title)}">${up ? "+" : "−"}${pct}%</span>`;
+}
+
+// Every recorded price move across the whole rotation, newest menu first.
+// Restaurants with no `priceHistory` anywhere simply don't appear -- this
+// report is about what changed, not a roll call.
+function computePriceChanges() {
+  const list = (_restaurantsConfig && _restaurantsConfig.restaurants) || [];
+  const seen = new Set();
+  const byRestaurant = [];
+  list.forEach(raw => {
+    const r = findRestaurantByName(raw.name);
+    if (!r || !Array.isArray(r.menu) || seen.has(r.name)) return;
+    seen.add(r.name);
+    const changes = r.menu
+      .map(it => priceChangeFor(it, r))
+      .filter(Boolean)
+      .sort((a, b) => b.pct - a.pct);
+    if (!changes.length) return;
+    const avgPct = changes.reduce((s, c) => s + c.pct, 0) / changes.length;
+    const prevTotal = changes.reduce((s, c) => s + c.prev, 0);
+    const curTotal  = changes.reduce((s, c) => s + c.cur, 0);
+    byRestaurant.push({
+      restaurant: r.name,
+      changes,
+      avgPct,
+      // Basket inflation: what the same set of dishes costs now vs before.
+      // Differs from avgPct, which weights a $4 side the same as a $22 entree.
+      basketPct: prevTotal > 0 ? ((curTotal - prevTotal) / prevTotal) * 100 : null,
+      prevTotal, curTotal,
+      since: changes[0].since,
+      sinceIsOrder: changes[0].sinceIsOrder,
+      on: changes[0].on,
+    });
+  });
+  byRestaurant.sort((a, b) => (b.on || "").localeCompare(a.on || "") || b.basketPct - a.basketPct);
+  if (!byRestaurant.length) return null;
+
+  const all = byRestaurant.flatMap(r => r.changes);
+  const prevTotal = all.reduce((s, c) => s + c.prev, 0);
+  const curTotal  = all.reduce((s, c) => s + c.cur, 0);
+  return {
+    byRestaurant,
+    count: all.length,
+    avgPct: all.reduce((s, c) => s + c.pct, 0) / all.length,
+    basketPct: prevTotal > 0 ? ((curTotal - prevTotal) / prevTotal) * 100 : null,
+    prevTotal, curTotal,
+    raised:  all.filter(c => c.diff > 0).length,
+    lowered: all.filter(c => c.diff < 0).length,
+  };
+}
+
 // ── Reports and Stats: cross-restaurant stats shown under Rate Your Order ──
 // A grid of small independent widgets (mini chart or a bare number) rather
 // than one big chart -- each is its own question ("what do people like",
@@ -2685,6 +2806,16 @@ function renderOrderReportsCard() {
     thisYearSpend ? `$${thisYearSpend.total.toFixed(2)}` : "—",
     thisYearSpend ? `spent in ${thisYear}` : `nothing logged in ${thisYear}`);
 
+  // Only a rotation with at least one recorded reprice has anything to say
+  // here, so the tile stays hidden rather than showing a permanent dash.
+  const priceChanges = computePriceChanges();
+  const priceWidget  = document.getElementById("order-reports-prices-widget");
+  if (priceWidget) priceWidget.style.display = priceChanges ? "" : "none";
+  if (priceChanges) {
+    setStatTile("prices", fmtPct(priceChanges.basketPct),
+      `across ${priceChanges.count} repriced dish${priceChanges.count === 1 ? "" : "es"}`);
+  }
+
   renderProteinMixPreview(computeProteinMix("", ""));
   renderFoodChartPreview(computeFoodChartPreview());
   renderFavsAndHates(computeGlobalFavsAndHates());
@@ -2885,6 +3016,9 @@ function openOrderReportsDetail(kind) {
   } else if (kind === "orders") {
     title.textContent = "Dishes Logged";
     body.innerHTML = renderDishesLoggedDetailHtml();
+  } else if (kind === "prices") {
+    title.textContent = "Menu Price Changes";
+    body.innerHTML = renderPriceChangesDetailHtml(computePriceChanges());
   }
 
   modal.classList.add("open");
@@ -2979,6 +3113,63 @@ function renderSpendDetailHtml(spend) {
     </div>`).join("");
   return `<div class="order-reports-detail-summary">Average: <strong>$${spend.avg.toFixed(2)}</strong> per person, per order, across ${spend.count} orders</div>
     <div class="order-reports-bar-list">${rows}</div>`;
+}
+
+// Signed percentage, rendered the same way everywhere (tile, badge, table).
+function fmtPct(pct) {
+  if (pct == null) return "—";
+  if (Math.abs(pct) < 0.05) return "±0.0%";
+  return `${pct > 0 ? "+" : "−"}${Math.abs(pct).toFixed(1)}%`;
+}
+function pctClass(pct) {
+  if (pct == null || Math.abs(pct) < 0.05) return "flat";
+  return pct > 0 ? "is-up" : "is-down";
+}
+
+// "since our last order on Jul 25, 2026" vs "as of Apr 19, 2026" -- an
+// undated revision is anchored to the last night we ordered, and the
+// wording has to say so rather than implying we know the reprint date.
+function priceSinceLabel(since, sinceIsOrder) {
+  if (!since) return "since the previous menu";
+  return `${sinceIsOrder ? "since our last order on" : "since"} ${fmtRatingDate(since)}`;
+}
+
+function renderPriceChangesDetailHtml(data) {
+  if (!data) return `<div class="placeholder">No price changes recorded yet. They'll show up here once a menu is updated with its previous prices kept in <code>priceHistory</code>.</div>`;
+
+  const blocks = data.byRestaurant.map(r => {
+    const max = Math.max(...r.changes.map(c => Math.abs(c.pct)), 0.01);
+    const rows = r.changes.map(c => `
+      <div class="order-reports-bar-row price-change-row">
+        <span class="order-reports-bar-label">${esc(c.item)}</span>
+        <div class="order-reports-bar-track">
+          <div class="order-reports-bar-fill ${pctClass(c.pct)}" style="width:${Math.round((Math.abs(c.pct) / max) * 100)}%"></div>
+        </div>
+        <span class="price-change-prices">$${c.prev.toFixed(2)} &rarr; <strong>$${c.cur.toFixed(2)}</strong></span>
+        <span class="price-change-pct ${pctClass(c.pct)}">${fmtPct(c.pct)}</span>
+      </div>`).join("");
+    return `<div class="price-change-block">
+      <div class="price-change-head">
+        <span class="price-change-restaurant">${esc(r.restaurant)}</span>
+        <span class="price-change-head-pct ${pctClass(r.basketPct)}">${fmtPct(r.basketPct)}</span>
+      </div>
+      <div class="price-change-sub">${r.changes.length} dish${r.changes.length === 1 ? "" : "es"} repriced ${esc(priceSinceLabel(r.since, r.sinceIsOrder))}${r.on ? ` &middot; recorded ${esc(fmtRatingDate(r.on))}` : ""} &middot; same basket $${r.prevTotal.toFixed(2)} &rarr; $${r.curTotal.toFixed(2)}</div>
+      <div class="order-reports-bar-list">${rows}</div>
+    </div>`;
+  }).join("");
+
+  // Basket vs average: the headline number is what the same set of dishes
+  // costs now versus before, so a $22 salmon counts for more than a $4 side.
+  // The per-dish average is kept beside it because they answer different
+  // questions and a reader who sees only one will assume it's the other.
+  return `<div class="order-reports-detail-summary">
+      Same basket of ${data.count} repriced dish${data.count === 1 ? "" : "es"}:
+      <strong>$${data.prevTotal.toFixed(2)} &rarr; $${data.curTotal.toFixed(2)}</strong>
+      (<span class="${pctClass(data.basketPct)}">${fmtPct(data.basketPct)}</span>),
+      averaging <span class="${pctClass(data.avgPct)}">${fmtPct(data.avgPct)}</span> per dish
+      &mdash; ${data.raised} raised${data.lowered ? `, ${data.lowered} lowered` : ""}.
+    </div>
+    ${blocks}`;
 }
 
 // One heart per band: 2 separate weeks, 3, then 4+. They overlap so the

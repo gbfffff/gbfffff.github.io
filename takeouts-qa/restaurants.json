@@ -9,6 +9,7 @@
       "mapUrl": "https://maps.app.goo.gl/CjWfEY3Wrm7jzwmn6",
       "address": "10413 Baltimore Ave, Beltsville, MD 20705",
       "menuUrl": "https://www.iloveyiayias.com/menu",
+      "priceUpdated": "2026-10-09",
       "menuImages": [
         "images/yiayias-menu-1.jpeg",
         "images/yiayias-menu-2.jpeg"
@@ -214,9 +215,14 @@
         },
         {
           "item": "Chicken Souvlaki Gyro",
-          "price": 10.95,
+          "price": 11.5,
+          "priceHistory": [
+            {
+              "price": 10.95
+            }
+          ],
           "combo": true,
-          "comboPrice": 4.25,
+          "comboPrice": 4.5,
           "comboSides": [
             "Jasmine Rice",
             "French Fries",
@@ -227,9 +233,14 @@
         },
         {
           "item": "Pork Gyro Stuffed With Fries",
-          "price": 10.95,
+          "price": 11.5,
+          "priceHistory": [
+            {
+              "price": 10.95
+            }
+          ],
           "combo": true,
-          "comboPrice": 4.25,
+          "comboPrice": 4.5,
           "comboSides": [
             "Jasmine Rice",
             "French Fries",
@@ -240,10 +251,15 @@
         },
         {
           "item": "Big Fat Gyro (Lamb)",
-          "price": 10.95,
+          "price": 11.5,
+          "priceHistory": [
+            {
+              "price": 10.95
+            }
+          ],
           "popular": true,
           "combo": true,
-          "comboPrice": 4.25,
+          "comboPrice": 4.5,
           "comboSides": [
             "Jasmine Rice",
             "French Fries",
@@ -254,9 +270,14 @@
         },
         {
           "item": "Keftethes Gyro",
-          "price": 10.95,
+          "price": 11.5,
+          "priceHistory": [
+            {
+              "price": 10.95
+            }
+          ],
           "combo": true,
-          "comboPrice": 4.25,
+          "comboPrice": 4.5,
           "comboSides": [
             "Jasmine Rice",
             "French Fries",
@@ -267,9 +288,14 @@
         },
         {
           "item": "Falafel Gyro",
-          "price": 10.5,
+          "price": 11.0,
+          "priceHistory": [
+            {
+              "price": 10.5
+            }
+          ],
           "combo": true,
-          "comboPrice": 4.25,
+          "comboPrice": 4.5,
           "comboSides": [
             "Jasmine Rice",
             "French Fries",
@@ -280,9 +306,14 @@
         },
         {
           "item": "Zucchini Gyro",
-          "price": 10.5,
+          "price": 11.0,
+          "priceHistory": [
+            {
+              "price": 10.5
+            }
+          ],
           "combo": true,
-          "comboPrice": 4.25,
+          "comboPrice": 4.5,
           "comboSides": [
             "Jasmine Rice",
             "French Fries",
@@ -293,10 +324,15 @@
         },
         {
           "item": "Steak Souvlaki Gyro",
-          "price": 11.95,
+          "price": 12.5,
+          "priceHistory": [
+            {
+              "price": 11.95
+            }
+          ],
           "popular": true,
           "combo": true,
-          "comboPrice": 4.25,
+          "comboPrice": 4.5,
           "comboSides": [
             "Jasmine Rice",
             "French Fries",
@@ -307,9 +343,14 @@
         },
         {
           "item": "Grilled Shrimp Gyro",
-          "price": 11.95,
+          "price": 12.5,
+          "priceHistory": [
+            {
+              "price": 11.95
+            }
+          ],
           "combo": true,
-          "comboPrice": 4.25,
+          "comboPrice": 4.5,
           "comboSides": [
             "Jasmine Rice",
             "French Fries",
@@ -422,80 +463,145 @@
         },
         {
           "item": "Souvlaki Platter - Chicken",
-          "price": 17.5,
+          "price": 17.75,
+          "priceHistory": [
+            {
+              "price": 17.5
+            }
+          ],
           "desc": "Chicken souvlaki skewers served with rice, potatoes, salad, and pita",
           "category": "Platters & Entrees"
         },
         {
           "item": "Souvlaki Platter - Steak",
-          "price": 19.5,
+          "price": 19.75,
+          "priceHistory": [
+            {
+              "price": 19.5
+            }
+          ],
           "popular": true,
           "desc": "Steak souvlaki skewers served with rice, potatoes, salad, and pita",
           "category": "Platters & Entrees"
         },
         {
           "item": "Souvlaki Platter - Falafel",
-          "price": 17.5,
+          "price": 17.75,
+          "priceHistory": [
+            {
+              "price": 17.5
+            }
+          ],
           "desc": "Falafel skewers served with rice, potatoes, salad, and pita",
           "category": "Platters & Entrees"
         },
         {
           "item": "Gyro Platter - Lamb",
-          "price": 17.5,
+          "price": 17.75,
+          "priceHistory": [
+            {
+              "price": 17.5
+            }
+          ],
           "desc": "Sliced lamb gyro served with rice, potatoes, salad, and pita",
           "category": "Platters & Entrees"
         },
         {
           "item": "Gyro Platter - Pork",
-          "price": 17.5,
+          "price": 17.75,
+          "priceHistory": [
+            {
+              "price": 17.5
+            }
+          ],
           "desc": "Sliced pork gyro served with rice, potatoes, salad, and pita",
           "category": "Platters & Entrees"
         },
         {
           "item": "Keftethes Platter",
-          "price": 17.5,
+          "price": 17.75,
+          "priceHistory": [
+            {
+              "price": 17.5
+            }
+          ],
           "desc": "Grilled meatballs served with rice, potatoes, salad, and pita",
           "category": "Platters & Entrees"
         },
         {
           "item": "Moussaka",
-          "price": 16.5,
+          "price": 17.0,
+          "priceHistory": [
+            {
+              "price": 16.5
+            }
+          ],
           "desc": "Layered eggplant, seasoned ground beef, and b\u00e9chamel sauce, baked",
           "category": "Platters & Entrees"
         },
         {
           "item": "Pastichio",
-          "price": 16.5,
+          "price": 17.0,
+          "priceHistory": [
+            {
+              "price": 16.5
+            }
+          ],
           "desc": "Greek baked pasta with seasoned ground beef and b\u00e9chamel sauce",
           "category": "Platters & Entrees"
         },
         {
           "item": "Mixed Grill",
-          "price": 21.0,
+          "price": 21.25,
+          "priceHistory": [
+            {
+              "price": 21.0
+            }
+          ],
           "desc": "Assortment of grilled chicken, steak, and lamb with sides",
           "category": "Platters & Entrees"
         },
         {
           "item": "Shrimp Platter (1 skewer)",
-          "price": 16.0,
+          "price": 16.25,
+          "priceHistory": [
+            {
+              "price": 16.0
+            }
+          ],
           "desc": "One skewer of marinated grilled shrimp with rice, potatoes, salad, and pita",
           "category": "Platters & Entrees"
         },
         {
           "item": "Shrimp Platter (2 skewers)",
-          "price": 21.0,
+          "price": 21.25,
+          "priceHistory": [
+            {
+              "price": 21.0
+            }
+          ],
           "desc": "Two skewers of marinated grilled shrimp with rice, potatoes, salad, and pita",
           "category": "Platters & Entrees"
         },
         {
           "item": "Sampler Platter",
-          "price": 19.0,
+          "price": 19.25,
+          "priceHistory": [
+            {
+              "price": 19.0
+            }
+          ],
           "desc": "A taste of chicken, lamb, and pork with rice, potatoes, salad, and pita",
           "category": "Platters & Entrees"
         },
         {
           "item": "Grilled Salmon",
-          "price": 22.0,
+          "price": 23.0,
+          "priceHistory": [
+            {
+              "price": 22.0
+            }
+          ],
           "desc": "Fresh Atlantic salmon grilled with lemon, herbs, and olive oil",
           "category": "Platters & Entrees"
         },

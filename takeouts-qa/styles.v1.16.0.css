@@ -3557,6 +3557,68 @@
     body.dark .order-reports-widget:hover { background: rgba(255,255,255,0.08); }
     body.dark .order-reports-bar-track { background: rgba(255,255,255,0.12); }
 
+    /* ── Menu price changes: badge beside a price, + the Price Changes report ── */
+    .mpi-price-delta {
+      display: inline-block;
+      margin-left: 0.4rem;
+      padding: 0.05rem 0.3rem;
+      border: 1.5px solid currentColor;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      vertical-align: 0.08em;
+    }
+    .mpi-price-delta.is-up   { color: var(--red); }
+    .mpi-price-delta.is-down { color: var(--green); }
+    /* A menu row inverts to accent-on-black on hover and forces its text
+       color with !important; the badge keeps its own red/green through that,
+       so it has to win the same fight rather than inherit the inversion. */
+    .mpi:hover .mpi-price-delta.is-up   { color: var(--red) !important; }
+    .mpi:hover .mpi-price-delta.is-down { color: var(--green) !important; }
+
+    .price-change-block { margin-bottom: 1.35rem; }
+    .price-change-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.3rem;
+    }
+    .price-change-restaurant { font-weight: 900; font-size: 0.95rem; }
+    .price-change-head-pct   { font-weight: 900; font-size: 0.95rem; white-space: nowrap; }
+    .price-change-sub {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      padding: 0.35rem 0 0.65rem;
+      line-height: 1.45;
+    }
+    .order-reports-bar-row.price-change-row { grid-template-columns: 9rem 1fr 8.5rem 3.6rem; }
+    .price-change-prices {
+      text-align: right;
+      white-space: nowrap;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .price-change-pct { text-align: right; font-weight: 800; white-space: nowrap; }
+
+    .price-change-pct.is-up,
+    .price-change-head-pct.is-up,
+    .order-reports-detail-summary .is-up   { color: var(--red); }
+    .price-change-pct.is-down,
+    .price-change-head-pct.is-down,
+    .order-reports-detail-summary .is-down { color: var(--green); }
+    .order-reports-bar-fill.is-up   { background: var(--red); }
+    .order-reports-bar-fill.is-down { background: var(--green); }
+
+    @media (max-width: 560px) {
+      /* The track is the first thing to drop when there's no room -- the
+         numbers on either side of it carry the actual information. Hiding
+         it also takes it out of the grid, so three columns is correct. */
+      .order-reports-bar-row.price-change-row { grid-template-columns: 1fr 7.5rem 3.4rem; }
+      .order-reports-bar-row.price-change-row .order-reports-bar-track { display: none; }
+    }
+
     /* ── Restaurant stats: Visits / Orders / Rating columns ── */
     .order-reports-restaurants-head {
       font-size: 0.62rem;
