@@ -11,6 +11,7 @@
       "menuUrl": "https://www.iloveyiayias.com/menu",
       "priceUpdated": "2026-10-09",
       "menuImages": [
+        "images/yiayias-menu-0.jpeg",
         "images/yiayias-menu-1.jpeg",
         "images/yiayias-menu-2.jpeg"
       ],
@@ -23,13 +24,23 @@
         },
         {
           "item": "Spanakopita",
-          "price": 9.95,
+          "price": 10.5,
+          "priceHistory": [
+            {
+              "price": 9.95
+            }
+          ],
           "desc": "Spinach, leeks, feta cheese, herbs in puff pastry",
           "category": "Appetizers"
         },
         {
           "item": "Tyropita",
-          "price": 7.95,
+          "price": 8.25,
+          "priceHistory": [
+            {
+              "price": 7.95
+            }
+          ],
           "desc": "Feta cheese and herbs in puff pastry",
           "category": "Appetizers"
         },
@@ -59,7 +70,12 @@
         },
         {
           "item": "Dolmades",
-          "price": 9.5,
+          "price": 9.75,
+          "priceHistory": [
+            {
+              "price": 9.5
+            }
+          ],
           "desc": "Vine leaves stuffed with ground beef, rice, and avgolemono sauce",
           "category": "Appetizers"
         },
@@ -71,25 +87,45 @@
         },
         {
           "item": "Tzatziki Dip",
-          "price": 6.5,
+          "price": 6.75,
+          "priceHistory": [
+            {
+              "price": 6.5
+            }
+          ],
           "desc": "Greek yogurt, cucumber, garlic, dill, and lemon, served with pita wedges",
           "category": "Dips"
         },
         {
           "item": "Hummus Dip",
-          "price": 6.5,
+          "price": 6.75,
+          "priceHistory": [
+            {
+              "price": 6.5
+            }
+          ],
           "desc": "Whipped chickpea, lemon, garlic, and fresh herbs, served with pita wedges",
           "category": "Dips"
         },
         {
           "item": "Spicy Feta Dip",
-          "price": 6.5,
+          "price": 6.75,
+          "priceHistory": [
+            {
+              "price": 6.5
+            }
+          ],
           "desc": "Whipped imported feta with roasted jalape\u00f1o, garlic, and fresh herbs, served with pita wedges",
           "category": "Dips"
         },
         {
           "item": "Melitzanosalata Dip",
-          "price": 6.5,
+          "price": 6.75,
+          "priceHistory": [
+            {
+              "price": 6.5
+            }
+          ],
           "desc": "Roasted eggplant, garlic, lemon, and extra virgin olive oil, served with pita wedges",
           "category": "Dips"
         },
@@ -143,7 +179,12 @@
         },
         {
           "item": "Yia Yia's Salad",
-          "price": 9.95,
+          "price": 10.5,
+          "priceHistory": [
+            {
+              "price": 9.95
+            }
+          ],
           "desc": "Romaine, tomato, kalamata olives, imported feta, cucumbers, red onion, peppers, lemon olive oil vinaigrette, served with warm pita",
           "extras": [
             {
@@ -179,7 +220,12 @@
         },
         {
           "item": "Hortiatiki Village Salad",
-          "price": 9.75,
+          "price": 10.0,
+          "priceHistory": [
+            {
+              "price": 9.75
+            }
+          ],
           "desc": "No lettuce \u2014 tomato, cucumber, onion, imported feta, kalamata olives, peppers, lemon olive oil vinaigrette, served with warm pita, served with warm pita",
           "extras": [
             {
