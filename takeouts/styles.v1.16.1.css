@@ -568,7 +568,7 @@
     /* Real floating tooltip (JS-positioned, appended to <body>) instead of a
        CSS ::after -- .friday-calendar has overflow:hidden, which was
        clipping the old absolutely-positioned tooltip at the container edge. */
-    #override-flag-tooltip {
+    #floating-tooltip {
       display: none;
       position: fixed;
       background: #000;
@@ -580,7 +580,7 @@
       padding: 0.5rem 0.75rem;
       width: max-content;
       max-width: 200px;
-      white-space: normal;
+      white-space: pre-line;
       text-align: center;
       border: 1px solid var(--accent);
       z-index: 500;
@@ -3560,13 +3560,15 @@
     /* ── Menu price changes: badge beside a price, + the Price Changes report ── */
     .mpi-price-delta {
       display: inline-block;
-      margin-left: 0.4rem;
-      padding: 0.05rem 0.3rem;
-      border: 1.5px solid currentColor;
-      font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.02em;
-      vertical-align: 0.08em;
+      margin-left: 0.3rem;
+      font-size: 0.6rem;
+      line-height: 1;
+      vertical-align: 0.12em;
+      cursor: help;
+      /* The glyph is the whole control, so give it a bit of slack to aim
+         at without letting it push the price around. */
+      padding: 0.15rem;
+      margin-right: -0.15rem;
     }
     .mpi-price-delta.is-up   { color: var(--red); }
     .mpi-price-delta.is-down { color: var(--green); }
@@ -3575,6 +3577,25 @@
        so it has to win the same fight rather than inherit the inversion. */
     .mpi:hover .mpi-price-delta.is-up   { color: var(--red) !important; }
     .mpi:hover .mpi-price-delta.is-down { color: var(--green) !important; }
+
+    /* Per-date inflation on a collapsed Past Orders line, sitting just
+       left of that night's subtotal. */
+    .rh-price-delta {
+      font-size: 0.68rem;
+      font-weight: 800;
+      margin-right: 0.45rem;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      cursor: help;
+    }
+    .rh-price-delta.is-up   { color: var(--red); }
+    .rh-price-delta.is-down { color: var(--green); }
+    /* The header is a button that inverts on hover/open like the menu rows,
+       so the delta has to hold its own color through that. */
+    .report-history-header:hover .rh-price-delta.is-up,
+    .report-history-header.open  .rh-price-delta.is-up   { color: var(--red) !important; }
+    .report-history-header:hover .rh-price-delta.is-down,
+    .report-history-header.open  .rh-price-delta.is-down { color: var(--green) !important; }
 
     .price-change-block { margin-bottom: 1.35rem; }
     .price-change-head {

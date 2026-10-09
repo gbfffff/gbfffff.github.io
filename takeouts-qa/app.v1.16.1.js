@@ -40,8 +40,15 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.16.0";
+const APP_VERSION = "1.16.1";
 const CHANGELOG = [
+  { version: "1.16.1", date: "2026-10-09", notes: [
+    "Yia Yia's appetizers, dips and salads updated from the reprint's first page, which had been missing from the menu images entirely -- nine more dishes moved, the four dips going 6.50 to 6.75 while the 3-dip Sampler held at 11.00",
+    "The price-change marker in the menu is now a bare red arrow instead of a percentage pill. The old price and the percentage moved into a hover tooltip, so a repriced menu reads as a column of small marks rather than numbers competing with the prices themselves",
+    "A collapsed Past Orders date line now carries that night's inflation, so you can see what the same order would cost today without opening the group. Hover it for the old total and how many of the night's dishes actually moved",
+    "That figure is the whole basket, not an average of the dishes: a night where one dish of three went up 5% reads as the ~1.7% the bill actually moved. It's a ratio, so the Tax toggle doesn't change it",
+    "The rotation override's floating tooltip is now shared by anything with a data-tip, which is what keeps the new price tooltips from being clipped by the menu panel's scroll box",
+  ]},
   { version: "1.16.0", date: "2026-10-09", notes: [
     "Yia Yia's prices updated from their new menu -- gyros are up $0.50-0.55, the platters $0.25 across the board (Grilled Salmon $1.00), and the combo upcharge went $4.25 to $4.50",
     "A dish whose price we've seen change now shows a small +/-% pill next to its price in the menu, so a reprint reads as \"the gyro went up 5%\" instead of just a number that's different from the one you remember. Hover it for the old price and what it's measured since",
@@ -2222,17 +2229,20 @@ function priceChangeFor(item, restaurant) {
   };
 }
 
-// Small "+5.0%" pill shown beside a price in the menu panel. Only rendered
-// when there's a real move, so an unchanged menu stays visually quiet.
+// A bare red arrow beside a price in the menu panel -- the number itself
+// lives in the hover tooltip, so a repriced menu reads as a column of
+// small marks rather than a wall of percentages competing with the prices.
+// Only rendered when there's a real move, so an unchanged menu stays quiet.
 function priceDeltaBadgeHtml(change) {
   if (!change) return "";
   const up  = change.pct > 0;
   const pct = Math.abs(change.pct) < 0.05 ? "0.0" : Math.abs(change.pct).toFixed(1);
   const when = change.since
-    ? ` as of ${change.sinceIsOrder ? "our last order on " : ""}${fmtRatingDate(change.since)}`
-    : " on the previous menu";
-  const title = `was $${change.prev.toFixed(2)}${when}`;
-  return `<span class="mpi-price-delta ${up ? "is-up" : "is-down"}" title="${escAttr(title)}">${up ? "+" : "−"}${pct}%</span>`;
+    ? `${change.sinceIsOrder ? "since our last order on " : "since "}${fmtRatingDate(change.since)}`
+    : "on the previous menu";
+  // \n renders because the floating tooltip is white-space: pre-line.
+  const tip = `was $${change.prev.toFixed(2)}  ${up ? "+" : "−"}${pct}%\n${when}`;
+  return `<span class="mpi-price-delta ${up ? "is-up" : "is-down"}" data-tip="${escAttr(tip)}" role="img" aria-label="${escAttr(tip.replace(/\n/g, ", "))}">${up ? "&#9650;" : "&#9660;"}</span>`;
 }
 
 // Every recorded price move across the whole rotation, newest menu first.
@@ -4821,12 +4831,14 @@ document.getElementById("restaurant-toggle-btn")?.addEventListener("click", () =
   panel?.classList.toggle("open", open);
 });
 
-// Floating override tooltip: positioned via JS and appended to <body> so
-// .friday-calendar's overflow:hidden can't clip it at the table edge.
+// Shared floating tooltip for anything carrying data-tip: positioned via
+// JS and parked at the top level of <body> so neither .friday-calendar's
+// overflow:hidden nor the menu panel's own scroll box can clip it at the
+// edge. Used by the rotation override flag and the menu price arrows.
 document.addEventListener("mouseover", e => {
-  const tip = document.getElementById("override-flag-tooltip");
+  const tip = document.getElementById("floating-tooltip");
   if (!tip) return;
-  const flag = e.target.closest?.(".fcal-override-flag");
+  const flag = e.target.closest?.("[data-tip]");
   if (!flag) { tip.style.display = "none"; return; }
 
   tip.textContent = flag.dataset.tip || "";
@@ -4839,6 +4851,13 @@ document.addEventListener("mouseover", e => {
   if (top < 8) top = fr.bottom + 8;
   tip.style.left = `${left}px`;
   tip.style.top  = `${top}px`;
+});
+
+// mouseover alone never fires again if the pointer leaves the window
+// straight off a tip target, which would strand the tooltip on screen.
+document.documentElement.addEventListener("mouseleave", () => {
+  const tip = document.getElementById("floating-tooltip");
+  if (tip) tip.style.display = "none";
 });
 
 document.getElementById("order-complete-btn").addEventListener("click", async () => {
@@ -5174,16 +5193,37 @@ function computeDateBreakdown() {
     }
   });
 
+  const restaurantObj = findRestaurantByName(_reportRestaurant);
+
   return [...byDate.entries()].map(([date, entries]) => {
     const items = [...entries.values()].map(e => {
       const resolvedPrice = resolveItemPrice(e.item, _reportMenu);
       const price = resolvedPrice || null;
+      // The recorded change is against the dish's base price, but what got
+      // billed may be a size/protein variant, so carry the move across as a
+      // ratio rather than subtracting a flat base-price difference.
+      const menuItem = findMenuItem(e.item, _reportMenu);
+      const change   = menuItem ? priceChangeFor(menuItem, restaurantObj) : null;
       // Ratings have no name column (kept anonymous even in the raw sheet),
       // so a per-person rating can no longer be looked up here at all.
-      return { person: e.person, item: e.item, qty: e.qty || 1, price };
+      return { person: e.person, item: e.item, qty: e.qty || 1, price, change };
     }).sort((a, b) => a.person.localeCompare(b.person) || a.item.localeCompare(b.item));
     const subtotal = items.reduce((sum, it) => sum + (it.price ? it.price * it.qty : 0), 0);
-    return { date, items, subtotal };
+    // What this same order would have cost at the previous prices. Dishes
+    // that never moved count unchanged on both sides, so a night where only
+    // one dish was repriced correctly reads as a small rise, not that
+    // dish's full jump. Market-price lines carry no price either way.
+    const prevSubtotal = items.reduce((sum, it) => {
+      if (!it.price) return sum;
+      const was = it.change ? it.price * (it.change.prev / it.change.cur) : it.price;
+      return sum + was * it.qty;
+    }, 0);
+    const movedCount = items.filter(it => it.price && it.change).length;
+    // Tax-invariant (it's a ratio), so it stays correct under the Tax toggle.
+    const pct = (movedCount && prevSubtotal > 0)
+      ? ((subtotal - prevSubtotal) / prevSubtotal) * 100
+      : null;
+    return { date, items, subtotal, prevSubtotal, movedCount, pct };
   }).sort((a, b) => b.date.localeCompare(a.date));
 }
 
@@ -5220,10 +5260,21 @@ function renderReportHistory(groups, showNames, showTax) {
         <span class="report-history-item-meta">${priceLabel}</span>
       </div>`;
     }).join("");
+    // How much more (or less) this same order would cost at today's prices,
+    // shown on the collapsed line so a night's inflation reads without
+    // having to open the group.
+    const pctHtml = g.pct === null ? "" : (() => {
+      const up   = g.pct > 0;
+      const was  = (showTax ? g.prevSubtotal * TAX_RATE : g.prevSubtotal).toFixed(2);
+      const size = `${g.movedCount} of ${g.items.length} dish${g.items.length === 1 ? "" : "es"} repriced`;
+      const tip  = `was $${was} for this order\n${size}`;
+      return `<span class="rh-price-delta ${up ? "is-up" : "is-down"}" data-tip="${escAttr(tip)}">`
+        + `${up ? "&#9650;" : "&#9660;"}${Math.abs(g.pct) < 0.05 ? "0.0" : Math.abs(g.pct).toFixed(1)}%</span>`;
+    })();
     return `<div class="report-history-group">
       <button type="button" class="report-history-header${open ? " open" : ""}" data-date="${escAttr(g.date)}">
         <span>${esc(fmtRatingDate(g.date))}</span>
-        <span>${subtotal ? `$${subtotal.toFixed(2)} ` : ""}<span class="report-history-arrow">&#9660;</span></span>
+        <span>${pctHtml}${subtotal ? `$${subtotal.toFixed(2)} ` : ""}<span class="report-history-arrow">&#9660;</span></span>
       </button>
       <div class="report-history-body${open ? " open" : ""}">${rows}</div>
     </div>`;
