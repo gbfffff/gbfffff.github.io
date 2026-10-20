@@ -275,7 +275,22 @@
             "House Salad"
           ],
           "desc": "Grilled chicken souvlaki in pita with tomato, onion, tzatziki, and herbs",
-          "category": "Gyros"
+          "category": "Gyros",
+          "comboPriceHistory": [
+            {
+              "price": 4.25
+            }
+          ],
+          "extras": [
+            {
+              "name": "Extra Sauce",
+              "price": 0.5
+            },
+            {
+              "name": "Add Feta",
+              "price": 0.75
+            }
+          ]
         },
         {
           "item": "Pork Gyro Stuffed With Fries",
@@ -293,7 +308,22 @@
             "House Salad"
           ],
           "desc": "Pork gyro stuffed with crispy fries, tomato, onion, tzatziki, and herbs",
-          "category": "Gyros"
+          "category": "Gyros",
+          "comboPriceHistory": [
+            {
+              "price": 4.25
+            }
+          ],
+          "extras": [
+            {
+              "name": "Extra Sauce",
+              "price": 0.5
+            },
+            {
+              "name": "Add Feta",
+              "price": 0.75
+            }
+          ]
         },
         {
           "item": "Big Fat Gyro (Lamb)",
@@ -312,7 +342,22 @@
             "House Salad"
           ],
           "desc": "Generous lamb gyro in pita with tomato, onion, tzatziki, and herbs",
-          "category": "Gyros"
+          "category": "Gyros",
+          "comboPriceHistory": [
+            {
+              "price": 4.25
+            }
+          ],
+          "extras": [
+            {
+              "name": "Extra Sauce",
+              "price": 0.5
+            },
+            {
+              "name": "Add Feta",
+              "price": 0.75
+            }
+          ]
         },
         {
           "item": "Keftethes Gyro",
@@ -330,7 +375,22 @@
             "House Salad"
           ],
           "desc": "Grilled meatballs in pita with tomato, onion, tzatziki, and herbs",
-          "category": "Gyros"
+          "category": "Gyros",
+          "comboPriceHistory": [
+            {
+              "price": 4.25
+            }
+          ],
+          "extras": [
+            {
+              "name": "Extra Sauce",
+              "price": 0.5
+            },
+            {
+              "name": "Add Feta",
+              "price": 0.75
+            }
+          ]
         },
         {
           "item": "Falafel Gyro",
@@ -348,7 +408,22 @@
             "House Salad"
           ],
           "desc": "Crispy falafel in pita with tomato, onion, tzatziki, and herbs",
-          "category": "Gyros"
+          "category": "Gyros",
+          "comboPriceHistory": [
+            {
+              "price": 4.25
+            }
+          ],
+          "extras": [
+            {
+              "name": "Extra Sauce",
+              "price": 0.5
+            },
+            {
+              "name": "Add Feta",
+              "price": 0.75
+            }
+          ]
         },
         {
           "item": "Zucchini Gyro",
@@ -366,7 +441,22 @@
             "House Salad"
           ],
           "desc": "Fried zucchini in pita with tomato, onion, tzatziki, and herbs",
-          "category": "Gyros"
+          "category": "Gyros",
+          "comboPriceHistory": [
+            {
+              "price": 4.25
+            }
+          ],
+          "extras": [
+            {
+              "name": "Extra Sauce",
+              "price": 0.5
+            },
+            {
+              "name": "Add Feta",
+              "price": 0.75
+            }
+          ]
         },
         {
           "item": "Steak Souvlaki Gyro",
@@ -385,7 +475,22 @@
             "House Salad"
           ],
           "desc": "Grilled steak souvlaki in pita with tomato, onion, tzatziki, and herbs",
-          "category": "Gyros"
+          "category": "Gyros",
+          "comboPriceHistory": [
+            {
+              "price": 4.25
+            }
+          ],
+          "extras": [
+            {
+              "name": "Extra Sauce",
+              "price": 0.5
+            },
+            {
+              "name": "Add Feta",
+              "price": 0.75
+            }
+          ]
         },
         {
           "item": "Grilled Shrimp Gyro",
@@ -403,7 +508,22 @@
             "House Salad"
           ],
           "desc": "Marinated grilled shrimp in pita with tomato, onion, tzatziki, and herbs",
-          "category": "Gyros"
+          "category": "Gyros",
+          "comboPriceHistory": [
+            {
+              "price": 4.25
+            }
+          ],
+          "extras": [
+            {
+              "name": "Extra Sauce",
+              "price": 0.5
+            },
+            {
+              "name": "Add Feta",
+              "price": 0.75
+            }
+          ]
         },
         {
           "item": "Yia Yias Fries",
@@ -668,6 +788,21 @@
           "price": 4.25,
           "desc": "Traditional Greek rice pudding with cinnamon",
           "category": "Desserts"
+        },
+        {
+          "item": "Kids Meal (Chicken Tenders or Keftethes)",
+          "price": 10.0,
+          "desc": "Served with fries. Choice of chicken tenders or keftethes (grilled meatballs)",
+          "orOptions": [
+            "Chicken Tenders",
+            "Keftethes"
+          ],
+          "category": "Kids",
+          "priceHistory": [
+            {
+              "price": 9.0
+            }
+          ]
         }
       ]
     },
