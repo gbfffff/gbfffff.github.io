@@ -115,7 +115,7 @@
               "price": 6.5
             }
           ],
-          "desc": "Whipped imported feta with roasted jalape\u00f1o, garlic, and fresh herbs, served with pita wedges",
+          "desc": "Whipped imported feta with roasted jalapeño, garlic, and fresh herbs, served with pita wedges",
           "category": "Dips"
         },
         {
@@ -226,7 +226,7 @@
               "price": 9.75
             }
           ],
-          "desc": "No lettuce \u2014 tomato, cucumber, onion, imported feta, kalamata olives, peppers, lemon olive oil vinaigrette, served with warm pita, served with warm pita",
+          "desc": "No lettuce — tomato, cucumber, onion, imported feta, kalamata olives, peppers, lemon olive oil vinaigrette, served with warm pita, served with warm pita",
           "extras": [
             {
               "name": "Gyro Meat",
@@ -515,7 +515,7 @@
               "price": 17.5
             }
           ],
-          "desc": "Chicken souvlaki skewers served with rice, potatoes, salad, and pita",
+          "desc": "Marinated and grilled chicken souvlaki, served with jasmine rice, Greek salad, and warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -527,7 +527,7 @@
             }
           ],
           "popular": true,
-          "desc": "Steak souvlaki skewers served with rice, potatoes, salad, and pita",
+          "desc": "Marinated and grilled steak souvlaki, served with jasmine rice, Greek salad, and warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -538,7 +538,7 @@
               "price": 17.5
             }
           ],
-          "desc": "Falafel skewers served with rice, potatoes, salad, and pita",
+          "desc": "Marinated and grilled falafel, served with jasmine rice, Greek salad, and warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -549,7 +549,7 @@
               "price": 17.5
             }
           ],
-          "desc": "Sliced lamb gyro served with rice, potatoes, salad, and pita",
+          "desc": "Tender slices of lamb gyro meat, served with jasmine rice, Greek salad, and warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -560,7 +560,7 @@
               "price": 17.5
             }
           ],
-          "desc": "Sliced pork gyro served with rice, potatoes, salad, and pita",
+          "desc": "Tender slices of pork gyro meat, served with jasmine rice, Greek salad, and warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -571,7 +571,7 @@
               "price": 17.5
             }
           ],
-          "desc": "Grilled meatballs served with rice, potatoes, salad, and pita",
+          "desc": "Seasoned Greek beef meatballs, served with jasmine rice, Greek salad, and warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -582,7 +582,7 @@
               "price": 16.5
             }
           ],
-          "desc": "Layered eggplant, seasoned ground beef, and b\u00e9chamel sauce, baked",
+          "desc": "Alternating layers of eggplant, potato, and zucchini with seasoned meat sauce, topped with béchamel. Served with Greek salad and warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -593,7 +593,7 @@
               "price": 16.5
             }
           ],
-          "desc": "Greek baked pasta with seasoned ground beef and b\u00e9chamel sauce",
+          "desc": "Layers of pasta and seasoned meat sauce topped with béchamel. Served with Greek salad and warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -604,7 +604,7 @@
               "price": 21.0
             }
           ],
-          "desc": "Assortment of grilled chicken, steak, and lamb with sides",
+          "desc": "Grilled chicken skewer, steak skewer, gyro meat, and grilled meatballs, served over crispy fries with warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -615,7 +615,7 @@
               "price": 16.0
             }
           ],
-          "desc": "One skewer of marinated grilled shrimp with rice, potatoes, salad, and pita",
+          "desc": "One skewer of marinated and grilled shrimp, served with jasmine rice, Greek salad, and warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -626,7 +626,7 @@
               "price": 21.0
             }
           ],
-          "desc": "Two skewers of marinated grilled shrimp with rice, potatoes, salad, and pita",
+          "desc": "Two skewers of marinated and grilled shrimp, served with jasmine rice, Greek salad, and warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -637,7 +637,7 @@
               "price": 19.0
             }
           ],
-          "desc": "A taste of chicken, lamb, and pork with rice, potatoes, salad, and pita",
+          "desc": "Spanakopita, tyropita, dolmades, moussaka, and hummus with warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -648,7 +648,7 @@
               "price": 22.0
             }
           ],
-          "desc": "Fresh Atlantic salmon grilled with lemon, herbs, and olive oil",
+          "desc": "Marinated grilled salmon, served with jasmine rice, Greek salad, and warm pita",
           "category": "Platters & Entrees"
         },
         {
@@ -2633,7 +2633,8 @@
         {
           "item": "Salty Duck Shanghai Style (Dim Sum) 食尚鹽水鴨（點心）",
           "price": 9.95,
-          "category": "Dim Sum & Snacks"
+          "category": "Dim Sum & Snacks",
+          "outOfStock": true
         },
         {
           "item": "Jelly Fish Salad 蔥油海蜇",
@@ -2668,7 +2669,8 @@
         {
           "item": "Spicy Pork Ears 麻辣豬耳",
           "price": 11.95,
-          "category": "Dim Sum & Snacks"
+          "category": "Dim Sum & Snacks",
+          "outOfStock": true
         },
         {
           "item": "Tofu with Preserved Egg 皮蛋豆腐",
@@ -2842,6 +2844,144 @@
               "price": 10.95
             }
           ]
+        },
+        {
+          "item": "Chicken or Shrimp with String Beans 四季豆雞/蝦 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Beef with Broccoli 芥蘭牛 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special",
+          "desc": "Tender beef and crisp broccoli in savory sauce."
+        },
+        {
+          "item": "Sweet & Sour Chicken 甜酸雞 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Chicken with Scallions 蔥爆雞片 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Tofu with Basil 九層塔豆腐 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Pork Chop with Spiced Salt 椒鹽排骨 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special",
+          "desc": "Crispy pork chop seasoned with spiced salt."
+        },
+        {
+          "item": "Orange Chicken with Rice 陳皮雞 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Tofu with Vegetable 素菜豆腐 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Kung Pao Chicken 宮保雞 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special",
+          "desc": "Spicy stir-fried chicken with peanuts and chili."
+        },
+        {
+          "item": "Hunan Chicken 湖南雞 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Pork with Garlic Sauce 魚香肉絲 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Shrimp Chow Mein 蝦炒麵 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Basil Chicken with Rice 九層塔雞 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Moo Goo Gai Pan 毛菇雞 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "General Tso's Chicken 左公雞 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Hunan Shrimp 湖南蝦 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Shredded Pork with Bean Curd 香干肉絲 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Szechuan Chicken 四川雞 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Curry Chicken 咖喱雞 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Chicken Chow Mein 雞炒麵 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Sweet and Sour Shrimp 甜酸蝦 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Lemon Chicken 檸檬雞 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Chicken with Broccoli 芥蘭雞 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Beef with Green Pepper 青椒牛 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Shrimp with Hot Garlic Sauce 魚香蝦 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Fish Fillet with Spiced Salt 椒鹽魚片 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
+        },
+        {
+          "item": "Triple Delight 炒三鮮 (Lunch)",
+          "price": 10.95,
+          "category": "Lunch Special"
         }
       ]
     },

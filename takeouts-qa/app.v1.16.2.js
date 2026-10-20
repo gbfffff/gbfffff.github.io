@@ -40,8 +40,15 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.16.1";
+const APP_VERSION = "1.16.2";
 const CHANGELOG = [
+  { version: "1.16.2", date: "2026-10-20", notes: [
+    "Fixed a dish whose own name ends in brackets being priced as a different dish. Ordering the 2-skewer Shrimp Platter at Yia Yia's has been billing $16.25 instead of $21.25 -- the pricing stripped \"(2 skewers)\" as though it were a choice of options, then matched the leftover \"Shrimp Platter\" to the 1-skewer one. An order line that is exactly a menu item is now settled as that item before any of that parsing runs",
+    "Ixtapalapa repriced off the Sept 2026 menu at ixtataqueria.com: every dish we had on file went up, +18.2% over the same basket, though that's four years of catching up rather than one reprint -- the prices we were carrying dated from July 2022. Also adds the kids menu, guacamole at market price, the burrito \"gringo options\", and the cocktails and cerveza list",
+    "Shanghai Taste repriced from their site: 207 of 220 dishes up, +6.1% over the same basket, two now marked out of stock. Matched on the Chinese name rather than the English, which is what caught General Tso's and Kung Pao being relabelled (Dark Meat)/(White Meat) rather than genuinely cheaper",
+    "Shanghai Taste's 28-dish Lunch Special section is now in the menu, suffixed \"(Lunch)\" so a lunch dish and its dinner twin stay separate -- they're the same dish at two prices, and without the suffix an order for either would have priced as whichever came first in the menu",
+    "Yia Yia's platter descriptions now match the printed menu. The Sampler Platter in particular said \"a taste of chicken, lamb and pork\" when it is in fact spanakopita, tyropita, dolmades, moussaka and hummus",
+  ]},
   { version: "1.16.1", date: "2026-10-09", notes: [
     "Yia Yia's appetizers, dips and salads updated from the reprint's first page, which had been missing from the menu images entirely -- nine more dishes moved, the four dips going 6.50 to 6.75 while the 3-dip Sampler held at 11.00",
     "The price-change marker in the menu is now a bare red arrow instead of a percentage pill. The old price and the percentage moved into a hover tooltip, so a repriced menu reads as a column of small marks rather than numbers competing with the prices themselves",
@@ -3944,6 +3951,22 @@ function bakedDelta(optionText) {
 // flat base price plus any baked-in deltas from a chosen orOptions/sidesPick
 // option (or 0 for non-price-affecting suffixes, like a free protein name).
 function resolveItemPrice(itemText, menu) {
+  // An order line that is itself, exactly, a menu item IS that item --
+  // settle that before any of the parenthetical parsing below. Otherwise a
+  // trailing "(...)" that belongs to the dish's own name gets stripped as
+  // though it were an options group, and the leftover base name resolves to
+  // a different dish: "Shrimp Platter (2 skewers)" billing as the 1-skewer
+  // one, or a "(Lunch)" special billing at its dinner price.
+  //
+  // Deliberately a strict name comparison rather than findMenuItem, whose
+  // startsWith fallbacks would also swallow genuine option groups --
+  // "Burrito Clasico (Carne Asada)" has to keep falling through to the
+  // group handling so the protein delta still gets added.
+  const list = menu || allMenuItems;
+  const exact = list.find(i => i.item === itemText)
+             || list.find(i => i.item.toLowerCase() === itemText.toLowerCase());
+  if (exact && exact.price != null) return Number(exact.price) || 0;
+
   const m = itemText.match(/^(.*)\s\((.+)\)$/);
   if (m) {
     const meta = findMenuItem(m[1].trim(), menu);
