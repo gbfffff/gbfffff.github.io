@@ -40,8 +40,12 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.16.2";
+const APP_VERSION = "1.16.3";
 const CHANGELOG = [
+  { version: "1.16.3", date: "2026-10-23", notes: [
+    "Fixed a new round opening already closed when the previous one was completed after its own Friday. Last week's Shanghai Taste round was logged on Saturday the 17th, and because the check looked at WHEN Order Complete was clicked rather than which round the entry was for, that Saturday landed inside this week's window and shut Ixtapalapa before anyone could order. The check now reads the entry's own date, so a late finish closes the round it belongs to and nothing else",
+    "The worksheet's \"orders placed before the last round ended\" filter is deliberately unchanged -- it wants the moment the previous round actually ended, whoever it belonged to, which is what keeps a Saturday order for last week out of this week's sheet",
+  ]},
   { version: "1.16.2", date: "2026-10-20", notes: [
     "Fixed a dish whose own name ends in brackets being priced as a different dish. Ordering the 2-skewer Shrimp Platter at Yia Yia's has been billing $16.25 instead of $21.25 -- the pricing stripped \"(2 skewers)\" as though it were a choice of options, then matched the leftover \"Shrimp Platter\" to the 1-skewer one. An order line that is exactly a menu item is now settled as that item before any of that parsing runs",
     "Ixtapalapa repriced off the Sept 2026 menu at ixtataqueria.com: every dish we had on file went up, +18.2% over the same basket, though that's four years of catching up rather than one reprint -- the prices we were carrying dated from July 2022. Also adds the kids menu, guacamole at market price, the burrito \"gringo options\", and the cocktails and cerveza list",
@@ -2005,8 +2009,49 @@ function getRoundCutoff(date) {
 // override starts a brand-new ordering session, cancelling any earlier
 // completion for everyone -- persistently, across reloads and devices --
 // until a fresh Order Complete is logged for the new round.
+// Shift a YYYY-MM-DD string by whole days. Done in UTC on the parsed
+// parts rather than by parsing into a local Date, so it can't slide a day
+// for viewers east of UTC.
+function shiftYMD(ymd, days) {
+  const [y, m, d] = ymd.split("-").map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d + days));
+  return `${t.getUTCFullYear()}-${String(t.getUTCMonth() + 1).padStart(2, "0")}-${String(t.getUTCDate()).padStart(2, "0")}`;
+}
+
+// The newest completion belonging to THIS round, judged by the History
+// rows' own Date column -- which says which round they're for -- rather
+// than by when Order Complete happened to be clicked.
+//
+// Those two diverge whenever a round is finished after its own Friday,
+// which is allowed: the worksheet stays open until Monday 6am ET. The
+// timestamp-based latestHistoryTimestampForWeek scans a window opening the
+// Saturday BEFORE this Friday, so a late completion for last week lands
+// inside this week's window and reads as this week being already done.
+// That is what shut the new round before it opened: the 2026-10-16
+// Shanghai Taste round was completed 10/17 08:30, which froze 2026-10-23
+// on arrival.
+//
+// Matched across Friday..Monday rather than on the Friday alone because an
+// overridden round logs the day it was actually completed (see
+// completedDate in the Order Complete handler), not the nominal Friday.
+// getRoundCutoff deliberately still uses the timestamp window: it wants
+// the instant the previous round ended, whichever round that was, so that
+// orders placed before it stay out of this week's worksheet.
+function latestCompletionForRound(friday) {
+  if (!friday) return 0;
+  const lastDay = shiftYMD(friday, 3); // Fri -> Sat -> Sun -> Mon
+  return _historyRows
+    .filter(r => {
+      const d = (r[1] || "").trim();
+      return d >= friday && d <= lastDay;
+    })
+    .map(r => new Date(r[0]).getTime())
+    .filter(t => !isNaN(t))
+    .reduce((a, b) => Math.max(a, b), 0);
+}
+
 function computeWeekComplete() {
-  const histTs = latestHistoryTimestampForWeek(currentFriday);
+  const histTs = latestCompletionForRound(currentFriday);
   const ovTs   = latestTimestampFor(_overrideRows, currentFriday);
   return histTs > 0 && histTs > ovTs;
 }
