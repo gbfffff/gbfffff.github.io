@@ -40,8 +40,16 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.16.3";
+const APP_VERSION = "1.17.0";
 const CHANGELOG = [
+  { version: "1.17.0", date: "2026-10-27", notes: [
+    "New Manage Rotation button beside Override Restaurant, behind the same PIN: take a restaurant out of the rotation or put it back, without editing the menu file or redeploying. A restaurant holding two slots (Shanghai Taste, Mi La Cay) goes out of both",
+    "Taking one out shortens the cycle rather than leaving a blank week -- its turns pass to whoever comes next, so every later week shifts up one",
+    "Because that re-maps which week lands on which restaurant, a change only starts applying from the following week. Otherwise taking out a restaurant that isn't even this week's would quietly swap this week's out from under anyone mid-order. To change the restaurant for this week specifically, that's still Override Restaurant",
+    "The Friday calendar now reports weeks we've already ordered from the History sheet instead of recomputing them, so rotation changes can't retroactively relabel weeks that already happened",
+    "The rotation list marks anything out with a struck-through name and an OUT badge, hover for the reason",
+    "Stored as rows on the existing Overrides sheet under a ROTATION:PAUSE / ROTATION:RESUME marker in place of a date -- append-only and latest-wins like a date override, so no new sheet, no new config and no Apps Script redeploy. Everything that reads overrides matches on a real Friday, so these rows are invisible to it",
+  ]},
   { version: "1.16.3", date: "2026-10-23", notes: [
     "Fixed a new round opening already closed when the previous one was completed after its own Friday. Last week's Shanghai Taste round was logged on Saturday the 17th, and because the check looked at WHEN Order Complete was clicked rather than which round the entry was for, that Saturday landed inside this week's window and shut Ixtapalapa before anyone could order. The check now reads the entry's own date, so a late finish closes the round it belongs to and nothing else",
     "The worksheet's \"orders placed before the last round ended\" filter is deliberately unchanged -- it wants the moment the previous round actually ended, whoever it belonged to, which is what keeps a Saturday order for last week out of this week's sheet",
@@ -295,7 +303,14 @@ const RESET_DAY_OF_WEEK = 1; // Monday (0=Sun..6=Sat)
 const RESET_HOUR_ET     = 6; // 6:00 AM
 
 function getThisFriday() {
-  const now = new Date(debugNow());
+  return fridayForInstant(debugNow());
+}
+
+// Which round (by its Friday) a given instant falls in -- the same
+// Monday-6am-ET boundary getThisFriday uses, just for an arbitrary time
+// rather than now. Used to work out when a rotation change was made.
+function fridayForInstant(instant) {
+  const now = new Date(instant);
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/New_York",
     year: "numeric", month: "2-digit", day: "2-digit",
@@ -349,6 +364,106 @@ function getRotationIndex(startDate, total) {
   return ((weeks % total) + total) % total;
 }
 
+// ── Rotation pause/resume ───────────────────────────────────────────────
+// Taking a restaurant out of the rotation is stored as a row on the
+// existing Overrides sheet, under a sentinel Date instead of a real one.
+// Everything that reads overrides matches r[1] against a YYYY-MM-DD
+// Friday, so these rows are invisible to that code and no new sheet, GID
+// or secret is needed -- and the Apps Script already appends whatever Date
+// it's handed, so it doesn't need redeploying either.
+//
+// Append-only with latest-row-wins per restaurant, exactly like a date
+// override, so resuming is just a newer row rather than an edit.
+const ROTATION_PAUSE_TAG  = "ROTATION:PAUSE";
+const ROTATION_RESUME_TAG = "ROTATION:RESUME";
+
+function rotationSlotName(raw) {
+  return ((raw && (raw.name || raw.ref)) || "").trim();
+}
+
+// The round a rotation change starts applying to: the one after the round
+// it was made in. Changing the set mid-round would re-map which week lands
+// on which restaurant, and that moves the CURRENT week too -- pausing Taco
+// Madre would quietly swap this Friday's restaurant to someone else, even
+// though Taco Madre wasn't this week's. Deferring a round keeps the week
+// people are already ordering for exactly as it was. Swapping this week
+// specifically is what Override Restaurant is for.
+function rotationChangeEffectiveFrom(ts) {
+  return toYMD(new Date(fridayForInstant(ts).getTime() + 7 * 24 * 60 * 60 * 1000));
+}
+
+// lowercased name -> { name, note, ts, effectiveFrom } for restaurants out
+// of the rotation. Pass a Friday to get the set as it applies to that
+// round; omit it for the latest state regardless of when it kicks in
+// (what the admin list and the rotation panel show).
+function getPausedRestaurants(forFriday) {
+  const latest = new Map();
+  _overrideRows.forEach(r => {
+    const tag = (r[1] || "").trim().toUpperCase();
+    if (tag !== ROTATION_PAUSE_TAG && tag !== ROTATION_RESUME_TAG) return;
+    const name = (r[2] || "").trim();
+    const ts   = new Date(r[0]).getTime();
+    if (!name || isNaN(ts)) return;
+    const from = rotationChangeEffectiveFrom(ts);
+    if (forFriday && from > forFriday) return; // not in effect for that round yet
+    const key  = name.toLowerCase();
+    const prev = latest.get(key);
+    if (!prev || ts >= prev.ts) {
+      latest.set(key, { name, ts, paused: tag === ROTATION_PAUSE_TAG, note: (r[3] || "").trim(), effectiveFrom: from });
+    }
+  });
+  const out = new Map();
+  latest.forEach((v, k) => { if (v.paused) out.set(k, v); });
+  return out;
+}
+
+function isRestaurantPaused(name) {
+  return getPausedRestaurants().has((name || "").trim().toLowerCase());
+}
+
+// Whole weeks between the rotation's start date and a given Friday.
+function weeksSinceStart(startDate, friday) {
+  const start = new Date(startDate + "T00:00:00");
+  const f = friday instanceof Date ? friday : new Date(friday + "T00:00:00");
+  return Math.round((f - start) / (7 * 24 * 60 * 60 * 1000));
+}
+
+// The rotation cycles over the slots that aren't paused, so pausing
+// shortens the cycle rather than leaving a blank week -- the paused
+// restaurant's turn passes to whoever comes next, which is the point of
+// taking it out. Note this re-maps which week lands on which restaurant;
+// the Friday calendar shows already-ordered weeks from History instead of
+// recomputing them, so past weeks keep saying what actually happened.
+//
+// A restaurant can hold more than one slot (the array is a schedule, not a
+// set -- Shanghai Taste and Mi La Cay each appear twice), and pausing by
+// name takes out every slot it holds.
+function activeRotationSlots(config, friday) {
+  const paused = getPausedRestaurants(friday);
+  const all = (config.restaurants || []).map((raw, i) => ({ raw, i }));
+  const active = all.filter(s => !paused.has(rotationSlotName(s.raw).toLowerCase()));
+  // Pausing every restaurant would leave nothing to schedule; fall back to
+  // the full list rather than divide by zero and strand the page on TBD.
+  return active.length ? active : all;
+}
+
+function rotationSlotFor(config, friday) {
+  const active = activeRotationSlots(config, friday instanceof Date ? toYMD(friday) : friday);
+  if (!active.length) return null;
+  const weeks = weeksSinceStart(config.startDate, friday);
+  return active[((weeks % active.length) + active.length) % active.length];
+}
+
+// What we actually ordered on a past Friday, straight from History, so
+// pausing something today can't rewrite weeks that already happened.
+// Overridden rounds log the day they were completed rather than the
+// nominal Friday, so this won't always find one -- callers fall back to
+// the computed rotation.
+function actualRestaurantFor(ymd) {
+  const row = _historyRows.find(r => (r[1] || "").trim() === ymd);
+  return row ? (row[2] || "").trim() : null;
+}
+
 // ── Load restaurant ─────────────────────────────────────────────────
 
 function buildFridayCalendar(config) {
@@ -356,19 +471,19 @@ function buildFridayCalendar(config) {
   const thisFri  = new Date(currentFriday + "T00:00:00");
   const year     = thisFri.getFullYear();
   const month    = thisFri.getMonth();
-  const total    = config.restaurants.length;
-  const startMs  = new Date(config.startDate + "T00:00:00").getTime();
-
   // Collect all Fridays in the current month
   const d = new Date(year, month, 1);
   while (d.getDay() !== 5) d.setDate(d.getDate() + 1);
   const rows = [];
   while (d.getMonth() === month) {
-    const ymd   = toYMD(d);
-    const weeks = Math.round((d.getTime() - startMs) / (7 * 24 * 60 * 60 * 1000));
-    const idx   = ((weeks % total) + total) % total;
-    const name  = config.restaurants[idx].name;
-    rows.push({ ymd, day: d.getDate(), mon: d.toLocaleDateString("en-US", { month: "short" }), name });
+    const ymd = toYMD(d);
+    // A week we've already ordered is reported from History rather than
+    // recomputed, so pausing a restaurant now can't retroactively relabel
+    // weeks that already happened.
+    const actual = ymd < currentFriday ? actualRestaurantFor(ymd) : null;
+    const slot   = rotationSlotFor(config, d);
+    const name   = actual || (slot ? rotationSlotName(slot.raw) : "TBD");
+    rows.push({ ymd, day: d.getDate(), mon: d.toLocaleDateString("en-US", { month: "short" }), name, actual: !!actual });
     d.setDate(d.getDate() + 7);
   }
 
@@ -395,18 +510,24 @@ function buildRotationPanel(config) {
   const panel = document.getElementById("rotation-panel");
   if (!btn || !panel || !config.restaurants?.length) return;
 
-  const total    = config.restaurants.length;
-  const curIdx   = getRotationIndex(config.startDate, total);
+  const curSlot = rotationSlotFor(config, getThisFriday());
+  const paused  = getPausedRestaurants();
 
   const rows = config.restaurants.map((r, i) => {
-    const cur     = i === curIdx;
+    const cur     = !!curSlot && curSlot.i === i;
     const name    = r.name || r.ref || "?";
+    const off     = paused.get(name.trim().toLowerCase());
     const cuisine = r.cuisine ? `<span class="rotation-cuisine">${esc(r.cuisine)}</span>` : "";
     const curArrow = cur ? `<span class="rotation-row-current-arrow" aria-hidden="true">&#9654;</span>` : "";
-    return `<div class="rotation-row${cur ? " rotation-row-current" : ""}" data-restaurant="${escAttr(name)}" title="View order history &amp; ratings for ${escAttr(name)}">
+    const offBadge = off
+      ? `<span class="rotation-paused-badge" data-tip="${escAttr("Out of rotation" + (off.note ? " \u2014 " + off.note : ""))}">OUT</span>`
+      : "";
+    const title = off ? `${name} is out of the rotation` : `View order history & ratings for ${name}`;
+    return `<div class="rotation-row${cur ? " rotation-row-current" : ""}${off ? " rotation-row-paused" : ""}" data-restaurant="${escAttr(name)}" title="${escAttr(title)}">
       <span class="rotation-idx">${i + 1}</span>
       ${curArrow}
       <span class="rotation-name">${esc(name)}</span>
+      ${offBadge}
       ${cuisine}
     </div>`;
   });
@@ -480,12 +601,15 @@ async function loadRestaurant() {
                                   // (not just the one on screen) can be
                                   // looked up, e.g. for the rotation-panel
                                   // report links.
+    // ?week=N still indexes the full list, paused entries included -- it's
+    // a "show me this restaurant's page" preview, and being able to look at
+    // one that's currently out is the useful behaviour.
     const weekParam = new URLSearchParams(location.search).get("week");
-    const idx  = weekParam !== null
-      ? ((parseInt(weekParam, 10) % config.restaurants.length) + config.restaurants.length) % config.restaurants.length
-      : getRotationIndex(config.startDate, config.restaurants.length);
-    const raw  = config.restaurants[idx];
-    restaurant = raw.ref
+    const slot = weekParam !== null
+      ? { raw: config.restaurants[((parseInt(weekParam, 10) % config.restaurants.length) + config.restaurants.length) % config.restaurants.length] }
+      : rotationSlotFor(config, getThisFriday());
+    const raw  = slot?.raw;
+    restaurant = raw?.ref
       ? config.restaurants.find(r => r.name === raw.ref) || raw
       : raw;
 
@@ -1835,6 +1959,9 @@ async function post(payload) {
 async function loadData() {
   await loadOrders();
   await Promise.all([loadHistory(), loadRatings()]);
+  // The calendar reports past weeks from History, which only lands here --
+  // loadRestaurant painted it before any of it was fetched.
+  if (_restaurantsConfig?.restaurants?.length) buildFridayCalendar(_restaurantsConfig);
   document.getElementById("last-updated").textContent =
     `Updated ${new Date().toLocaleTimeString()}`;
 }
@@ -5087,7 +5214,7 @@ function promptOverridePicker() {
   });
 }
 
-function promptOverrideReason(label) {
+function promptOverrideReason(label, message) {
   return new Promise(resolve => {
     const modal  = document.getElementById("override-reason-modal");
     const msg    = document.getElementById("override-reason-msg");
@@ -5095,7 +5222,7 @@ function promptOverrideReason(label) {
     const okBtn  = document.getElementById("override-reason-ok");
     const cancel = document.getElementById("override-reason-cancel");
 
-    msg.textContent = `Override this week's restaurant to ${label}? Everyone will see this change.`;
+    msg.textContent = message || `Override this week's restaurant to ${label}? Everyone will see this change.`;
     input.value = "";
     modal.style.display = "flex";
     markOverlayOpen("override-reason-modal");
@@ -5145,6 +5272,95 @@ document.getElementById("override-restaurant-btn")?.addEventListener("click", as
   } catch (err) {
     alert("Could not apply override — " + err.message);
   }
+});
+
+// ── Manage Rotation (PIN-gated) ─────────────────────────────────────────
+// Same PIN, same Overrides sheet and same append-only shape as a date
+// override -- this just writes the ROTATION:PAUSE / ROTATION:RESUME
+// sentinel instead of a Friday, so no new sheet or Apps Script deploy.
+function renderRotationAdminList() {
+  const list = document.getElementById("rotation-admin-list");
+  if (!list) return;
+  const paused  = getPausedRestaurants();                       // latest state
+  const inForce = getPausedRestaurants(currentFriday);           // applying this round
+  const names   = [...new Set((_restaurantsConfig?.restaurants || []).map(rotationSlotName).filter(Boolean))];
+  const active  = activeRotationSlots(_restaurantsConfig || { restaurants: [] }, currentFriday);
+  const nextFri = toYMD(new Date(new Date(currentFriday + "T00:00:00").getTime() + 7 * 864e5));
+  list.innerHTML = names.map(n => {
+    const off   = paused.get(n.toLowerCase());
+    const live  = inForce.has(n.toLowerCase());
+    const slots = (_restaurantsConfig.restaurants || []).filter(r => rotationSlotName(r) === n).length;
+    const bits  = [slots > 1 ? slots + " slots" : "1 slot"];
+    // A change made this round only starts applying next round, so say so
+    // rather than letting it look like nothing happened.
+    if (off && !live) bits.push("out from " + fmtRatingDate(off.effectiveFrom));
+    else if (off) bits.push("out of rotation");
+    if (off && off.note) bits.push(off.note);
+    return `<div class="rotation-admin-row${off ? " is-paused" : ""}">
+      <span class="rotation-admin-name">${esc(n)}<span class="rotation-admin-sub">${esc(bits.join(" \u00b7 "))}</span></span>
+      <button type="button" class="rotation-admin-toggle" data-name="${escAttr(n)}" data-pause="${off ? "0" : "1"}">${off ? "Put back" : "Take out"}</button>
+    </div>`;
+  }).join("") + `<div class="rotation-admin-count">${active.length} of ${(_restaurantsConfig?.restaurants || []).length} slots in rotation this week &middot; changes apply from ${esc(fmtRatingDate(nextFri))}</div>`;
+}
+
+async function setRotationPaused(name, pause, note) {
+  const tag = pause ? ROTATION_PAUSE_TAG : ROTATION_RESUME_TAG;
+  const row = [new Date().toISOString(), tag, name, note || ""];
+  if (MOCK_MODE) {
+    _mockOverrides.push(row);
+  } else {
+    if (!APPS_SCRIPT_URL) throw new Error("APPS_SCRIPT_URL not configured");
+    const params = new URLSearchParams({ type: "override", date: tag, restaurant: name, reason: note || "" });
+    await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { mode: "no-cors" });
+    // The CSV export lags a few seconds behind the write, so the refetch
+    // below would otherwise come back without this row and the change
+    // would appear to do nothing until a later reload.
+    _optimisticOverrides.push(row);
+  }
+  await loadRestaurant();
+  await loadData();
+  renderRotationAdminList();
+}
+
+document.getElementById("manage-rotation-btn")?.addEventListener("click", async () => {
+  const unlocked = await promptPin("Enter PIN to change the restaurant rotation.");
+  if (!unlocked) return;
+
+  const modal  = document.getElementById("rotation-admin-modal");
+  const list   = document.getElementById("rotation-admin-list");
+  const done   = document.getElementById("rotation-admin-cancel");
+  if (!modal || !list) return;
+
+  renderRotationAdminList();
+  modal.style.display = "flex";
+  markOverlayOpen("rotation-admin-modal");
+
+  function close() {
+    modal.style.display = "none";
+    markOverlayClosed("rotation-admin-modal");
+    list.removeEventListener("click", onClick);
+    done.removeEventListener("click", close);
+  }
+  async function onClick(e) {
+    const btn = e.target.closest(".rotation-admin-toggle");
+    if (!btn || btn.disabled) return;
+    const name  = btn.dataset.name;
+    const pause = btn.dataset.pause === "1";
+    const note  = pause
+      ? await promptOverrideReason(name, `Take ${name} out of the rotation from next week? Its turns pass to whoever comes next. This week is left alone \u2014 use Override Restaurant to change that.`)
+      : "";
+    if (pause && note === null) return; // cancelled
+    btn.disabled = true;
+    btn.textContent = "Saving\u2026";
+    try {
+      await setRotationPaused(name, pause, note);
+    } catch (err) {
+      alert("Could not update the rotation \u2014 " + err.message);
+      renderRotationAdminList();
+    }
+  }
+  list.addEventListener("click", onClick);
+  done.addEventListener("click", close);
 });
 
 const TAX_RATE = 1.06;

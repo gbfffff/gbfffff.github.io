@@ -3557,6 +3557,71 @@
     body.dark .order-reports-widget:hover { background: rgba(255,255,255,0.08); }
     body.dark .order-reports-bar-track { background: rgba(255,255,255,0.12); }
 
+    /* ── Rotation pause: panel state + the Manage Rotation dialog ── */
+    .rotation-row-paused .rotation-name { text-decoration: line-through; opacity: 0.55; }
+    .rotation-row-paused .rotation-idx,
+    .rotation-row-paused .rotation-cuisine { opacity: 0.45; }
+    .rotation-paused-badge {
+      font-size: 0.56rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      border: 1.5px solid currentColor;
+      padding: 0.05rem 0.25rem;
+      margin-left: 0.4rem;
+      color: var(--red);
+      cursor: help;
+      white-space: nowrap;
+    }
+
+    .rotation-admin-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      border: 2px solid #000;
+      padding: 0.45rem 0.55rem;
+      background: transparent;
+    }
+    .rotation-admin-row.is-paused { opacity: 0.6; }
+    .rotation-admin-row.is-paused .rotation-admin-name { text-decoration: line-through; }
+    .rotation-admin-name {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      color: #000;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.25;
+      min-width: 0;
+    }
+    .rotation-admin-sub {
+      font-size: 0.62rem;
+      font-weight: 600;
+      opacity: 0.7;
+      text-decoration: none;
+    }
+    .rotation-admin-toggle {
+      flex-shrink: 0;
+      border: 2px solid #000;
+      background: #000;
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.35rem 0.6rem;
+      cursor: pointer;
+    }
+    .rotation-admin-row.is-paused .rotation-admin-toggle { background: transparent; color: #000; }
+    .rotation-admin-toggle:disabled { opacity: 0.5; cursor: default; }
+    .rotation-admin-count {
+      color: #000;
+      font-size: 0.68rem;
+      font-weight: 700;
+      opacity: 0.7;
+      padding-top: 0.5rem;
+      text-align: center;
+    }
+
     /* ── Menu price changes: badge beside a price, + the Price Changes report ── */
     .mpi-price-delta {
       display: inline-block;
