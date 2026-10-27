@@ -40,8 +40,13 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.17.0";
+const APP_VERSION = "1.17.1";
 const CHANGELOG = [
+  { version: "1.17.1", date: "2026-10-27", notes: [
+    "Fixed driver swaps never showing up. The configured Drivers tab id was \"1\", which isn't a real tab, so every read failed while the writes kept landing in the sheet -- a swap made in one session vanished on reload and was never visible to anyone else. The Drivers tab is now read by name when the id doesn't resolve, so it works regardless of the setting",
+    "A few people had typed their name two ways in the order form over time, which quietly split their order history, their spend and their outstanding ratings. Haotong had a dish from 2026-10-09 stuck under the short spelling, unreachable while picking the long one. The spellings are now treated as one person on read, so either one finds everything; nothing in the sheets is rewritten",
+    "Sunnie and Sinnie are deliberately NOT treated as the same person -- unlike the others, both appear in the same round, so they're two people rather than one typo",
+  ]},
   { version: "1.17.0", date: "2026-10-27", notes: [
     "New Manage Rotation button beside Override Restaurant, behind the same PIN: take a restaurant out of the rotation or put it back, without editing the menu file or redeploying. A restaurant holding two slots (Shanghai Taste, Mi La Cay) goes out of both",
     "Taking one out shortens the cycle rather than leaving a blank week -- its turns pass to whoever comes next, so every later week shifts up one",
@@ -680,7 +685,16 @@ async function loadDrivers() {
   if (MOCK_MODE) { _driverRows = _mockDrivers; renderDriverCard(); return; }
   if (!DRIVERS_GID) { _driverRows = [..._optimisticDrivers]; renderDriverCard(); return; }
   try {
-    const csv = await fetchCSV(DRIVERS_GID);
+    let csv;
+    try {
+      csv = await fetchCSV(DRIVERS_GID);
+    } catch {
+      // Prod's DRIVERS_GID has been "1", which isn't a real tab, so every
+      // read 400'd: swaps silently never loaded while writes kept landing
+      // in the sheet. Reading the tab by name needs no gid, so this works
+      // whether or not the secret gets corrected.
+      csv = await fetchCSVByName("Drivers");
+    }
     _driverRows = parseCSV(csv).slice(1).concat(_optimisticDrivers);
   } catch {
     _driverRows = [..._optimisticDrivers];
@@ -2334,7 +2348,7 @@ function computeAllItemStats() {
     // same dish on a different week is what makes someone a regular --
     // quantity on one order doesn't: ordering three of something once is a
     // big appetite, not a habit.
-    const people = (r[5] || "").split(",").map(n => n.trim()).filter(Boolean);
+    const people = (r[5] || "").split(",").map(canonicalName).filter(Boolean);
     if (week) people.forEach(person => {
       const who = person.toLowerCase();
       if (!e.byPerson.has(who)) e.byPerson.set(who, new Set());
@@ -2590,7 +2604,7 @@ function computeAverageSpendPerPerson() {
     if (!restaurant || !item || !date) return;
     const menu = findRestaurantByName(restaurant)?.menu || allMenuItems;
     const price = resolveItemPrice(item, menu);
-    const people = (r[5] || "").split(",").map(n => n.trim()).filter(Boolean);
+    const people = (r[5] || "").split(",").map(canonicalName).filter(Boolean);
     // Post-fix History rows are already one-row-per-person (qty is that
     // person's own count); legacy pre-fix rows can still list several
     // names on one combined row, in which case each named person is
@@ -3745,13 +3759,13 @@ function isHistoryRowRated(r, name) {
 // reachable indefinitely instead of disappearing once the week rotates.
 // Sorted most-recent first.
 function getPendingRatings(name) {
-  const lname = name.trim().toLowerCase();
+  const lname = canonicalName(name).toLowerCase();
   const groups = new Map(); // "date|restaurant" -> Map(itemLower -> item)
   _historyRows.forEach(r => {
     const date       = (r[1] || "").trim();
     const restaurant = (r[2] || "").trim();
     const item       = (r[3] || "").trim();
-    const names      = (r[5] || "").split(",").map(n => n.trim().toLowerCase());
+    const names      = (r[5] || "").split(",").map(n => canonicalName(n).toLowerCase());
     if (!date || !item || item.startsWith("Sauce: ") || !names.includes(lname)) return;
     // Server-confirmed (Rated column) or optimistically-just-submitted
     // (localStorage, ahead of the History CSV catching up) both count.
@@ -3804,7 +3818,7 @@ function renderRatingCard() {
   // both show up separately claiming the exact same pending items.
   const namesByLower = new Map(); // lowercased -> first-seen original spelling
   _historyRows.forEach(r => {
-    (r[5] || "").split(",").map(n => n.trim()).filter(Boolean).forEach(n => {
+    (r[5] || "").split(",").map(canonicalName).filter(Boolean).forEach(n => {
       const key = n.toLowerCase();
       if (!namesByLower.has(key)) namesByLower.set(key, n);
     });
@@ -3958,7 +3972,7 @@ async function submitRatings(btn) {
     if (MOCK_MODE) {
       toSubmit.forEach(r => {
         _mockRatings.push([now, r.date, r.restaurant, r.item, r.slider.value]);
-        const lname = name.trim().toLowerCase();
+        const lname = canonicalName(name).toLowerCase();
         const histRow = _mockHistory.find(h =>
           h[1] === r.date && h[2] === r.restaurant && h[3] === r.item &&
           (h[5] || "").split(",").map(n => n.trim().toLowerCase()).includes(lname));
@@ -4260,12 +4274,12 @@ async function loadOrders() {
     });
     // Keep only the latest submission per person (for edits)
     const latest = new Map();
-    allRows.forEach(r => latest.set(r[1].trim().toLowerCase(), r));
+    allRows.forEach(r => latest.set(canonicalName(r[1]).toLowerCase(), r));
     const rows = [...latest.values()].filter(r => (r[2] ?? "").trim() !== "__deleted__");
 
     takenItems = {};
     rows.forEach(r => {
-      const name  = (r[1] ?? "").trim();
+      const name  = canonicalName(r[1]);
       // Split on commas that are NOT inside parentheses (handles "Gyro + Combo (Fries, Sprite)"),
       // then re-merge any menu items whose own name contains a comma.
       const orderText = (r[2] ?? "").replace(/ \| Notes:.*$/, ""); // strip notes suffix
@@ -4334,7 +4348,7 @@ function renderOrdersTable(dupCount) {
     const deadline = getOrderDeadline();
     const overrideActive = isOverrideActive();
     const trs = rows.map(r => {
-      const rowName    = (r[1] ?? "").trim();
+      const rowName    = canonicalName(r[1]);
       const items      = smartSplit(r[2] ?? "");
       const notes      = extractNotes(r[2] ?? "");
       const debugFakeTs = DEBUG_MODE ? _debugLateOverrides.get(rowName.toLowerCase()) : null;
@@ -4398,7 +4412,7 @@ function renderOrdersTable(dupCount) {
       // item without one are kept as separate lines, never merged.
       const groups = new Map();
       rows.forEach(r => {
-        const rowName = (r[1] ?? "").trim();
+        const rowName = canonicalName(r[1]);
         const notes   = extractNotes(r[2] ?? "");
         smartSplit(r[2] ?? "").forEach(item => {
           const key = `${item.toLowerCase()}||${notes.toLowerCase()}`;
@@ -4502,6 +4516,43 @@ async function fetchCSV(gid) {
   const text = await res.text();
   console.log("[fetchCSV] rows:", text.trim().split("\n").length);
   return text;
+}
+
+// ── Person identity ─────────────────────────────────────────────────────
+// The order form takes a free-text name, and a few people have typed
+// theirs two ways over time. That split their order history, their spend,
+// and -- worst -- their outstanding ratings: Haotong had a dish from
+// 2026-10-09 stranded under the short form, invisible while picking the
+// long one.
+//
+// Mapped on read rather than rewritten in the sheet, so old rows keep
+// resolving and nothing has to be edited by hand. The value is whichever
+// spelling the person uses now.
+//
+// Each pair was checked for ever appearing in the SAME round, which would
+// mean two different people rather than one changing spelling. Sunnie and
+// Sinnie DO both appear in 2026-06-26 and are deliberately left out --
+// merging them would fold two people into one.
+const NAME_ALIASES = {
+  "haotong":      "Haotong Liang",
+  "edward leong": "Edward",
+  "luis chan":    "Luis",
+  "zack wong":    "Zack",
+};
+
+function canonicalName(n) {
+  const t = (n || "").trim();
+  return NAME_ALIASES[t.toLowerCase()] || t;
+}
+
+// Reads a tab by its NAME instead of its gid -- same published-sheet
+// access, just addressed differently. Used as a fallback when a configured
+// gid doesn't resolve.
+async function fetchCSVByName(sheetName) {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.text();
 }
 
 function parseCSV(text) {
@@ -5461,7 +5512,7 @@ function computeDateBreakdown() {
     const date   = (r[1] || "").trim();
     const item   = (r[3] || "").trim();
     const qty    = Number(r[4]) || 0;
-    const people = (r[5] || "").split(",").map(n => n.trim()).filter(Boolean);
+    const people = (r[5] || "").split(",").map(canonicalName).filter(Boolean);
     if (!date || !item) return;
     if (!byDate.has(date)) byDate.set(date, new Map());
     const entries = byDate.get(date);
