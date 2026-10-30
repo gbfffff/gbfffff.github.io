@@ -40,8 +40,14 @@ function debugNow() { return _debugNowOverride ?? Date.now(); }
 // <script>/<link> tags in both index.html files to match. config.js is
 // exempt -- it's regenerated fresh by the deploy workflow every push, so it
 // stays on the simpler "?v=" query-param scheme.
-const APP_VERSION = "1.17.1";
+const APP_VERSION = "1.17.2";
 const CHANGELOG = [
+  { version: "1.17.2", date: "2026-10-30", notes: [
+    "Fixed editing an order being able to swallow an item. The worksheet's edit button handed the raw sheet cell -- notes and all -- to a plain comma split, so the \"| Notes:\" text became part of a dish name. Anything added afterwards landed after the note, where the notes-stripping regex runs to end of line and took it with it: the item vanished from the worksheet and counted as $0 in the Grand Total. Both edit paths now separate items from notes properly",
+    "The same two lines also broke any item whose own name contains a comma -- every combo, e.g. \"Big Fat Gyro (Lamb) + Combo (French Fries, Ginger ale or Coke Zero)\", was split into two fragments that priced as nothing. Editing now parses the way the rest of the app does, respecting brackets",
+    "Editing an order keeps its special request instead of silently dropping it",
+    "An order already saved in the broken shape stays that way until someone edits and re-saves it -- the note text is kept rather than guessed at, since a note can legitimately mention a dish",
+  ]},
   { version: "1.17.1", date: "2026-10-27", notes: [
     "Fixed driver swaps never showing up. The configured Drivers tab id was \"1\", which isn't a real tab, so every read failed while the writes kept landing in the sheet -- a swap made in one session vanished on reload and was never visible to anyone else. The Drivers tab is now read by name when the id doesn't resolve, so it works regardless of the setting",
     "A few people had typed their name two ways in the order form over time, which quietly split their order history, their spend and their outstanding ratings. Haotong had a dish from 2026-10-09 stuck under the short spelling, unreachable while picking the long one. The spellings are now treated as one person on read, so either one finds everything; nothing in the sheets is rewritten",
@@ -1887,6 +1893,7 @@ document.getElementById("order-form").addEventListener("submit", async e => {
     }
     localStorage.setItem("lastOrderName",  name);
     localStorage.setItem("lastOrderItems", items);
+    localStorage.setItem("lastOrderNotes", notes);
     localStorage.setItem("lastOrderDate",  currentFriday);
     showOrderSuccess(name, items);
     setTimeout(loadData, 4000);
@@ -1898,17 +1905,48 @@ document.getElementById("order-form").addEventListener("submit", async e => {
   }
 });
 
-document.getElementById("edit-order-btn").addEventListener("click", () => {
-  const savedName  = localStorage.getItem("lastOrderName")  || "";
-  const savedItems = (localStorage.getItem("lastOrderItems") || "").split(",").map(s => s.trim()).filter(Boolean);
+// Turn a stored order string back into the pills the form edits, keeping
+// any "| Notes:" suffix out of the item names.
+//
+// The worksheet's edit button hands over the raw sheet cell, notes and all,
+// and both edit paths used to split it on plain commas. That fused the note
+// into a dish name, so anything added afterwards was appended AFTER the
+// note -- and smartSplit's notes-stripping regex runs to end of string, so
+// the new item was swallowed with the note and priced as $0. That is how
+// "Thai Jasmine Green Tea" ended up inside Landen's note on 2026-10-30 and
+// missing from the Grand Total.
+//
+// Going through smartSplit + reconcileOrderParts also fixes a second,
+// quieter bug in the same two lines: a plain comma split breaks any item
+// whose own name contains a comma, including every combo suffix such as
+// "Gyro + Combo (French Fries, Can of root beer)".
+function parseStoredOrder(raw) {
+  const text = (raw ?? "").trim();
+  return {
+    items: reconcileOrderParts(smartSplit(text), allMenuItems),
+    notes: extractNotes(text),
+  };
+}
+
+function applyOrderToForm(name, raw) {
+  const { items, notes } = parseStoredOrder(raw);
   document.getElementById("order-form").style.display    = "block";
   document.getElementById("order-success").style.display = "none";
-  document.getElementById("order-name").value = savedName;
-  selectedItems = savedItems;
+  document.getElementById("order-name").value = name;
+  const notesEl = document.getElementById("order-notes");
+  if (notesEl) notesEl.value = notes;
+  selectedItems = items;
   renderPills();
   checkDuplicates();
   document.getElementById("order-btn").textContent = "Update Order";
   document.getElementById("order-btn").disabled    = false;
+}
+
+document.getElementById("edit-order-btn").addEventListener("click", () => {
+  const savedName  = localStorage.getItem("lastOrderName") || "";
+  const savedItems = localStorage.getItem("lastOrderItems") || "";
+  const savedNotes = localStorage.getItem("lastOrderNotes") || "";
+  applyOrderToForm(savedName, savedNotes ? `${savedItems} | Notes: ${savedNotes}` : savedItems);
 });
 
 function confirmModal(message, opts = {}) {
@@ -4462,15 +4500,7 @@ function renderOrdersTable(dupCount) {
 
     container.querySelectorAll(".order-row-edit-btn").forEach(btn => {
       btn.addEventListener("click", () => {
-        const savedItems = btn.dataset.items.split(",").map(s => s.trim()).filter(Boolean);
-        document.getElementById("order-form").style.display    = "block";
-        document.getElementById("order-success").style.display = "none";
-        document.getElementById("order-name").value = btn.dataset.name;
-        selectedItems = savedItems;
-        renderPills();
-        checkDuplicates();
-        document.getElementById("order-btn").textContent = "Update Order";
-        document.getElementById("order-btn").disabled    = false;
+        applyOrderToForm(btn.dataset.name, btn.dataset.items);
         document.getElementById("order-name").scrollIntoView({ behavior: "smooth", block: "center" });
       });
     });
